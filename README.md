@@ -1,4 +1,4 @@
-# bloonv6
+# bloonJS
 A Discord Bot replacement for our fallen comrade.
 Uses DiscordJS to handle the discord interactions and events.
 
