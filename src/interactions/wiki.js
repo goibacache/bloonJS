@@ -20,8 +20,6 @@ export const cmd = {
 		const result = await bloonUtils.getHHTPResult(queryUrl);
 
 		const wikiDoc = result[3][0]; // Oh,god.
-		console.log("wikiDoc");
-		console.log(wikiDoc);
 
 		if (wikiDoc){
 			await interaction.reply(`${wikiDoc}`);	

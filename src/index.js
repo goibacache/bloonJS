@@ -77,14 +77,6 @@ client.once(Events.ClientReady, async c => {
 		const command = await askQuestion("BLOON V6 console> ");
 		handleCommands(command, client);
 	}
-
-	/* 
-	// Fake somebody joining the server ;)
-	const list = await client.guilds.fetch("1123286614383272078"); 
-	// Iterate through the collection of GuildMembers from the Guild getting the username property of each member 
-	const me = await list.members.fetch("171450453068873729");
-	client.emit(Events.GuildMemberAdd, me);
-	*/
 });
 
 // Log in to Discord with your client's token
