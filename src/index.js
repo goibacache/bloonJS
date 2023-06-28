@@ -67,7 +67,6 @@ for (const eventFile of eventFiles) {
 //#endregion
 
 // When the client is ready, run this code (only once)
-// We use 'c' for the event parameter to keep it separate from the already defined 'client'
 client.once(Events.ClientReady, async c => {
 	console.log(`Ready! Logged in as ${c.user.tag} 😎`);
 
@@ -80,7 +79,7 @@ client.once(Events.ClientReady, async c => {
 // Log in to Discord with your client's token
 await client.login(config.token);
 
-
+//#region functions
 function askQuestion(query) {
     const rl = readline.createInterface({
         input: process.stdin,
@@ -129,3 +128,4 @@ async function handleCommands(command, client) {
 		console.error(`\nError in command: ${error}`);
 	}
 }
+//#endregion
