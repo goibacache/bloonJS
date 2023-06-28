@@ -1,4 +1,4 @@
-{
+module.exports = {
 	"token": 					"your-token",
 	"clientId": 				"your-client-id",
 	"guildId": 					"your-guild-id",
@@ -7,6 +7,6 @@
 	"bloonCommandsChannel":		"your-bloon-commands-channel",
 
 	"role_LookingToPlay": 		"your-role-lookingToPlay",
-	"role_Agent": 				"your-role-agent"
-
+	"role_Agent": 				"your-role-agent",
+	"wikiURL":					"your-wiki-url"
 }

@@ -46,15 +46,13 @@ export const getHHTPResult = (requestURL) => {
 }
 
 /**
- * Creates the embeded message for current rooms
+ * Creates the embeded message for current rooms. Beware, Embed descriptions are limited to 4096 characters.
  * @param {rooms.data from intruder https://api.intruderfps.com/rooms} rooms 
  * @returns 
  */
 export const createRoomEmbed = (rooms) => {
 
-    let regions   = "";
-    let names     = "";
-    let agents    = "";
+    
 
     // Creates rooms embed
     const roomEmbed = new EmbedBuilder()
@@ -62,19 +60,35 @@ export const createRoomEmbed = (rooms) => {
     .setTitle(`Current Server Information`)
     .setURL("https://intruderfps.com/rooms")
     .setTimestamp();
+    
+    // Create description with the format.
+    let description = "`\n";
 
-    
     rooms.forEach(room => {
-        regions += `${room.region}\n`;
-        names   += `${room.name}\n`;
-        agents  += `[${room.agentCount}/${room.maxAgents}]\n`;
+        description += `${room.region.padEnd(3)} | ${deleteTagsFromText(room.name.trim())} | [${room.agentCount.toString().padStart(2)}/${room.maxAgents.toString().padStart(2)}]\n`;
     });
-    
+
+    description += "`";
+
     roomEmbed.addFields(
-        { name: 'Region',  value: regions, inline: true },
-        { name: 'Names',   value: names, inline: true },
-        { name: 'Agents',  value: agents, inline: true },
+        { name: '`Reg | Name | Agents`',  value: description }
     );
 
+    //roomEmbed.setDescription(description);
+    
     return roomEmbed;
+}
+
+export const getQuotedText = (text) => {
+    var re = new RegExp(/"(.*)"/g);
+    var match = text.match(re);
+    if (match){
+        return match.toString();
+    }else{
+        return "";
+    }
+}
+
+export const deleteTagsFromText = (text) => {
+    return text.replace(/\<(.*?)>/g, "");
 }

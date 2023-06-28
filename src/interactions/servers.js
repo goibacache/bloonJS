@@ -1,8 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import * as bloonUtils from "../utils/utils.js";
-
-import fs 	from 'fs';
-const config  = JSON.parse(fs.readFileSync('./config.json'));
+import { config } from '../config.js';
 
 export const cmd = {
 	data: new SlashCommandBuilder()
@@ -24,7 +22,7 @@ export const cmd = {
 			await interaction.reply({ embeds: [roomEmbed]})
 		}).catch(error => {
 			//message.reply("It's a work in progress, ok?")
-			message.react("🙈"); // React with error
+			interaction.reply({ content: "An error has occurred, sorry 🙈", ephemeral: true}); // React with error
 			console.error("Error loading servers "+ error)
 		});
 	},

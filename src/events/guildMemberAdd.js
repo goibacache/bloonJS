@@ -1,8 +1,6 @@
 import { EmbedBuilder } from "@discordjs/builders";
 import { Events } from "discord.js";
-
-import fs 	from 'fs';
-const config  = JSON.parse(fs.readFileSync('./config.json'));
+import { config } from '../config.js';
 
 export const evnt = {
     name: Events.GuildMemberAdd,

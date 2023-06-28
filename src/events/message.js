@@ -1,15 +1,27 @@
 import { Events } from "discord.js";
 import * as bloonUtils from "../utils/utils.js";
+import { regexs } from "../messageRegexs.js";
+import { config } from '../config.js';
 
-import fs 	from 'fs';
-const config  = JSON.parse(fs.readFileSync('./config.json'));
-
-const commands = [".ltp", ".servers"]
+const commands  = [".ltp", ".servers"]
 
 export const evnt = {
     name: Events.MessageCreate,
 	async execute(message) {
-        console.log(`${message.author.username}: ${message.content}`);
+
+        // All messages should be lower case to be procesed
+        message.content = message.content.toLowerCase();
+
+        // Handle regexs replies in the main channel
+        if (isInGeneralChannel(message)){
+            regexs.forEach(reg => {
+                if(reg.regex.test(message)){
+                    message.reply(reg.answer); // Answer accordingly
+                }
+
+                return; // Stop the foreach
+            });
+        }
         
         // Doesn't include a command.
         if (!commands.includes(message.content.trim())){
@@ -24,18 +36,21 @@ export const evnt = {
 
         // .ltp
 		if (message.content === commands[0]) {
-            
-            const member = message.guild.members.cache.get(message.author.id);  // Get current member
-            const ltpRole = await message.guild.roles.fetch(config.role_LookingToPlay);
+            try{
+                const member = message.guild.members.cache.get(message.author.id);  // Get current member
+                const ltpRole = await message.guild.roles.fetch(config.role_LookingToPlay);
 
-            // Check if the user already has "looking to play"
-            if (member.roles.cache.some(role => role.id === config.role_LookingToPlay)){
-                member.roles.remove(ltpRole);   // Remove
-            }else{
-                member.roles.add(ltpRole);      // Assign
-                
+                // Check if the user already has "looking to play"
+                if (member.roles.cache.some(role => role.id === config.role_LookingToPlay)){
+                    await member.roles.remove(ltpRole);   // Remove
+                }else{
+                    await member.roles.add(ltpRole);      // Add
+                }
+                message.react("👍");                // React
+            }catch(error){
+                message.react("🙈"); // React with error
+                console.error("Error assigning role: "+ error)
             }
-            message.react("👍");                // React
         }
 
         // .servers
@@ -53,9 +68,8 @@ export const evnt = {
                 message.reply({ embeds: [roomEmbed]})
 
             }).catch(error => {
-                //message.reply("It's a work in progress, ok?")
                 message.react("🙈"); // React with error
-                console.error("Error loading servers "+ error)
+                console.error("Error loading servers: "+ error)
             });
         }
 	},
@@ -63,4 +77,8 @@ export const evnt = {
 
 function isInBloonCommandsChannel(message){
     return message.channelId == config.bloonCommandsChannel;
+}
+
+function isInGeneralChannel(message){
+    return message.channelId == config.intruderGeneralChannel;
 }

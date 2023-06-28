@@ -1,8 +1,6 @@
 import fs 	from 'fs';
 import { REST, Routes } from 'discord.js';
-
-// Import config
-const config  = JSON.parse(fs.readFileSync('./config.json'));
+import { config } from './config.js';
 
 const commands = [];
 
@@ -28,7 +26,7 @@ const rest = new REST().setToken(config.token);
 
 		// The put method is used to fully refresh all commands in the guild with the current set
 		const data = await rest.put(
-			Routes.applicationGuildCommands(config.clientId, config.guildId),
+			Routes.applicationGuildCommands(config.clientId, config.bloonTestingGuildId),
 			{ body: commands },
 		);
 
