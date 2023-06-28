@@ -1,5 +1,3 @@
-// Invite bot to server as an admin ;) https://discord.com/api/oauth2/authorize?client_id=1123288010197303396&permissions=8&scope=bot%20applications.commands
-
 // Imports
 import fs 	from 'fs';
 import { Client, Collection, Events, GatewayIntentBits, GuildMember } from 'discord.js';
