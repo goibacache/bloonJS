@@ -1,12 +1,13 @@
 module.exports = {
 	"token": 					"your-token",
 	"clientId": 				"your-client-id",
-	"guildId": 					"your-guild-id",
+	"bloonTestingGuildId": 		"your-guild-id",
 	
 	"intruderGeneralChannel":	"your-general-channel-id",
 	"bloonCommandsChannel":		"your-bloon-commands-channel",
 
 	"role_LookingToPlay": 		"your-role-lookingToPlay",
 	"role_Agent": 				"your-role-agent",
-	"wikiURL":					"your-wiki-url"
+	"wikiURL":					"your-wiki-url",
+	"wikiAPI":					"your-wiki-API-for-searchs"
 }

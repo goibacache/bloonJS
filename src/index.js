@@ -1,5 +1,5 @@
 // Imports
-import fs 	from 'fs';
+import fs from 'fs';
 import { Client, Collection, Events, GatewayIntentBits, GuildMember } from 'discord.js';
 import { config } from './config.js';
 import * as bloonUtils from './utils/utils.js'
