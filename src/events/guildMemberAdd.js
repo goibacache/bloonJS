@@ -21,7 +21,7 @@ export const evnt = {
 		const dateJoined = new Date(member.joinedTimestamp).toDateString();
 
 		// Creates the embed
-		const exampleEmbed = new EmbedBuilder()
+		const newUserEmbed = new EmbedBuilder()
 		.setColor(0x0099FF)
 		.setTitle(`New User Joined | ${member.user.username}`)
 		.setThumbnail(avatarURL)
@@ -32,6 +32,6 @@ export const evnt = {
 		.setFooter({ text: `Account Created: ${dateJoined}` });
 
 		// Sends the embed into the General channel.
-		channel.send({ embeds: [exampleEmbed] });
+		channel.send({ embeds: [newUserEmbed] });
 	},
 };

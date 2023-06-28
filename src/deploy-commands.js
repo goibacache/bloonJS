@@ -7,11 +7,11 @@ const config  = JSON.parse(fs.readFileSync('./config.json'));
 const commands = [];
 
 // Add all commands programaticly to commands array
-const commandsPath = 'commands';
+const commandsPath = 'interactions';
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
-	const folderRoute = `./commands/${file}`;
+	const folderRoute = `./${commandsPath}/${file}`;
 	const command = await import(folderRoute);
 	console.log(`Loading module ${file}`);
 	// Set a new item in the Collection with the key as the command name and the value as the exported module

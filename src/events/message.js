@@ -1,4 +1,5 @@
 import { Events } from "discord.js";
+import * as bloonUtils from "../utils/utils.js";
 
 import fs 	from 'fs';
 const config  = JSON.parse(fs.readFileSync('./config.json'));
@@ -40,7 +41,22 @@ export const evnt = {
         // .servers
 		if (message.content === commands[1]) {
 
-            message.reply("Work in progress, ok?")
+            bloonUtils.getHHTPResult("https://api.intruderfps.com/rooms")
+            .then(rooms => {
+                rooms.data.sort(function(a, b){
+                    return b.agentCount - a.agentCount;
+                });
+
+                message.react("👍");                // React
+
+                const roomEmbed = bloonUtils.createRoomEmbed(rooms.data);
+                message.reply({ embeds: [roomEmbed]})
+
+            }).catch(error => {
+                //message.reply("It's a work in progress, ok?")
+                message.react("🙈"); // React with error
+                console.error("Error loading servers "+ error)
+            });
         }
 	},
 };
