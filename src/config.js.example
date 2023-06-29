@@ -6,6 +6,7 @@ module.exports = {
 	"intruderGeneralChannel":	"your-general-channel-id",
 	"bloonCommandsChannel":		"your-bloon-commands-channel",
 
+	"role_Pug": 				"your-role-pug-players",
 	"role_LookingToPlay": 		"your-role-lookingToPlay",
 	"role_Agent": 				"your-role-agent",
 	"wikiURL":					"your-wiki-url",

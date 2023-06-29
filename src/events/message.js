@@ -3,7 +3,7 @@ import * as bloonUtils from "../utils/utils.js";
 import { regexs } from "../messageRegexs.js";
 import { config } from '../config.js';
 
-const commands  = [".ltp", ".servers"]
+const commands  = [".ltp", ".pug", ".servers"]
 
 export const evnt = {
     name: Events.MessageCreate,
@@ -53,8 +53,27 @@ export const evnt = {
             }
         }
 
-        // .servers
+        // .pug
 		if (message.content === commands[1]) {
+            try{
+                const member = message.guild.members.cache.get(message.author.id);  // Get current member
+                const pugRole = await message.guild.roles.fetch(config.role_Pug);
+
+                // Check if the user already has "PUG Player"
+                if (member.roles.cache.some(role => role.id === config.role_Pug)){
+                    await member.roles.remove(pugRole);   // Remove
+                }else{
+                    await member.roles.add(pugRole);      // Add
+                }
+                message.react("👍");                // React
+            }catch(error){
+                message.react("🙈"); // React with error
+                console.error("Error assigning role: "+ error)
+            }
+        }
+
+        // .servers
+		if (message.content === commands[2]) {
 
             bloonUtils.getHHTPResult("https://api.intruderfps.com/rooms")
             .then(rooms => {
