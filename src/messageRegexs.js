@@ -1,4 +1,4 @@
-export const regexs = [
+module.exports = [
 	{ regex: /(what|how).*(switch|change|move|swap).*(maps?)/g,														answer: "To change the map ingame make yourself an admin & then use `/changemap mapName` (You must be the admin to do this)." },
 	{ regex: /(how|what).*(can)?.*(make|give|become|be) (admini?s?t?r?a?t?o?r?)/g,									answer: "To make yourself an admin use `makeadmin` this only works if you are the original room creator." },
 	{ regex: /(is).*(map|list).*(map|list)/g,																		answer: "The Official maps are Riverside, Mountainside, Cliffside, and Oceanside; there are many unofficial maps out there too, check them out at: <https://steamcommunity.com/app/518150/workshop/>" },

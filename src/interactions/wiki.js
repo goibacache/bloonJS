@@ -1,8 +1,8 @@
-import { SlashCommandBuilder } from 'discord.js';
-import { config } from '../config.js';
-import * as bloonUtils from '../utils/utils.js';
+const { SlashCommandBuilder } = require('discord.js')
+const bloonUtils = require('../utils/utils.js');
+const config = require('../config.js')
 
-export const cmd = {
+module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('wiki')
 		.setDescription('Search the wiki for an specified article')

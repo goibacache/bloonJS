@@ -1,7 +1,7 @@
-import { EmbedBuilder } from '@discordjs/builders';
-import https from 'https'
+const { EmbedBuilder } = require('@discordjs/builders');
+const https = require('https');
 
-export const getHHTPResult = (requestURL) => {
+const getHHTPResult = (requestURL) => {
     return new Promise((resolve, reject) => {
         https.get(requestURL, (res) => {
             var { statusCode } = res;
@@ -50,7 +50,7 @@ export const getHHTPResult = (requestURL) => {
  * @param {rooms.data from intruder https://api.intruderfps.com/rooms} rooms 
  * @returns 
  */
-export const createRoomEmbed = (rooms) => {
+const createRoomEmbed = (rooms) => {
 
     
 
@@ -60,11 +60,14 @@ export const createRoomEmbed = (rooms) => {
     .setTitle(`Current Server Information`)
     .setURL("https://intruderfps.com/rooms")
     .setTimestamp();
+
+    let maxRooms = 10;
     
     // Create description with the format.
     let description = "`\n";
 
-    rooms.forEach(room => {
+    rooms.forEach((room, index) => {
+        if (index > maxRooms) return;
         description += `${room.region.padEnd(3)} | ${deleteTagsFromText(room.name.trim())} | [${room.agentCount.toString().padStart(2)}/${room.maxAgents.toString().padStart(2)}]\n`;
     });
 
@@ -79,7 +82,7 @@ export const createRoomEmbed = (rooms) => {
     return roomEmbed;
 }
 
-export const getQuotedText = (text) => {
+const getQuotedText = (text) => {
     var re = new RegExp(/"(.*)"/g);
     var match = text.match(re);
     if (match){
@@ -89,6 +92,13 @@ export const getQuotedText = (text) => {
     }
 }
 
-export const deleteTagsFromText = (text) => {
+const deleteTagsFromText = (text) => {
     return text.replace(/\<(.*?)>/g, "");
+}
+
+module.exports = {
+    getHHTPResult,
+    createRoomEmbed,
+    getQuotedText,
+    deleteTagsFromText
 }

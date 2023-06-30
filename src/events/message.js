@@ -1,14 +1,13 @@
-import { Events } from "discord.js";
-import * as bloonUtils from "../utils/utils.js";
-import { regexs } from "../messageRegexs.js";
-import { config } from '../config.js';
+const bloonUtils = require('../utils/utils.js');
+const regexs = require('../messageRegexs.js');
+const { Events } = require('discord.js');
+const config = require('../config.js');
 
 const commands  = [".ltp", ".pug", ".servers"]
 
-export const evnt = {
+const evnt = {
     name: Events.MessageCreate,
 	async execute(message) {
-
         // All messages should be lower case to be procesed
         message.content = message.content.toLowerCase();
 
@@ -37,16 +36,18 @@ export const evnt = {
         // .ltp
 		if (message.content === commands[0]) {
             try{
-                const member = message.guild.members.cache.get(message.author.id);  // Get current member
+                const member  = message.guild.members.cache.get(message.author.id);  // Get current member
                 const ltpRole = await message.guild.roles.fetch(config.role_LookingToPlay);
+                const npRole  = await message.guild.roles.fetch(config.role_NowPlaying);
 
                 // Check if the user already has "looking to play"
-                if (member.roles.cache.some(role => role.id === config.role_LookingToPlay)){
+                if (member.roles.cache.some(role => role.id === config.role_LookingToPlay || role.id === config.role_NowPlaying)){
                     await member.roles.remove(ltpRole);   // Remove
+                    await member.roles.remove(npRole);    // Remove
                 }else{
                     await member.roles.add(ltpRole);      // Add
                 }
-                message.react("👍");                // React
+                message.react("👍");                      // React
             }catch(error){
                 message.react("🙈"); // React with error
                 console.error("Error assigning role: "+ error)
@@ -100,4 +101,8 @@ function isInBloonCommandsChannel(message){
 
 function isInGeneralChannel(message){
     return message.channelId == config.intruderGeneralChannel;
+}
+
+module.exports = {
+    evnt
 }

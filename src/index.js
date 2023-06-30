@@ -1,12 +1,14 @@
 // Imports
-import fs from 'fs';
-import { Client, Collection, Events, GatewayIntentBits, GuildMember } from 'discord.js';
-import { config } from './config.js';
-import * as bloonUtils from './utils/utils.js'
-import * as readline from 'readline';
+
+const fs = require('fs');
+const { Client, Collection, Events, GatewayIntentBits, GuildMember } = require('discord.js');
+const config = require('./config.js');
+const bloonUtils = require('./utils/utils.js');
+const readline = require('readline');
 
 // Load initial config
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers] }); // Create a new client instance
+
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences] }); // Create a new client instance
 client.commands = new Collection(); // Command handler list
 
 //#region interactions
@@ -16,10 +18,10 @@ const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('
 
 for (const file of commandFiles) {
 	const folderRoute = `./${commandsPath}/${file}`;
-	const command = await import(folderRoute);
+	const command = require(folderRoute);
 	console.log(`Loading module ${file}`);
 	// Set a new item in the Collection with the key as the command name and the value as the exported module
-	client.commands.set(command.cmd.data.name, command.cmd);
+	client.commands.set(command.data.name, command);
 }
 
 // Check interactions 
@@ -54,7 +56,7 @@ const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'
 
 for (const eventFile of eventFiles) {
 	const folderRoute = `./events/${eventFile}`;
-	const event = await import(folderRoute);
+	const event = require(folderRoute);
 	console.log(`Loading event ${eventFile} - ${event.evnt.name}`);
 
 	if (event.once) {
@@ -77,7 +79,7 @@ client.once(Events.ClientReady, async c => {
 });
 
 // Log in to Discord with your client's token
-await client.login(config.token);
+client.login(config.token);
 
 //#region functions
 function askQuestion(query) {

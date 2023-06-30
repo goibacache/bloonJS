@@ -1,6 +1,6 @@
-import fs 	from 'fs';
-import { REST, Routes } from 'discord.js';
-import { config } from './config.js';
+const fs = require('fs')
+const { REST, Routes } = require('discord.js');
+const config = require('./config.js');
 
 const commands = [];
 
@@ -10,10 +10,11 @@ const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('
 
 for (const file of commandFiles) {
 	const folderRoute = `./${commandsPath}/${file}`;
-	const command = await import(folderRoute);
 	console.log(`Loading module ${file}`);
+	const command = require(folderRoute);
+	console.log(`Loaded module ${file}!`);
 	// Set a new item in the Collection with the key as the command name and the value as the exported module
-	commands.push(command.cmd.data.toJSON());
+	commands.push(command.data.toJSON());
 }
 
 // Construct and prepare an instance of the REST module

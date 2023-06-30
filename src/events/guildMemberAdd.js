@@ -1,8 +1,8 @@
-import { EmbedBuilder } from "@discordjs/builders";
-import { Events } from "discord.js";
-import { config } from '../config.js';
+const { EmbedBuilder } = require('@discordjs/builders');
+const { Events } = require('discord.js');
+const config = require('../config.js');
 
-export const evnt = {
+const evnt = {
     name: Events.GuildMemberAdd,
 	async execute(member) {
 		const agentRole = await member.guild.roles.fetch(config.role_Agent); // Lookup the "agent" role
@@ -33,3 +33,7 @@ export const evnt = {
 		channel.send({ embeds: [newUserEmbed] });
 	},
 };
+
+module.exports = {
+	evnt
+}
