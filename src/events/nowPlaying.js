@@ -7,6 +7,9 @@ const evnt = {
     name: Events.PresenceUpdate,
 	async execute(oldPresence, newPresence) {
 
+        if (oldPresence == null) return;
+        if (newPresence == null) return;
+
         const userId        = oldPresence.userId;
         const user          = await oldPresence.guild.members.fetch(userId);
 

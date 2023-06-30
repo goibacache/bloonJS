@@ -45,39 +45,66 @@ const getHHTPResult = (requestURL) => {
     });
 }
 
+
+const regionsToEmojis   = [];
+regionsToEmojis["EU"]   = "🇪🇺 ";
+regionsToEmojis["US"]   = "🇺🇸 ";
+regionsToEmojis["USW"]  = "🇺🇸W";
+regionsToEmojis["Asia"] = "🇸🇬 ";
+regionsToEmojis["JP"]   = "🇯🇵 ";
+regionsToEmojis["AU"]   = "🇦🇺 ";
+regionsToEmojis["SA"]   = "🇧🇷 ";
+regionsToEmojis["CAE"]  = "🇨🇦 ";
+regionsToEmojis["KR"]   = "🇰🇷 ";
+regionsToEmojis["IN"]   = "🇮🇳 ";
+regionsToEmojis["RU"]   = "🇷🇺 ";
+
+const maxRoomsForEmbed = 10;
+
 /**
  * Creates the embeded message for current rooms. Beware, Embed descriptions are limited to 4096 characters.
  * @param {rooms.data from intruder https://api.intruderfps.com/rooms} rooms 
  * @returns 
  */
 const createRoomEmbed = (rooms) => {
-
-    
-
-    // Creates rooms embed
     const roomEmbed = new EmbedBuilder()
     .setColor(0x0099FF)
     .setTitle(`Current Server Information`)
     .setURL("https://intruderfps.com/rooms")
     .setTimestamp();
 
-    let maxRooms = 10;
-    
-    // Create description with the format.
+    // How many left
+    let roomsLeftOut = rooms.length - maxRoomsForEmbed;;
+
+    // just do the max ammount of them.
+    if (rooms.length > maxRoomsForEmbed){
+        rooms = rooms.slice(0, maxRoomsForEmbed-1);
+    }
+
+    // Create description with the code tag.
     let description = "`\n";
 
+    // Rooms
     rooms.forEach((room, index) => {
-        if (index > maxRooms) return;
-        description += `${room.region.padEnd(3)} | ${deleteTagsFromText(room.name.trim())} | [${room.agentCount.toString().padStart(2)}/${room.maxAgents.toString().padStart(2)}]\n`;
+        if (index > maxRoomsForEmbed) return;
+
+        const emojiFlag = regionsToEmojis[room.region];
+        description += `${emojiFlag == undefined ? "❓" : emojiFlag} | ${truncateOrComplete(deleteTagsFromText(room.name.trim()))} | [${room.agentCount.toString().padStart(2)}/${room.maxAgents.toString().padStart(2)}]\n`;
     });
 
+    // Rooms left, only if they're
+    if (roomsLeftOut > 0){
+        description += `\nAnd ${roomsLeftOut} more rooms.\n`    
+    }
+
+    // Close the code tag
     description += "`";
 
-    roomEmbed.addFields(
-        { name: '`Reg | Name | Agents`',  value: description }
-    );
-
     //roomEmbed.setDescription(description);
+
+    roomEmbed.addFields(
+        { name: `Reg | Name | Agents`,  value: description }
+    );
     
     return roomEmbed;
 }
@@ -94,6 +121,16 @@ const getQuotedText = (text) => {
 
 const deleteTagsFromText = (text) => {
     return text.replace(/\<(.*?)>/g, "");
+}
+
+const truncateOrComplete = (text) => {
+    const maxLength = 27; // Mobile size defines this.
+    text = text.padEnd(maxLength); // Max is 27, fixed.
+    if (text.length > maxLength){
+        text = text.substr(0, maxLength-3) + "...";
+    }
+
+    return text;
 }
 
 module.exports = {
