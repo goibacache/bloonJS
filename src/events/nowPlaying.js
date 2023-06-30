@@ -1,7 +1,7 @@
 const { Events } = require('discord.js');
 const config = require('../config.js');
 
-const activityName = "Blender";
+const activityName = "Intruder";
 
 const evnt = {
     name: Events.PresenceUpdate,
