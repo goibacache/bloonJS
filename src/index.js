@@ -1,3 +1,5 @@
+// say 0 0 https://cdn.discordapp.com/attachments/1123666656728715335/1124422436771872819/bloon_lived.mp4
+
 // Imports
 
 const fs = require('fs');

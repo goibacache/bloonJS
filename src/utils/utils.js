@@ -45,6 +45,7 @@ const getHHTPResult = (requestURL) => {
     });
 }
 
+const maxRoomsForEmbed = 10;
 
 const regionsToEmojis   = [];
 regionsToEmojis["EU"]   = "🇪🇺 ";
@@ -59,8 +60,6 @@ regionsToEmojis["KR"]   = "🇰🇷 ";
 regionsToEmojis["IN"]   = "🇮🇳 ";
 regionsToEmojis["RU"]   = "🇷🇺 ";
 
-const maxRoomsForEmbed = 10;
-
 /**
  * Creates the embeded message for current rooms. Beware, Embed descriptions are limited to 4096 characters.
  * @param {rooms.data from intruder https://api.intruderfps.com/rooms} rooms 
@@ -74,7 +73,9 @@ const createRoomEmbed = (rooms) => {
     .setTimestamp();
 
     // How many left
-    let roomsLeftOut = rooms.length - maxRoomsForEmbed;;
+    let roomsLeftOut = rooms.length - maxRoomsForEmbed;
+    let totalPlayersOnlist = 0;
+    rooms.map(x => totalPlayersOnlist += x.agentCount);
 
     // just do the max ammount of them.
     if (rooms.length > maxRoomsForEmbed){
@@ -82,7 +83,8 @@ const createRoomEmbed = (rooms) => {
     }
 
     // Create description with the code tag.
-    let description = "`\n";
+    let description =  "`";
+    description     += `\nReg | ${truncateOrComplete("Name")} | Agents\n`;
 
     // Rooms
     rooms.forEach((room, index) => {
@@ -100,11 +102,14 @@ const createRoomEmbed = (rooms) => {
     // Close the code tag
     description += "`";
 
-    //roomEmbed.setDescription(description);
-
     roomEmbed.addFields(
-        { name: `Reg | Name | Agents`,  value: description }
+        { name: '\u200B',  value: description }
     );
+
+    const extensions = `🌏 [**Chrome**](https://chrome.google.com/webstore/detail/intruder-notifications/aoebpknpfcepopfgnbnikaipjeekalim) | [**Firefox**](https://addons.mozilla.org/en-US/firefox/addon/intruder-notifications/) 🔥`;
+    roomEmbed.addFields({ name: "Browser Extensions", value: extensions });
+
+    roomEmbed.setFooter({ text: `SuperbossGames | #current-server-info | Total Agents: ${totalPlayersOnlist}` });
     
     return roomEmbed;
 }
