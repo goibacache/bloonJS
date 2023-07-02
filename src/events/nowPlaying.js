@@ -14,7 +14,7 @@ const evnt = {
             const user          = await oldPresence.guild.members.fetch(userId);
 
             // If you don't have enough permissions to edit that user, end process.
-            if(!user.manageable) return
+            //if(!user.manageable) return // This doesn't work with server owners.
 
             // Check roles
             const hasLookingToPlay  = user.roles.cache.some(role => role.id === config.role_LookingToPlay);
