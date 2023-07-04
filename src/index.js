@@ -4,8 +4,8 @@
 
 const fs = require('fs');
 const { Client, Collection, Events, GatewayIntentBits, GuildMember } = require('discord.js');
-const config = require('./config.js');
 const bloonUtils = require('./utils/utils.js');
+const config = bloonUtils.getConfig();
 const readline = require('readline');
 
 // Load initial config

@@ -48,17 +48,18 @@ const getHHTPResult = (requestURL) => {
 const maxRoomsForEmbed = 10;
 
 const regionsToEmojis   = [];
-regionsToEmojis["EU"]   = "🇪🇺 ";
-regionsToEmojis["US"]   = "🇺🇸 ";
-regionsToEmojis["USW"]  = "🇺🇸W";
-regionsToEmojis["Asia"] = "🇸🇬 ";
-regionsToEmojis["JP"]   = "🇯🇵 ";
-regionsToEmojis["AU"]   = "🇦🇺 ";
-regionsToEmojis["SA"]   = "🇧🇷 ";
-regionsToEmojis["CAE"]  = "🇨🇦 ";
-regionsToEmojis["KR"]   = "🇰🇷 ";
-regionsToEmojis["IN"]   = "🇮🇳 ";
-regionsToEmojis["RU"]   = "🇷🇺 ";
+regionsToEmojis["EU"]   = "<:eu:1125796021574844520>";
+regionsToEmojis["US"]   = "<:us:1125796012263481456>";
+regionsToEmojis["USW"]  = "<:us:1125796012263481456>";
+regionsToEmojis["Asia"] = "<:Asia:1125796013454667787>";
+regionsToEmojis["JP"]   = "<:jp:1125796026092093601>";
+regionsToEmojis["AU"]   = "<:au:1125796016097083543>";
+regionsToEmojis["SA"]   = "<:br:1125796009428144188> ";
+regionsToEmojis["CAE"]  = "<:ca:1125796017909014579>";
+regionsToEmojis["KR"]   = "<:kr:1125796028369616968>";
+regionsToEmojis["IN"]   = "<:in:1125796023147704370>";
+regionsToEmojis["RU"]   = "<:ru:1125796030777131078>";
+regionsToEmojis["CN"]   = "<:cn:1125796020090048545>"; // Unused?
 
 /**
  * Creates the embeded message for current rooms. Beware, Embed descriptions are limited to 4096 characters.
@@ -83,15 +84,15 @@ const createRoomEmbed = (rooms) => {
     }
 
     // Create description with the code tag.
-    let description =  "`";
-    description     += `\nReg | ${truncateOrComplete("Name")} | Agents\n`;
+    let description =  "";
+    description     += `\`Re\` | \`${truncateOrComplete("Name")}\` | \`Agents\`\n`;
 
     // Rooms
     rooms.forEach((room, index) => {
         if (index > maxRoomsForEmbed) return;
 
         const emojiFlag = regionsToEmojis[room.region];
-        description += `${emojiFlag == undefined ? "❓" : emojiFlag} | ${truncateOrComplete(deleteTagsFromText(room.name.trim()))} | [${room.agentCount.toString().padStart(2)}/${room.maxAgents.toString().padStart(2)}]\n`;
+        description += `${emojiFlag == undefined ? "❓" : emojiFlag} | \`${truncateOrComplete(deleteTagsFromText(room.name.trim()))}\` | \`[${room.agentCount.toString().padStart(2)}/${room.maxAgents.toString().padStart(2)}]\`\n`;
     });
 
     // Rooms left, only if they're
@@ -100,7 +101,7 @@ const createRoomEmbed = (rooms) => {
     }
 
     // Close the code tag
-    description += "`";
+    //description += "";
 
     roomEmbed.addFields(
         { name: '\u200B',  value: description }
@@ -129,8 +130,8 @@ const deleteTagsFromText = (text) => {
 }
 
 const truncateOrComplete = (text) => {
-    const maxLength = 27; // Mobile size defines this.
-    text = text.padEnd(maxLength); // Max is 27, fixed.
+    const maxLength = 28; // Mobile size defines this.
+    text = text.padEnd(maxLength); // Max is 28, fixed.
     if (text.length > maxLength){
         text = text.substr(0, maxLength-3) + "...";
     }
@@ -138,9 +139,36 @@ const truncateOrComplete = (text) => {
     return text;
 }
 
+/**
+ * Gets the args of the node execution. ie: node . test will return ["test"]
+ * @returns array of args
+ */
+const getRunArgs = () => {
+    // From the third on it's a valid arg
+    if (process.argv.length <= 2){
+        return ["develop"];
+    }
+
+    return process.argv.slice(2);
+};
+
+/**
+ * Gets the actuall configuration file needed
+ * @returns require('../config.<environment>.js');
+ */
+const getConfig = () => {
+    const args = getRunArgs();
+    if (args.length == 0) return require('../config.develop.js');
+
+    const environment = args[0];
+    return require(`../config.${environment}.js`);
+};
+
 module.exports = {
     getHHTPResult,
     createRoomEmbed,
     getQuotedText,
-    deleteTagsFromText
+    deleteTagsFromText,
+    getRunArgs,
+    getConfig
 }

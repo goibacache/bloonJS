@@ -1,6 +1,7 @@
 const { EmbedBuilder } = require('@discordjs/builders');
 const { Events } = require('discord.js');
-const config = require('../config.js');
+const bloonUtils = require('../utils/utils.js');
+const config = bloonUtils.getConfig();
 
 const evnt = {
     name: Events.GuildMemberAdd,

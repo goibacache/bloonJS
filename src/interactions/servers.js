@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js')
 const bloonUtils = require('../utils/utils.js');
-const config = require('../config.js')
+const config = bloonUtils.getConfig();
 
 module.exports = {
 	data: new SlashCommandBuilder()

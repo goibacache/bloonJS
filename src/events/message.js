@@ -1,7 +1,9 @@
 const bloonUtils = require('../utils/utils.js');
+const config = bloonUtils.getConfig();
 const regexs = require('../messageRegexs.js');
 const { Events } = require('discord.js');
-const config = require('../config.js');
+
+
 
 const commands  = [".ltp", ".pug", ".servers"]
 

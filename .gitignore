@@ -3,3 +3,4 @@ config.js
 node_modules/
 .env
 config.superboss.js
+config.develop.js
