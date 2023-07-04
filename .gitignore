@@ -2,3 +2,4 @@ config.json
 config.js
 node_modules/
 .env
+config.superboss.js

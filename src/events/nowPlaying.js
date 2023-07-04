@@ -29,11 +29,13 @@ const evnt = {
             if(oldPresence.activities.some(x => x.name === activityName) == true && newPresence.activities.some(x => x.name === activityName) == false){
                 //console.log("Player LTP");
                 user.roles.remove(config.role_NowPlaying);
+                user.roles.add(config.role_LookingToPlay);
                 return;
             }
 
             if(oldPresence.activities.some(x => x.name === activityName) == false && newPresence.activities.some(x => x.name === activityName) == true){
                 //console.log("Player NP");
+                user.roles.remove(config.role_LookingToPlay);
                 user.roles.add(config.role_NowPlaying);
                 return;
             }
