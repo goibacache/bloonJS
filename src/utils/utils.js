@@ -106,7 +106,7 @@ const createRoomEmbed = (rooms) => {
         { name: '\u200B',  value: description }
     );
 
-    const extensions = `🌏 [**Chrome**](https://chrome.google.com/webstore/detail/intruder-notifications/aoebpknpfcepopfgnbnikaipjeekalim) | [**Firefox**](https://addons.mozilla.org/en-US/firefox/addon/intruder-notifications/) 🔥`;
+    const extensions = `<:chrome:1125641298213339167> [**Chrome**](https://chrome.google.com/webstore/detail/intruder-notifications/aoebpknpfcepopfgnbnikaipjeekalim) | [**Firefox**](https://addons.mozilla.org/en-US/firefox/addon/intruder-notifications/) <:firefox:1125641317565857833>`;
     roomEmbed.addFields({ name: "Browser Extensions", value: extensions });
 
     roomEmbed.setFooter({ text: `SuperbossGames | #current-server-info | Total Agents: ${totalPlayersOnlist}` });

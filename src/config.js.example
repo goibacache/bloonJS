@@ -12,5 +12,8 @@ module.exports = {
 	role_Agent: 				"your-role-agent",
 
 	wikiURL:					"your-wiki-url",
-	wikiAPI:					"your-wiki-API-for-searchs"
+	wikiAPI:					"your-wiki-API-for-searchs",
+
+	chromeEmoji: 				"<:your-chrome-emoji:0000000000>",
+	firefoxEmoji:				"<:your-firefox-emoji:0000000000>",
 }
