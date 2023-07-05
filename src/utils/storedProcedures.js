@@ -2,15 +2,17 @@ const bloonUtils = require('../utils/utils.js');
 const mysql = require('mysql2/promise');
 const config = bloonUtils.getConfig();
 
-const sp_banInsert = async(banedUserDiscordId, banReason, handledByDiscordId) => {
+
+
+const moderationAction_Insert = async(moderationAction, banedUserDiscordId, banReason, handledByDiscordId) => {
     try{
-        const query = `CALL ban_insert(?, ?, ?)`;
+        const query = `CALL moderationAction_Insert(?, ?, ?, ?)`;
     
         const connection = await createConnection();
 
-        const [rows] = await connection.execute(query, [banedUserDiscordId, banReason, handledByDiscordId]);
+        const [rows] = await connection.execute(query, [moderationAction.id, banedUserDiscordId, banReason, handledByDiscordId]);
 
-        return parseInt(rows[0][0]['LAST_INSERT_ID()']); // Awfull, but eh.
+        return parseInt(rows[0][0]['res']); // Awfull, but eh.
 
     }catch(error){
         console.error("Error in sp_banInsert: ", error);
@@ -61,5 +63,5 @@ const execSP = (query) => {
 
 
 module.exports = {
-    sp_banInsert
+    moderationAction_Insert
 }

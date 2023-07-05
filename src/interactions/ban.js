@@ -23,8 +23,10 @@ module.exports = {
         .setDMPermission(false),
 	async execute(interaction) {
 		try{
-            const target = interaction.options.getUser('target');
-            const reason = interaction.options.getString('reason') ?? 'No reason provided';
+            const target        = interaction.options.getUser('target');
+            const reason        = interaction.options.getString('reason') ?? 'No reason provided';
+            const action        = bloonUtils.moderationActions.Ban;
+            const actionName    = Object.keys(moderationActions)[moderationAction.id-1];
     
             const confirm = new ButtonBuilder()
                 .setCustomId('confirm')
@@ -40,7 +42,7 @@ module.exports = {
                 .addComponents(confirm, cancel);
     
             const response = await interaction.reply({
-                content: `Are you sure you want to ban ${target} for reason: ${reason}?`,
+                content: `Are you sure you want to ${actionName} ${target} for reason: ${reason}?`,
                 components: [row],
                 ephemeral: true
             });
@@ -51,33 +53,33 @@ module.exports = {
                 const confirmation = await response.awaitMessageComponent({ filter: collectorFilter, time: 60000 });
 
                 if (confirmation.customId === 'confirm') {
-                    const caseID            = await storedProcedures.sp_banInsert(target.id, reason, interaction.member.id);
+                    const caseID            = await storedProcedures.moderationAction_Insert(action, target.id, reason, interaction.member.id);
                     const usertToBeBanned   = await interaction.member.guild.members.fetch(target.id);
                     const channel           = await interaction.member.guild.channels.fetch(config.moderationActionsChannel);
-                    const banEmbed          = bloonUtils.createBanEmbed(usertToBeBanned, caseID, reason, interaction.member);
+                    const banEmbed          = bloonUtils.createModerationActionEmbed(action, usertToBeBanned, caseID, reason, interaction.member);
                     
                     if (caseID == 0) {
-                        await confirmation.update({ content: `Couldn't save ban in database.`, components: [] });
+                        await confirmation.update({ content: `Couldn't save ${actionName} in database.`, components: [] });
                         return;
                     }      
 
                     // Actually ban and update the reply
                     //await interaction.guild.members.ban(target);
-                    await confirmation.update({ content: `${target.username} has been banned for reason: ${reason}`, components: [] });      
+                    await confirmation.update({ content: `${target.username} has been ${action.conjutation} for reason: ${reason}`, components: [] });      
                     
                     // Write ban in the chat to log it.
                     channel.send({ embeds: [banEmbed]});
 
                 } else if (confirmation.customId === 'cancel') {
-                    await confirmation.update({ content: 'Ban has been cancelled', components: [] });
+                    await confirmation.update({ content: `${actionName} has been cancelled`, components: [] });
                 }
             } catch (e) {
-                console.log("Error in ban", e);
+                console.log(`Error in ${actionName}`, e);
                 await interaction.editReply({ content: 'Confirmation not received within 1 minute, cancelling', components: [] });
             }
 
 		}catch(error){
-			console.error("\nError in Servers.js: " + error);
+			console.error("\nError in ban.js: " + error);
 		}
 	},
 };

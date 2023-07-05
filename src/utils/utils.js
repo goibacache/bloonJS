@@ -115,17 +115,21 @@ const createRoomEmbed = (rooms) => {
     return roomEmbed;
 }
 
-const createBanEmbed = (bannedMember, caseId, reason, bannedBy) => {
+const createModerationActionEmbed = (moderationAction, bannedMember, caseId, reason, bannedBy) => {
+
+    // Get the action name based on the sent one.
+    const actionName = Object.keys(moderationActions)[moderationAction.id-1];
+
     const banEmbed = new EmbedBuilder()
     .setColor(0xFF0000) // Red?
     //.setColor(0xFF9900) // Yellow
-    .setTitle(`Ban: Case #${caseId}`)
+    .setTitle(`${actionName}: Case #${caseId}`)
     .setTimestamp();
 
     banEmbed.addFields(
-        { name: 'User banned',  value: `**${bannedMember.displayName}**\n${bannedMember.id}`, inline: true },
-        { name: 'Handled by',  value: `**${bannedBy.displayName}**\n${bannedBy.id}`, inline: true },
-        { name: 'Ban reason',  value: reason, inline: false },
+        { name: `User ${moderationAction.conjutation}:`,  value: `**${bannedMember.displayName}**\n${bannedMember.id}`, inline: true },
+        { name: 'Handled by:',  value: `**${bannedBy.displayName}**\n${bannedBy.id}`, inline: true },
+        { name: `${actionName} reason:`,  value: reason, inline: false },
     );
     
     return banEmbed;
@@ -180,12 +184,21 @@ const getConfig = () => {
     return require(`../config.${environment}.js`);
 };
 
+const moderationActions = {
+    Mute:   { id: 1, conjutation: "Muted"   },
+    Kick:   { id: 2, conjutation: "Kicked"  },
+    Ban:    { id: 3, conjutation: "Banned"  },
+    Warn:   { id: 4, conjutation: "Warned"  },
+    Unban:  { id: 5, conjutation: "Unbaned" }
+};
+
 module.exports = {
     getHHTPResult,
     createRoomEmbed,
-    createBanEmbed,
+    createModerationActionEmbed,
     getQuotedText,
     deleteTagsFromText,
     getRunArgs,
-    getConfig
+    getConfig,
+    moderationActions
 }
