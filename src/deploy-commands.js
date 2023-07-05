@@ -1,6 +1,7 @@
 const fs = require('fs')
 const { REST, Routes } = require('discord.js');
-const config = require('./config.js');
+const bloonUtils = require('./utils/utils.js');
+const config = bloonUtils.getConfig();
 
 const commands = [];
 

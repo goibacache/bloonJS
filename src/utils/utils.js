@@ -115,6 +115,22 @@ const createRoomEmbed = (rooms) => {
     return roomEmbed;
 }
 
+const createBanEmbed = (bannedMember, caseId, reason, bannedBy) => {
+    const banEmbed = new EmbedBuilder()
+    .setColor(0xFF0000) // Red?
+    //.setColor(0xFF9900) // Yellow
+    .setTitle(`Ban: Case #${caseId}`)
+    .setTimestamp();
+
+    banEmbed.addFields(
+        { name: 'User banned',  value: `**${bannedMember.displayName}**\n${bannedMember.id}`, inline: true },
+        { name: 'Handled by',  value: `**${bannedBy.displayName}**\n${bannedBy.id}`, inline: true },
+        { name: 'Ban reason',  value: reason, inline: false },
+    );
+    
+    return banEmbed;
+}
+
 const getQuotedText = (text) => {
     var re = new RegExp(/"(.*)"/g);
     var match = text.match(re);
@@ -167,6 +183,7 @@ const getConfig = () => {
 module.exports = {
     getHHTPResult,
     createRoomEmbed,
+    createBanEmbed,
     getQuotedText,
     deleteTagsFromText,
     getRunArgs,

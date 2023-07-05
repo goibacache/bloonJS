@@ -5,6 +5,7 @@ module.exports = {
 	
 	intruderGeneralChannel:		"your-general-channel-id",
 	bloonCommandsChannel:		"your-bloon-commands-channel",
+	moderationActionsChannel:	"your-moderation-actions-channel",
 
 	role_Pug: 					"your-role-pug-players",
 	role_LookingToPlay: 		"your-role-lookingToPlay",
@@ -16,4 +17,9 @@ module.exports = {
 
 	chromeEmoji: 				"<:your-chrome-emoji:0000000000>",
 	firefoxEmoji:				"<:your-firefox-emoji:0000000000>",
+
+	mysqlHost:					"your-sql-host",
+	mysqlDDBB:					"your-ddbb-name",
+	mysqlUser:					"your-sql-user",
+	mysqlPass:					"your-sql-pass"
 }
