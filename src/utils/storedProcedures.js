@@ -45,7 +45,7 @@ const execSP = (query) => {
                 return false;
             };
 
-            console.log("SQL RESULT: ", result);
+            // console.log("SQL RESULT: ", result);
             
             /* CLOSE CONECTION */
             connection.end(function(err) {

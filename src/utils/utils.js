@@ -142,7 +142,7 @@ const createModerationActionEmbed = (moderationAction, actedUponMember, caseId, 
         banEmbed.setImage(attachmentUrl)
     }
 
-    console.log("createModerationActionEmbed > actedUponMember", actedUponMember);
+    // console.log("createModerationActionEmbed > actedUponMember", actedUponMember);
 
     banEmbed.addFields(
         { name: `User ${moderationAction.conjugation}:`,  value: `**${actedUponMember.displayName ?? actedUponMember.username}**\n${actedUponMember.id}`, inline: true },

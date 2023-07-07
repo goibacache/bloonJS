@@ -97,8 +97,6 @@ module.exports = {
                         return;
                     }
 
-                    console.log("action to do: ", action);
-
                     switch(action){
                         case bloonUtils.moderationActions.Timeout:
                                 try{
@@ -142,7 +140,6 @@ module.exports = {
                             break;
 
                         case bloonUtils.moderationActions.Unban:
-                            console.log("UNBAN");
                             await interaction.guild.bans.fetch()
                             .then(async bans => {
                                 if (bans.size == 0) {
