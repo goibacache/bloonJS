@@ -37,3 +37,5 @@ public Task ExtensionsAsync(CommandContext ctx)
         $"{DiscordEmoji.FromGuildEmote(ctx.Client, BrowserEmojis.Chrome)} <https://chrome.google.com/webstore/detail/intruder-notifications/aoebpknpfcepopfgnbnikaipjeekalim>\n" +
         $"{DiscordEmoji.FromGuildEmote(ctx.Client, BrowserEmojis.Firefox)} <https://addons.mozilla.org/en-US/firefox/addon/intruder-notifications/>");
 }
+
+/links !
