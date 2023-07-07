@@ -5,7 +5,7 @@ const { Events } = require('discord.js');
 
 
 
-const commands  = [".ltp", ".pug", ".servers"]
+const commands  = [".ltp", ".pug", ".rule34"];
 
 const evnt = {
     name: Events.MessageCreate,
@@ -75,24 +75,10 @@ const evnt = {
             }
         }
 
-        // .servers
+        // .rule34
 		if (message.content === commands[2]) {
-
-            bloonUtils.getHHTPResult("https://api.intruderfps.com/rooms")
-            .then(rooms => {
-                rooms.data.sort(function(a, b){
-                    return b.agentCount - a.agentCount;
-                });
-
-                message.react("👍");                // React
-
-                const roomEmbed = bloonUtils.createRoomEmbed(rooms.data);
-                message.reply({ embeds: [roomEmbed]})
-
-            }).catch(error => {
-                message.react("🙈"); // React with error
-                console.error("Error loading servers: "+ error)
-            });
+            message.react("💦");                // React
+            message.reply({ content: 'https://www.youtube.com/watch?v=gb8wRhHZxNc' }); // Answer accordingly
         }
 	},
 };

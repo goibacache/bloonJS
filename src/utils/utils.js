@@ -79,8 +79,8 @@ const createRoomEmbed = (rooms) => {
     rooms.map(x => totalPlayersOnlist += x.agentCount);
 
     // just do the max ammount of them.
-    if (rooms.length > maxRoomsForEmbed){
-        rooms = rooms.slice(0, maxRoomsForEmbed-1);
+    if (rooms.length > maxRoomsForEmbed+1){
+        rooms = rooms.slice(0, maxRoomsForEmbed);
     }
 
     // Create description with the code tag.
@@ -115,23 +115,42 @@ const createRoomEmbed = (rooms) => {
     return roomEmbed;
 }
 
-const createModerationActionEmbed = (moderationAction, bannedMember, caseId, reason, bannedBy) => {
-
-    // Get the action name based on the sent one.
-    const actionName = Object.keys(moderationActions)[moderationAction.id-1];
-
-    const banEmbed = new EmbedBuilder()
-    .setColor(0xFF0000) // Red?
-    //.setColor(0xFF9900) // Yellow
-    .setTitle(`${actionName}: Case #${caseId}`)
+const createHelpEmbed = () => {
+    const helpEmbed = new EmbedBuilder()
+    .setColor(0x0099FF)
+    .setTitle(`Bloon commands`)
     .setTimestamp();
 
-    banEmbed.addFields(
-        { name: `User ${moderationAction.conjutation}:`,  value: `**${bannedMember.displayName}**\n${bannedMember.id}`, inline: true },
-        { name: 'Handled by:',  value: `**${bannedBy.displayName}**\n${bannedBy.id}`, inline: true },
-        { name: `${actionName} reason:`,  value: reason, inline: false },
+    helpEmbed.addFields(
+        { name: '.ltp',                         value: 'add yourself to the "looking to play" role so you can get pinged when a new server is up!' },
+        { name: '.pug',                         value: 'add yourself to the "Pick up games" role so you can get pinged when new PUG Game is up and running!' },
+        { name: '/wiki',                        value: 'search directly in the wiki for a specified article, if found, it will be posted as an answer!' },
+        { name: '/help',                        value: 'shows this message so you know which commands are available!' },
+        { name: '/servers',                     value: 'list the top 10 servers available in the game!' },
     );
     
+    return helpEmbed;
+}
+
+const createModerationActionEmbed = (moderationAction, actedUponMember, caseId, reason, handledBy, attachmentUrl) => {
+    const banEmbed = new EmbedBuilder()
+    .setColor(moderationAction.color)
+    .setTitle(`${moderationAction.name}: Case #${caseId}`)
+    .setTimestamp();
+
+    if (attachmentUrl != null && attachmentUrl.length > 0){
+        banEmbed.setImage(attachmentUrl)
+    }
+
+    console.log("createModerationActionEmbed > actedUponMember", actedUponMember);
+
+    banEmbed.addFields(
+        { name: `User ${moderationAction.conjugation}:`,  value: `**${actedUponMember.displayName ?? actedUponMember.username}**\n${actedUponMember.id}`, inline: true },
+        { name: 'Handled by:',  value: `**${handledBy.displayName}**\n${handledBy.id}`, inline: true },
+        { name: `${moderationAction.name} reason:`,  value: reason, inline: false },
+    );
+
+
     return banEmbed;
 }
 
@@ -185,20 +204,37 @@ const getConfig = () => {
 };
 
 const moderationActions = {
-    Mute:   { id: 1, conjutation: "Muted"   },
-    Kick:   { id: 2, conjutation: "Kicked"  },
-    Ban:    { id: 3, conjutation: "Banned"  },
-    Warn:   { id: 4, conjutation: "Warned"  },
-    Unban:  { id: 5, conjutation: "Unbaned" }
+    Timeout:    { name: 'Timeout',  id: 1, conjugation: "Timeout",  color: 0x00DD00   }, // name & value used for options | colors: Green
+    Kick:       { name: 'Kick',     id: 2, conjugation: "Kicked",   color: 0xDDDD00   }, // name & value used for options | colors: Yellow
+    Ban:        { name: 'Ban',      id: 3, conjugation: "Banned",   color: 0xDD0000   }, // name & value used for options | colors: Red
+    Warn:       { name: 'Warn',     id: 4, conjugation: "Warned",   color: 0x000000   }, // name & value used for options | colors: Black
+    Unban:      { name: 'Unban',    id: 5, conjugation: "Unbanned", color: 0xFFFFFF   },  // name & value used for options | colors: White
+    Note:       { name: 'Note',     id: 5, conjugation: "Noted",    color: 0xFFFFFF   }  // name & value used for options | colors: White
 };
+
+const moderationActionsToChoices = () => {
+    let choices = [];
+    let count = 0;
+    for (const key in moderationActions){
+        choices.push({
+            name: moderationActions[key].name,
+            value: (moderationActions[key].id-1).toString()
+        });
+    }
+
+    return choices;
+}
+
 
 module.exports = {
     getHHTPResult,
     createRoomEmbed,
     createModerationActionEmbed,
+    createHelpEmbed,
     getQuotedText,
     deleteTagsFromText,
     getRunArgs,
     getConfig,
-    moderationActions
+    moderationActions,
+    moderationActionsToChoices
 }

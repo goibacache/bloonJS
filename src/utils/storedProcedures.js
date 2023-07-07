@@ -2,8 +2,6 @@ const bloonUtils = require('../utils/utils.js');
 const mysql = require('mysql2/promise');
 const config = bloonUtils.getConfig();
 
-
-
 const moderationAction_Insert = async(moderationAction, banedUserDiscordId, banReason, handledByDiscordId) => {
     try{
         const query = `CALL moderationAction_Insert(?, ?, ?, ?)`;
@@ -22,10 +20,11 @@ const moderationAction_Insert = async(moderationAction, banedUserDiscordId, banR
 
 const createConnection = async () => {
     return await mysql.createConnection({
-        host: config.mysqlHost,
-        user: config.mysqlUser,
-        password: config.mysqlPass,
-        database: config.mysqlDDBB
+        host:       config.mysqlHost,
+        user:       config.mysqlUser,
+        password:   config.mysqlPass,
+        database:   config.mysqlDDBB,
+        charset:    "utf8mb4_bin"
     });
 }
 

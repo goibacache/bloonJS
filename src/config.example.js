@@ -1,7 +1,7 @@
 module.exports = {
 	token: 						"your-token",
 	clientId: 					"your-client-id",
-	bloonTestingGuildId: 		"your-guild-id",
+	bloonGuildId: 				"your-guild-id",
 	
 	intruderGeneralChannel:		"your-general-channel-id",
 	bloonCommandsChannel:		"your-bloon-commands-channel",

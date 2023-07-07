@@ -123,7 +123,7 @@ async function handleCommands(command, client) {
 				return;
 			}
 	
-			const guild = await client.guilds.fetch(args[1] == 0 ? config.bloonTestingGuildId : args[1] == 0);
+			const guild = await client.guilds.fetch(args[1] == 0 ? config.bloonGuildId : args[1] == 0);
 			const channel = await guild.channels.fetch(args[2] == 0 ? config.intruderGeneralChannel : args[2] == 0);
 			console.log("sending text: " + text.replace(/\"/g, ""));
 			channel.send(text.replace(/\"/g, ""));
