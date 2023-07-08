@@ -3,6 +3,7 @@ const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 
 module.exports = {
+	cooldown: 15,
 	data: new SlashCommandBuilder()
 		.setName('help')
 		.setDescription(`Shows the available command list, only for you ;)`),
@@ -11,7 +12,8 @@ module.exports = {
 			const helpEmbed = bloonUtils.createHelpEmbed();
 			await interaction.reply({ embeds: [helpEmbed], ephemeral: true});
 		}catch(error){
-			console.error("\nError in Servers.js: " + error);
+			await interaction.reply({ content: `There was an error in the /help command, sorry.`, ephemeral: true});
+			console.error(`\nError in help.js for ID ${interaction.member.id}: ` + error);
 		}
 	},
 };

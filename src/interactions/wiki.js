@@ -3,9 +3,10 @@ const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 
 module.exports = {
+	cooldown: 5,
 	data: new SlashCommandBuilder()
 		.setName('wiki')
-		.setDescription('Search the wiki for an specified article')
+		.setDescription('Search the wiki for a specific article')
 		.addStringOption(option =>
 			option
 				.setName('searchterm')
@@ -28,7 +29,8 @@ module.exports = {
 				await interaction.reply({ content: `Nothing was found under ${searchTerm}`, ephemeral: true });
 			}
 		}catch(error){
-			console.error("\nError in Wiki.js: " + error);
+			await interaction.reply({ content: 'There was an error in /servers, sorry.', ephemeral: true });
+			console.error(`\nError in wiki.js for ID ${interaction.member.id}: ` + error);
 		}
 	},
 };

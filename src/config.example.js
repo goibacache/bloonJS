@@ -6,6 +6,7 @@ module.exports = {
 	intruderGeneralChannel:		"your-general-channel-id",
 	bloonCommandsChannel:		"your-bloon-commands-channel",
 	moderationActionsChannel:	"your-moderation-actions-channel",
+	offTopicChannel:			"your-off-topic-channel",
 
 	role_Pug: 					"your-role-pug-players",
 	role_LookingToPlay: 		"your-role-lookingToPlay",

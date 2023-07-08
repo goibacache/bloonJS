@@ -122,13 +122,33 @@ const createHelpEmbed = () => {
     .setTimestamp();
 
     helpEmbed.addFields(
-        { name: '.ltp',                         value: 'add yourself to the "looking to play" role so you can get pinged when a new server is up!' },
-        { name: '.pug',                         value: 'add yourself to the "Pick up games" role so you can get pinged when new PUG Game is up and running!' },
-        { name: '/wiki',                        value: 'search directly in the wiki for a specified article, if found, it will be posted as an answer!' },
+        { name: '/ltp',                         value: 'add yourself to the "Looking to play" role so you can get pinged when a new server is up!' },
+        { name: '/pug',                         value: 'add yourself to the "Pick up games" role so you can get pinged when new PUG Game is up and running!' },
+        { name: '/wiki',                        value: 'search directly in the wiki for a specified article, if found, it will be posted as an answer for everyone to see!' },
         { name: '/help',                        value: 'shows this message so you know which commands are available!' },
         { name: '/servers',                     value: 'list the top 10 servers available in the game!' },
     );
     
+    return helpEmbed;
+}
+
+const createModHelpEmbed = () => {
+    const helpEmbed = new EmbedBuilder()
+    .setColor(0x0099FF)
+    .setTitle(`Bloon Mods commands`)
+    .setTimestamp();
+
+    helpEmbed.addFields(
+        { name: '/moderationaction',        value: 'The main mod command' },
+        { name: '[type] (Required)',        value: `:record_button:**Note**: Creates a note on the user and logs it.\n:warning:**Warn**: Sends a DM from Bloon (me) with the warning reason and logs it.\n:record_button:**Timeout**: Timeout a user, by default set to 10 minutes. _(To modify the timeout time see the [timeouttime] parameter)_\n:warning:**Kick**: Sends a DM from Bloon (me) to the user with the reason and kicks him.\n:warning:**Ban**: Sends a DM from Bloon (me) to the user with the ban reason and bans him.\n:record_button:**Unban**: Unbans a specified user and logs it.\n\n:warning:: Sends a DM\n:record_button:: Doesn't send a DM` },
+        { name: '[target] (Required)',      value: `The user to act upon. Could be the @Name or their Discord's User Id. It only accepts Discord's Ids if you're unbaning someone as that user no longer belongs to the server.` },
+        { name: '[reason] (Required)',      value: `The reason for the action. If the action sends a message to the user then it will attach it to Bloon's DM` },
+        { name: '[evidence] (Optional)',    value: `A single image file to attach to the action. If the action sends a message to the user then it will attach it to Bloon's DM` },
+        { name: '[timeouttime] (Optional)', value: `Time in minutes to timeout an user, only read when the action is "timeout".` },
+    );
+    
+
+
     return helpEmbed;
 }
 
@@ -165,6 +185,7 @@ const getQuotedText = (text) => {
 }
 
 const deleteTagsFromText = (text) => {
+    text = text.replace(/`/g, `'`); // Fix the ` in room names
     return text.replace(/\<(.*?)>/g, "");
 }
 
@@ -231,6 +252,7 @@ module.exports = {
     createRoomEmbed,
     createModerationActionEmbed,
     createHelpEmbed,
+    createModHelpEmbed,
     getQuotedText,
     deleteTagsFromText,
     getRunArgs,

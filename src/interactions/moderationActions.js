@@ -4,6 +4,7 @@ const config = bloonUtils.getConfig();
 const storedProcedures = require('../utils/storedProcedures.js');
 
 module.exports = {
+    cooldown: 0,
 	data: new SlashCommandBuilder()
 		.setName('moderationactions')
 		.setDescription(`Does an admin action and creates a log in the #moderation-actions channel.`)
@@ -87,10 +88,12 @@ module.exports = {
 
                 if (confirmation.customId === 'confirm') {
                     // Store in DDBB and create EMBED
-                    const caseID            = await storedProcedures.moderationAction_Insert(action, target.id, reason, interaction.member.id);
+                    
                     const userToBeActedUpon = action == bloonUtils.moderationActions.Unban ? target : await interaction.member.guild.members.fetch(target.id); // Only get the user if he's in the server.
+                    const caseID            = await storedProcedures.moderationAction_GetNewId(action);
                     const channel           = await interaction.member.guild.channels.fetch(config.moderationActionsChannel);
                     const actionEmbed       = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, reason, interaction.member, attachment?.url);
+                    let   overrideMessage   = null; // Useful to try and catch unban errors.
                     
                     if (caseID == 0) {
                         await confirmation.update({ content: `Couldn't save ${actionName} in database.`, components: [] });
@@ -99,13 +102,13 @@ module.exports = {
 
                     switch(action){
                         case bloonUtils.moderationActions.Timeout:
-                                try{
-                                    const usertToBeMuted   = await interaction.member.guild.members.fetch(target.id);
-                                    await usertToBeMuted.timeout(timeouttime * 60 * 1000);
-                                }catch(error){
-                                    confirmation.update({ content: `Sorry, can't mute a server adminsitrator.`, components: [] });
-                                    return;
-                                }
+                            try{
+                                const userToBeMuted   = await interaction.member.guild.members.fetch(target.id);
+                                await userToBeMuted.timeout(timeouttime * 60 * 1000);
+                            }catch(error){
+                                confirmation.update({ content: `Sorry, can't mute a server administrator.`, components: [] });
+                                return;
+                            }
                             break;
 
                         case bloonUtils.moderationActions.Kick:
@@ -140,21 +143,24 @@ module.exports = {
                             break;
 
                         case bloonUtils.moderationActions.Unban:
-                            await interaction.guild.bans.fetch()
-                            .then(async bans => {
+                            try{
+                                const bans = await interaction.guild.bans.fetch()
+                            
                                 if (bans.size == 0) {
-                                    await confirmation.update({ content: `There are no banned user on this server.`, ephemeral: true });
+                                    overrideMessage = `There are no banned user on this server.`;
                                     return;
                                 }
 
-                                const bannedUser = bans.find(ban => ban.user.id === target.id);
+                                const bannedUser = await bans.find(ban => ban.user.id === target.id);
                                 if (!bannedUser) {
-                                    await confirmation.update({ content: `The ID stated is not banned from this server.`, ephemeral: true });
+                                    overrideMessage = `The ID stated is not banned from this server.`;
                                     return;
                                 }
                                 // Removes the ban
                                 await interaction.guild.bans.remove(target.id, reason);
-                            });
+                            }catch(error){
+                                overrideMessage = `There was an error unbaning the user. Error: ${error}`
+                            }
                             
                             break;
 
@@ -163,19 +169,27 @@ module.exports = {
                             break;
                     }
 
-                    await confirmation.update({ content: `${target.username} has been ${action.conjugation} for reason: ${reason}`, components: [] });      
-                    // Write moderation action in the chat to log it.
-                    channel.send({ embeds: [actionEmbed]});
+                    // If overrideMessage is set, that's the message, if not, the standard one.
+                    let content = overrideMessage ?? `${target.username} has been ${action.conjugation} for reason: ${reason}`;
+
+                    await confirmation.update({ content: content, components: [] });      
+
+                    // If nothing overwrote the message, then write the moderation action in the chat to log it in the DDBB
+                    if (overrideMessage == null){
+                        channel.send({ embeds: [actionEmbed]});
+                        await storedProcedures.moderationAction_Insert(action, target.id, reason, interaction.member.id); // Also save it on the DB :D
+                    }
 
                 }
             })
             .catch(async error => {
                 await interaction.editReply({ content: 'Confirmation not received within 1 minute, cancelling. Error: ' + error, components: [] });
+                console.error(`\nPossible error in moderationActions.js for ID ${interaction.member.id}, action ${action.name}: ` + error);
             });
 
 		}catch(error){
-			console.error("\nError in ban.js: " + error);
-            await interaction.editReply({ content: 'There was an error, sorry. Error: ' + error, components: [] });
+            await interaction.editReply({ content: 'There was an error in /moderationActions, sorry.', components: [] });
+			console.error(`\nError in moderationActions.js for ID ${interaction.member.id}, action ${interaction.options.getString('type')}: ` + error);
 		}
 	},
 };

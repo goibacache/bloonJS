@@ -3,6 +3,7 @@ const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 
 module.exports = {
+	cooldown: 60,
 	data: new SlashCommandBuilder()
 		.setName('servers')
 		.setDescription(`Provides information about Intruder's servers.`),
@@ -27,7 +28,8 @@ module.exports = {
 				console.error("Error loading servers "+ error)
 			});
 		}catch(error){
-			console.error("\nError in Servers.js: " + error);
+			await interaction.reply({ content: 'There was an error in /servers, sorry.', ephemeral: true });
+			console.error(`\nError in servers.js for ID ${interaction.member.id}: ` + error);
 		}
 	},
 };

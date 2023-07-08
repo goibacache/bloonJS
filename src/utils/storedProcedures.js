@@ -18,6 +18,16 @@ const moderationAction_Insert = async(moderationAction, banedUserDiscordId, banR
     }
 }
 
+const moderationAction_GetNewId = async(moderationAction) => {
+    const query = `CALL moderationAction_GetNewId(?)`;
+
+    const connection = await createConnection();
+
+    const [rows] = await connection.execute(query, [moderationAction.id]);
+
+    return parseInt(rows[0][0]['res']); // Awfull, but eh.
+}
+
 const createConnection = async () => {
     return await mysql.createConnection({
         host:       config.mysqlHost,
@@ -62,5 +72,6 @@ const execSP = (query) => {
 
 
 module.exports = {
-    moderationAction_Insert
+    moderationAction_Insert,
+    moderationAction_GetNewId
 }

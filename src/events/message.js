@@ -5,7 +5,7 @@ const { Events } = require('discord.js');
 
 
 
-const commands  = [".ltp", ".pug", ".rule34"];
+const commands  = [".rule34"];
 
 const evnt = {
     name: Events.MessageCreate,
@@ -29,62 +29,27 @@ const evnt = {
             return;
         }
 
+        // .rule34
+        if (message.content === ".rule34" && isInOffTopicChannel(message)) {
+            message.react("💦");                                                        // React
+            message.reply({ content: 'https://www.youtube.com/watch?v=gb8wRhHZxNc' });  // Answer accordingly
+            return;
+        }
+
         // Includes a command but not in the right channel.
         if (commands.includes(message.content.trim()) && !isInBloonCommandsChannel(message)){
             message.react("🚫");        // React
             return;
-        }
-
-        // .ltp
-		if (message.content === commands[0]) {
-            try{
-                const member  = message.guild.members.cache.get(message.author.id);  // Get current member
-                const ltpRole = await message.guild.roles.fetch(config.role_LookingToPlay);
-                const npRole  = await message.guild.roles.fetch(config.role_NowPlaying);
-
-                // Check if the user already has "looking to play"
-                if (member.roles.cache.some(role => role.id === config.role_LookingToPlay || role.id === config.role_NowPlaying)){
-                    await member.roles.remove(ltpRole);   // Remove
-                    await member.roles.remove(npRole);    // Remove
-                }else{
-                    await member.roles.add(ltpRole);      // Add
-                }
-                message.react("👍");                      // React
-            }catch(error){
-                message.react("🙈"); // React with error
-                console.error("Error assigning role: "+ error)
-            }
-        }
-
-        // .pug
-		if (message.content === commands[1]) {
-            try{
-                const member = message.guild.members.cache.get(message.author.id);  // Get current member
-                const pugRole = await message.guild.roles.fetch(config.role_Pug);
-
-                // Check if the user already has "PUG Player"
-                if (member.roles.cache.some(role => role.id === config.role_Pug)){
-                    await member.roles.remove(pugRole);   // Remove
-                }else{
-                    await member.roles.add(pugRole);      // Add
-                }
-                message.react("👍");                // React
-            }catch(error){
-                message.react("🙈"); // React with error
-                console.error("Error assigning role: "+ error)
-            }
-        }
-
-        // .rule34
-		if (message.content === commands[2]) {
-            message.react("💦");                // React
-            message.reply({ content: 'https://www.youtube.com/watch?v=gb8wRhHZxNc' }); // Answer accordingly
         }
 	},
 };
 
 function isInBloonCommandsChannel(message){
     return message.channelId == config.bloonCommandsChannel;
+}
+
+function isInOffTopicChannel(message){
+    return message.channelId == config.offTopicChannel;
 }
 
 function isInGeneralChannel(message){
