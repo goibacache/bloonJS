@@ -26,5 +26,5 @@ module.exports = [
 	{ regex: /(where|how).*(can|do).*(access|show|get|pull).*(console)/g,											answer: "You can access the console within the game at any time by using `\\ + Tab` at the same time. It\'ll open a black box with colored debugging." },
 	{ regex: /(my|the|team).*(microphone|mic|team).*(quiet|silent|trouble hearing)/g,								answer: "1) USB Microphone? \r\nhttps://discordapp.com/channels/103933666417217536/306213064934424576/551549500251045907\r\n2) Check microphone volume within Windows (Sometimes this changes)\r\n3) Check microphone values within game settings" },
 	{ regex: /(what|how).*(is|join|make|get).*(pug|pick*up*games).(game|player?s?)?.*/g,							answer: "You can get the pick-up-games role by using the `/pug` command" },
-	{ regex: /(what|how).*(is|join|make|get|go).*(comp|comps|competitive).?(player?s?)?/g,							answer: "You can join ask a competitive team leader to join their team and participate in the next ICL (Intruder Competitive League)" }
+	{ regex: /(what|how).*(is|join|make|get|go|play).*(comp|comps|competitive|competitively).?(player?s?)?/g,		answer: "You can ask a competitive team leader to join their team and participate in the next ICL (Intruder Competitive League)" }
 ];

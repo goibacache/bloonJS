@@ -27,7 +27,7 @@ const evnt = {
         // Doesn't include a command.
         if (!commands.includes(message.content.trim())){
             return;
-        }
+        }       
 
         // .rule34
         if (message.content === ".rule34" && isInOffTopicChannel(message)) {

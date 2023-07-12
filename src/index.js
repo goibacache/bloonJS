@@ -10,12 +10,13 @@ const readline = require('readline');
 
 // Load initial config
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences] }); // Create a new client instance
-client.commands = new Collection(); // Command handler list
-client.cooldowns = new Collection();
+const client 		= new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences] }); // Create a new client instance
+client.events 		= new Collection(); // Events handler list
+client.commands 	= new Collection(); // Command handler list
+client.cooldowns 	= new Collection();
 
-//#region interactions
-// Import all interactions programmatically 
+
+//#region import interactions
 const commandsPath = 'interactions';
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
@@ -27,7 +28,29 @@ for (const file of commandFiles) {
 	client.commands.set(command.data.name, command);
 }
 
-// Check interactions 
+//#endregion
+
+//#region import events
+const eventsPath = 'events';
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+
+for (const eventFile of eventFiles) {
+	const folderRoute = `./events/${eventFile}`;
+	const event = require(folderRoute);
+	console.log(`Loading event ${eventFile} - ${event.evnt.name}`);
+
+	if (event.once) {
+		client.once(event.evnt.name, (...args) => event.evnt.execute(...args));
+	} else {
+		client.on(event.evnt.name, (...args) => event.evnt.execute(...args));
+	}
+
+	client.events.set(eventFile.replace(/.js/g, ''), event.evnt.execute);
+}
+
+//#endregion
+
+//#region handle interactions
 client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isChatInputCommand()) return;
 
@@ -74,29 +97,9 @@ client.on(Events.InteractionCreate, async interaction => {
 		}
 	}
 });
-
 //#endregion
 
-//#region events
-// Import all events programmatically 
-const eventsPath = 'events';
-const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
-
-for (const eventFile of eventFiles) {
-	const folderRoute = `./events/${eventFile}`;
-	const event = require(folderRoute);
-	console.log(`Loading event ${eventFile} - ${event.evnt.name}`);
-
-	if (event.once) {
-		client.once(event.evnt.name, (...args) => event.evnt.execute(...args));
-	} else {
-		client.on(event.evnt.name, (...args) => event.evnt.execute(...args));
-	}
-}
-
-//#endregion
-
-// When the client is ready, run this code (only once)
+//#region handle log in
 client.once(Events.ClientReady, async c => {
 	console.log(`Ready! Logged in as ${c.user.tag} 😎`);
 
@@ -105,6 +108,7 @@ client.once(Events.ClientReady, async c => {
 		handleCommands(command, client);
 	}
 });
+//#endregion
 
 // Log in to Discord with your client's token
 client.login(config.token);
@@ -133,7 +137,7 @@ async function handleCommands(command, client) {
 		if (command.startsWith("say")){
 			var text  = bloonUtils.getQuotedText(command);
 			if (!text){
-				console.log("Say> No text command was found")
+				console.log("Say> No text input was found in the command")
 				return;
 			} 
 
@@ -153,6 +157,29 @@ async function handleCommands(command, client) {
 			const channel = await guild.channels.fetch(args[2] == 0 ? config.intruderGeneralChannel : args[2] == 0);
 			console.log("sending text: " + text.replace(/\"/g, ""));
 			channel.send(text.replace(/\"/g, ""));
+		}
+
+		if (command.startsWith("reload")){
+			var text  = bloonUtils.getQuotedText(command);
+			if (!text){
+				console.log("Say> No text input was found in the command")
+				return;
+			} 
+
+			text = text.replace(/\"/g, "");
+
+			// Check commands
+			const loadedCommand = client.commands.get(text);
+
+			if (!loadedCommand) {
+				console.log(`There is no command with the name \`${text}\`!`);
+			}else{
+				client.commands.delete(loadedCommand.data.name);
+				const newCommand = require(`./interactions/${loadedCommand.data.name}.js`);
+				client.commands.set(newCommand.data.name, newCommand);
+				console.log(`Command \`${newCommand.data.name}\` was reloaded!`);
+				return;
+			}
 		}
 	}catch(error){
 		console.error(`\nError in command: ${error}`);

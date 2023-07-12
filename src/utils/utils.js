@@ -246,6 +246,15 @@ const moderationActionsToChoices = () => {
     return choices;
 }
 
+const capitalizeFirstLetter = (text) => {
+    if (text.length > 1){
+        return `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
+    }else{
+        return text.charAt(0).toUpperCase();
+    }
+    
+}
+
 
 module.exports = {
     getHHTPResult,
@@ -258,5 +267,6 @@ module.exports = {
     getRunArgs,
     getConfig,
     moderationActions,
-    moderationActionsToChoices
+    moderationActionsToChoices,
+    capitalizeFirstLetter
 }
