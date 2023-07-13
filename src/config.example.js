@@ -4,6 +4,8 @@ module.exports = {
 	bloonGuildId: 				"your-guild-id",
 	
 	intruderGeneralChannel:		"your-general-channel-id",
+	intruderHelpChannel:		"your-help-channel-id",
+	intruderMapmakingChannel:	"your-mapmaking-channel-id",
 	bloonCommandsChannel:		"your-bloon-commands-channel",
 	moderationActionsChannel:	"your-moderation-actions-channel",
 	offTopicChannel:			"your-off-topic-channel",
@@ -12,6 +14,7 @@ module.exports = {
 	role_LookingToPlay: 		"your-role-lookingToPlay",
 	role_NowPlaying: 			"your-role-nowplaying",
 	role_Agent: 				"your-role-agent",
+	role_News: 					"your-role-news",
 
 	wikiURL:					"your-wiki-url",
 	wikiAPI:					"your-wiki-API-for-searchs",

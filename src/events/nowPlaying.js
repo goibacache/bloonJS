@@ -41,7 +41,7 @@ const evnt = {
                 return;
             }
         }catch(error){
-            console.error("\nError in nowPlaying.js: " + error);
+            console.error(`\nError in nowPlaying.js for user ID ${oldPresence.userId}: ${error}`);
         }
 	},
 };

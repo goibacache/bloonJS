@@ -13,13 +13,12 @@ const evnt = {
         // All messages should be lower case to be procesed
         message.content = message.content.toLowerCase();
 
-        // Handle regexs replies in the main channel
-        if (isInGeneralChannel(message)){
+        // Handle regexs replies in the general / help & mapmaking channels
+        if (isInChannel(message, config.intruderGeneralChannel) || isInChannel(message, config.intruderHelpChannel) || isInChannel(message, config.intruderMapmakingChannel) ) {
             regexs.forEach(reg => {
                 if(reg.regex.test(message)){
                     message.reply(reg.answer); // Answer accordingly
                 }
-
                 return; // Stop the foreach
             });
         }
@@ -29,32 +28,25 @@ const evnt = {
             return;
         }       
 
-        // .rule34
-        if (message.content === ".rule34" && isInOffTopicChannel(message)) {
-            message.react("💦");                                                        // React
-            message.reply({ content: 'https://www.youtube.com/watch?v=gb8wRhHZxNc' });  // Answer accordingly
+        // Includes a command but not in the right channel.
+        if (commands.includes(message.content.trim()) && !isInChannel(message, config.offTopicChannel)){
+            message.react("🚫");        // React
             return;
         }
 
-        // Includes a command but not in the right channel.
-        if (commands.includes(message.content.trim()) && !isInBloonCommandsChannel(message)){
-            message.react("🚫");        // React
+        // .rule34
+        if (message.content === ".rule34" && isInChannel(message, config.offTopicChannel)) {
+            message.react("💦");                                                        // React
+            message.reply({ content: 'https://www.youtube.com/watch?v=gb8wRhHZxNc' });  // Answer accordingly
             return;
         }
 	},
 };
 
-function isInBloonCommandsChannel(message){
-    return message.channelId == config.bloonCommandsChannel;
+function isInChannel(message, channel){
+    return message.channelId == channel;
 }
 
-function isInOffTopicChannel(message){
-    return message.channelId == config.offTopicChannel;
-}
-
-function isInGeneralChannel(message){
-    return message.channelId == config.intruderGeneralChannel;
-}
 
 module.exports = {
     evnt
