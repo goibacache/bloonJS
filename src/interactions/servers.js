@@ -9,9 +9,11 @@ module.exports = {
 		.setDescription(`Provides information about Intruder's servers.`),
 	async execute(interaction) {
 		try{
+			console.log(`\nservers.js: ${interaction.member.id}`);
 			if (interaction.channel.id != config.bloonCommandsChannel){
 				await interaction.reply({ content: 'This command can only be used in the Bloon Commands Channel!', ephemeral: true });
-				return;
+				console.log(`\nservers.js: Interaction used in wrong channel.`);
+				return "noCooldown"; // Inmediatly remove cooldown
 			}
 	
 			bloonUtils.getHHTPResult("https://api.intruderfps.com/rooms")

@@ -15,9 +15,10 @@ module.exports = {
 		),
 	async execute(interaction) {
 		try{
+			console.log(`\nwiki.js: ${interaction.member.id}`);
 			// sharklootgilt.superbossgames.com/wiki/
 			const searchTerm = interaction.options.getString('searchterm');
-			const parameters = `?action=opensearch&format=json&formatversion=2&search=${searchTerm}&namespace=0&limit=10`
+			const parameters = `?action=opensearch&format=json&formatversion=2&search=${searchTerm}&namespace=0&limit=1`
 			const queryUrl = `${config.wikiAPI}${parameters}`;
 			const result = await bloonUtils.getHHTPResult(queryUrl);
 
@@ -26,7 +27,7 @@ module.exports = {
 			if (wikiDoc){
 				await interaction.reply(`${wikiDoc}`);	
 			}else{
-				await interaction.reply({ content: `Nothing was found under ${searchTerm}`, ephemeral: true });
+				await interaction.reply({ content: `Nothing was found under ${searchTerm}. The search is case sensitive.`, ephemeral: true });
 			}
 		}catch(error){
 			await interaction.reply({ content: 'There was an error in /servers, sorry.', ephemeral: true });

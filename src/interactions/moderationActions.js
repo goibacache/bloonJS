@@ -21,6 +21,8 @@ const addBasicInteractionOptions = (command) => {
             .setName('reason')
             .setDescription('Reason for action')
             .setRequired(true)
+            .setMaxLength(6000)
+            .setMinLength(1)
     )
     .addAttachmentOption(option => 
         option
@@ -57,6 +59,11 @@ const command = {
                 .setDescription('Timeouts an user');
     
             return  addBasicInteractionOptions(subcommand)
+                    .addBooleanOption(option =>
+                        option.setName('directmessage')
+                        .setRequired(false)
+                        .setDescription('Whether or not a DM will be sent towards the user')
+                    )
                     .addNumberOption(option => 
                         option
                             .setName('timeouttime')
@@ -67,16 +74,32 @@ const command = {
         .addSubcommand(subcommand => {
             subcommand
                 .setName('kick')
-                .setDescription('Kicks an user from the server and tells them via DM the reason for the kick while creating a note');
+                .setDescription('Kicks an user from the server and creates a note');
     
-            return addBasicInteractionOptions(subcommand);
+            return  addBasicInteractionOptions(subcommand)
+                    .addBooleanOption(option =>
+                        option.setName('directmessage')
+                        .setRequired(false)
+                        .setDescription('Whether or not a DM will be sent towards the user')
+                    )
         })
         .addSubcommand(subcommand => {
             subcommand
                 .setName('ban')
-                .setDescription('Bans an user from the server and tells them via DM the reason for the ban while creating a note');
-    
-            return addBasicInteractionOptions(subcommand);
+                .setDescription('Bans an user from the server and creates a note');
+            return  addBasicInteractionOptions(subcommand)
+                    .addBooleanOption(option =>
+                        option.setName('directmessage')
+                        .setRequired(false)
+                        .setDescription('Whether or not a DM will be sent towards the user')
+                    )
+                    .addNumberOption(option => 
+                        option.setName('hoursofmessagestodelete')
+                        .setRequired(false)
+                        .setDescription('Number of hours of messages to delete, must be between 0 and 168 (7 days), inclusive')
+                        .setMinValue(0)
+                        .setMaxValue(168)
+                    )
         })
         .addSubcommand(subcommand => {
             subcommand
@@ -86,13 +109,18 @@ const command = {
         }),
     async execute(interaction) {
         try{
-            const subCommand    = interaction.options.getSubcommand();
-            const actionName    = bloonUtils.capitalizeFirstLetter(subCommand); // Actually value, but eh.
-            const action        = bloonUtils.moderationActions[actionName];
-            const target        = interaction.options.getUser('target');
-            const reason        = interaction.options.getString('reason') ?? 'No reason provided';
-            const attachment    = interaction.options.getAttachment("evidence");
-            const timeouttime   = interaction.options.getNumber('timeouttime') ?? 10;
+            console.log(`\nmoderationactions.js: ${interaction.member.id}`);
+            const subCommand                = interaction.options.getSubcommand();
+            const actionName                = bloonUtils.capitalizeFirstLetter(subCommand); // Actually value, but eh.
+            const action                    = bloonUtils.moderationActions[actionName];
+            const target                    = interaction.options.getUser('target');
+            const reason                    = interaction.options.getString('reason') ?? 'No reason provided';
+            const attachment                = interaction.options.getAttachment("evidence");
+            const timeouttime               = interaction.options.getNumber('timeouttime') ?? 10;
+            const directmessage             = interaction.options.getBoolean('directmessage') ?? false;
+            const hoursofmessagestodelete   = interaction.options.getNumber('hoursofmessagestodelete') ?? 12;
+
+            console.log(`\naction: ${actionName}\ntarget: ${target}\nreason: ${reason}\ntimeouttime: ${timeouttime}\ndirectmessage: ${directmessage}\nhoursofmessagestodelete: ${hoursofmessagestodelete}`);
     
             const confirm = new ButtonBuilder()
                 .setCustomId('confirm')
@@ -108,7 +136,7 @@ const command = {
                 .addComponents(confirm, cancel);
     
             const response = await interaction.reply({
-                content: `Are you sure you want to ${actionName} ${target} for reason: ${reason}?`,
+                content: `Are you sure you want to ${actionName} ${target} for the following reason: ${reason}?`,
                 components: [row],
                 ephemeral: true
             });
@@ -152,8 +180,10 @@ const command = {
     
                         case bloonUtils.moderationActions.Kick:
                             try{
-                                await target.send({content: `You have been kicked from the server for the following reason: ${reason}`})
-                                .catch(() => confirmation.update({ content: `Couldn't DM the user.`, components: [] }));
+                                if (directmessage){
+                                    await target.send({content: `You have been kicked from the server for the following reason: ${reason}`})
+                                    .catch(() => confirmation.update({ content: `Couldn't DM the user.`, components: [] }));
+                                }
                                 await interaction.guild.members.kick(target, reason);
                             }catch(error){
                                 confirmation.update({ content: `Sorry, there was an error kicking that person. Error: ${error}`, components: [] });
@@ -163,9 +193,11 @@ const command = {
                             break;
                         case bloonUtils.moderationActions.Ban:
                             try{
-                                await target.send({content: `You have been banned from the server for the following reason: ${reason}`})
-                                .catch(() => confirmation.update({ content: `Couldn't DM the user.`, components: [] }));
-                                await interaction.guild.bans.create(target, { reason, deleteMessageSeconds: 12 * 3600 }); // 12 hours.
+                                if (directmessage){
+                                    await target.send({content: `You have been banned from the server for the following reason: ${reason}`})
+                                    .catch(() => confirmation.update({ content: `Couldn't DM the user.`, components: [] }));
+                                }
+                                await interaction.guild.bans.create(target, { reason, deleteMessageSeconds: hoursofmessagestodelete * 3600 }); // 12 hours.
                             }catch(error){
                                 confirmation.update({ content: `Couldn't find the user to be banned. Error: ${error}`, components: [] });
                                 return;
@@ -209,7 +241,7 @@ const command = {
                     }
     
                     // If overrideMessage is set, that's the message, if not, the standard one.
-                    let content = overrideMessage ?? `${target.username} has been ${action.conjugation} for reason: ${reason}`;
+                    let content = overrideMessage ?? `${target.username} has been ${action.conjugation} for the following reason: ${reason}`;
     
                     await confirmation.update({ content: content, components: [] });      
     

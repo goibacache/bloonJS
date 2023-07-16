@@ -122,8 +122,9 @@ const createHelpEmbed = () => {
     .setTimestamp();
 
     helpEmbed.addFields(
-        { name: '/ltp',                         value: 'add yourself to the "Looking to play" role so you can get pinged when a new server is up!' },
-        { name: '/pug',                         value: 'add yourself to the "Pick up games" role so you can get pinged when new PUG Game is up and running!' },
+        { name: '/news',                        value: 'add yourself to the "News" role so you can be notified when something important is going on!' },
+        { name: '/ltp',                         value: 'add yourself to the "Looking to play" role so you can be notified when a new server is up!' },
+        { name: '/pug',                         value: 'add yourself to the "Pick up games" role so you can be notified when new PUG game is being set up!' },
         { name: '/wiki',                        value: 'search directly in the wiki for a specified article, if found, it will be posted as an answer for everyone to see!' },
         { name: '/help',                        value: 'shows this message so you know which commands are available!' },
         { name: '/servers',                     value: 'list the top 10 servers available in the game!' },
@@ -139,12 +140,11 @@ const createModHelpEmbed = () => {
     .setTimestamp();
 
     helpEmbed.addFields(
-        { name: '/moderationaction',        value: 'The main mod command' },
-        { name: '[type] (Required)',        value: `:record_button:**Note**: Creates a note on the user and logs it.\n:warning:**Warn**: Sends a DM from Bloon (me) with the warning reason and logs it.\n:record_button:**Timeout**: Timeout a user, by default set to 10 minutes. _(To modify the timeout time see the [timeouttime] parameter)_\n:warning:**Kick**: Sends a DM from Bloon (me) to the user with the reason and kicks him.\n:warning:**Ban**: Sends a DM from Bloon (me) to the user with the ban reason and bans him.\n:record_button:**Unban**: Unbans a specified user and logs it.\n\n:warning:: Sends a DM\n:record_button:: Doesn't send a DM` },
-        { name: '[target] (Required)',      value: `The user to act upon. Could be the @Name or their Discord's User Id. It only accepts Discord's Ids if you're unbaning someone as that user no longer belongs to the server.` },
-        { name: '[reason] (Required)',      value: `The reason for the action. If the action sends a message to the user then it will attach it to Bloon's DM` },
-        { name: '[evidence] (Optional)',    value: `A single image file to attach to the action. If the action sends a message to the user then it will attach it to Bloon's DM` },
-        { name: '[timeouttime] (Optional)', value: `Time in minutes to timeout an user, only read when the action is "timeout".` },
+        { name: '/moderationaction timeout',        value: `Timeouts an user and creates a log in the evidence channel. The amount of time a user is timed out can be set as an optional parameter, if not set manually, the time out will last 10 minutes.` },
+        { name: '/moderationaction warn',           value: `Warns an user with a DM from bloon and creates a log in the evidence channel. If you don't want to send a DM from bloon, consider making a note and warning the user yourself.` },
+        { name: '/moderationaction kick',           value: `Kicks an user and creates a log in the evidence channel. If the offending user receives a DM from bloon explaining the kick reason can be set as  an optional parameter, by default it's set to off.` },
+        { name: '/moderationaction ban',            value: `Bans an user and creates a log in the evidence channel. If the offending user receives a DM from bloon explaining the ban reason can be set as  an optional parameter, by default it's set to off.` },
+        { name: '/moderationaction unban',          value: `Lifts a ban from an user and leaves a record in the evidence channel` },
     );
     
 

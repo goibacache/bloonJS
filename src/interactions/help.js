@@ -9,6 +9,7 @@ module.exports = {
 		.setDescription(`Shows the available command list, only for you ;)`),
 	async execute(interaction) {
 		try{
+			console.log(`\nhelp.js: ${interaction.member.id}`);
 			const helpEmbed = bloonUtils.createHelpEmbed();
 			await interaction.reply({ embeds: [helpEmbed], ephemeral: true});
 		}catch(error){
