@@ -6,7 +6,7 @@ module.exports = {
 	cooldown: 5,
 	data: new SlashCommandBuilder()
 		.setName('ltp')
-		.setDescription(`Assigns or removes the "Lookin to play" role`),
+		.setDescription(`Assigns or removes the "Looking to play" role`),
 	async execute(interaction) {
 		try{
 			console.log(`\nltp.js: ${interaction.member.id}`);
