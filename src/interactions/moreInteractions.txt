@@ -39,3 +39,5 @@ public Task ExtensionsAsync(CommandContext ctx)
 }
 
 /links !
+
+// Bloon shoot @person. Bloon shooting to the camera.

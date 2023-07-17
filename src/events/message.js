@@ -13,6 +13,12 @@ const evnt = {
         // All messages should be lower case to be procesed
         message.content = message.content.toLowerCase();
 
+        // Not reply to itself
+        if (message.author.id === config.clientId){
+            console.log("Not replying to itself");
+            return;
+        }
+
         // Handle regexs replies in the general / help & mapmaking channels
         if (isInChannel(message, config.intruderGeneralChannel) || isInChannel(message, config.intruderHelpChannel) || isInChannel(message, config.intruderMapmakingChannel) ) {
             regexs.forEach(reg => {
