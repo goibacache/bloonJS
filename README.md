@@ -12,4 +12,4 @@ In order to run and install locally you'll need to make a copy of config.js.exam
 - Helps auto assign "PUG Players" & "News" roles.
 - List the current servers.
 - Search the wiki.
-- Moderation commands and loging those commands into a channel.
+- Moderation commands and logging those commands into a channel.
