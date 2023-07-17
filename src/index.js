@@ -186,8 +186,6 @@ async function handleCommands(command, client) {
 				return;
 			}
 		}
-
-		if (command.startsWith())
 	}catch(error){
 		console.error(`\nError in command: ${error}`);
 	}
