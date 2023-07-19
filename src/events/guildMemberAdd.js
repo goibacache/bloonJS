@@ -14,7 +14,7 @@ const evnt = {
 			// Welcome message
 			const channel 	= member.guild.channels.cache.get(config.intruderGeneralChannel);
 			const avatarURL	= member.user.avatarURL();
-			const dateJoined = new Date(member.joinedTimestamp).toDateString();
+			const dateJoined = new Date(member.user.createdAt).toDateString();
 
 			// Creates the embed
 			const newUserEmbed = new EmbedBuilder()

@@ -14,5 +14,8 @@
   },
   "keywords": [],
   "author": "Xixo",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "decache": "^4.6.2"
+  }
 }

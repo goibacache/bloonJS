@@ -115,65 +115,6 @@ const createRoomEmbed = (rooms) => {
     return roomEmbed;
 }
 
-const createHelpEmbed = () => {
-    const helpEmbed = new EmbedBuilder()
-    .setColor(0x0099FF)
-    .setTitle(`Bloon commands`)
-    .setTimestamp();
-
-    helpEmbed.addFields(
-        { name: '/news',                        value: 'add yourself to the "News" role so you can be notified when something important is going on!' },
-        { name: '/ltp',                         value: 'add yourself to the "Looking to play" role so you can be notified when a new server is up!' },
-        { name: '/pug',                         value: 'add yourself to the "Pick up games" role so you can be notified when new PUG game is being set up!' },
-        { name: '/wiki',                        value: 'search directly in the wiki for a specified article, if found, it will be posted as an answer for everyone to see!' },
-        { name: '/help',                        value: 'shows this message so you know which commands are available!' },
-        { name: '/servers',                     value: 'list the top 10 servers available in the game!' },
-    );
-    
-    return helpEmbed;
-}
-
-const createModHelpEmbed = () => {
-    const helpEmbed = new EmbedBuilder()
-    .setColor(0x0099FF)
-    .setTitle(`Bloon Mods commands`)
-    .setTimestamp();
-
-    helpEmbed.addFields(
-        { name: '/moderationaction timeout',        value: `Timeouts an user and creates a log in the evidence channel. The amount of time a user is timed out can be set as an optional parameter, if not set manually, the time out will last 10 minutes.` },
-        { name: '/moderationaction warn',           value: `Warns an user with a DM from bloon and creates a log in the evidence channel. If you don't want to send a DM from bloon, consider making a note and warning the user yourself.` },
-        { name: '/moderationaction kick',           value: `Kicks an user and creates a log in the evidence channel. If the offending user receives a DM from bloon explaining the kick reason can be set as  an optional parameter, by default it's set to off.` },
-        { name: '/moderationaction ban',            value: `Bans an user and creates a log in the evidence channel. If the offending user receives a DM from bloon explaining the ban reason can be set as  an optional parameter, by default it's set to off.` },
-        { name: '/moderationaction unban',          value: `Lifts a ban from an user and leaves a record in the evidence channel` },
-    );
-    
-
-
-    return helpEmbed;
-}
-
-const createModerationActionEmbed = (moderationAction, actedUponMember, caseId, reason, handledBy, attachmentUrl) => {
-    const banEmbed = new EmbedBuilder()
-    .setColor(moderationAction.color)
-    .setTitle(`${moderationAction.name}: Case #${caseId}`)
-    .setTimestamp();
-
-    if (attachmentUrl != null && attachmentUrl.length > 0){
-        banEmbed.setImage(attachmentUrl)
-    }
-
-    // console.log("createModerationActionEmbed > actedUponMember", actedUponMember);
-
-    banEmbed.addFields(
-        { name: `User ${moderationAction.conjugation}:`,  value: `**${actedUponMember.displayName ?? actedUponMember.username}**\n${actedUponMember.id}`, inline: true },
-        { name: 'Handled by:',  value: `**${handledBy.displayName}**\n${handledBy.id}`, inline: true },
-        { name: `${moderationAction.name} reason:`,  value: reason, inline: false },
-    );
-
-
-    return banEmbed;
-}
-
 const getQuotedText = (text) => {
     var re = new RegExp(/"(.*)"/g);
     var match = text.match(re);
@@ -189,9 +130,17 @@ const deleteTagsFromText = (text) => {
     return text.replace(/\<(.*?)>/g, "");
 }
 
-const truncateOrComplete = (text) => {
-    const maxLength = 28; // Mobile size defines this.
-    text = text.padEnd(maxLength); // Max is 28, fixed.
+const timePlayedToHours = (timePlayed) => {
+    return Math.trunc(timePlayed/60)+"H";
+}
+
+const truncateOrComplete = (text, maxLength = 28, padRight = false) => {
+    text = text+""; // Transform to text, just in case.
+    if (padRight){
+        text = text.padStart(maxLength); // Max is 28, fixed.
+    }else{
+        text = text.padEnd(maxLength); // Max is 28, fixed.    
+    }
     if (text.length > maxLength){
         text = text.substr(0, maxLength-3) + "...";
     }
@@ -258,15 +207,14 @@ const capitalizeFirstLetter = (text) => {
 
 module.exports = {
     getHHTPResult,
+    timePlayedToHours,
     createRoomEmbed,
-    createModerationActionEmbed,
-    createHelpEmbed,
-    createModHelpEmbed,
     getQuotedText,
     deleteTagsFromText,
     getRunArgs,
     getConfig,
     moderationActions,
     moderationActionsToChoices,
-    capitalizeFirstLetter
+    capitalizeFirstLetter,
+    truncateOrComplete
 }

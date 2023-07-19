@@ -25,7 +25,6 @@ module.exports = {
 				const roomEmbed = bloonUtils.createRoomEmbed(rooms.data);
 				await interaction.reply({ embeds: [roomEmbed]})
 			}).catch(error => {
-				//message.reply("It's a work in progress, ok?")
 				interaction.reply({ content: "An error has occurred, sorry 🙈", ephemeral: true}); // React with error
 				console.error("Error loading servers "+ error)
 			});

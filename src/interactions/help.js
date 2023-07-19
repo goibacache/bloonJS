@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js')
-const bloonUtils = require('../utils/utils.js');
-const config = bloonUtils.getConfig();
+const { EmbedBuilder } = require('@discordjs/builders');
 
 module.exports = {
 	cooldown: 15,
@@ -10,7 +9,21 @@ module.exports = {
 	async execute(interaction) {
 		try{
 			console.log(`\nhelp.js: ${interaction.member.id}`);
-			const helpEmbed = bloonUtils.createHelpEmbed();
+			
+			const helpEmbed = new EmbedBuilder()
+			.setColor(0x0099FF)
+			.setTitle(`Bloon commands`)
+			.setTimestamp();
+		
+			helpEmbed.addFields(
+				{ name: '/news',                        value: 'add yourself to the "News" role so you can be notified when something important is going on!' },
+				{ name: '/ltp',                         value: 'add yourself to the "Looking to play" role so you can be notified when a new server is up!' },
+				{ name: '/pug',                         value: 'add yourself to the "Pick up games" role so you can be notified when new PUG game is being set up!' },
+				{ name: '/wiki',                        value: 'search directly in the wiki for a specified article, if found, it will be posted as an answer for everyone to see!' },
+				{ name: '/help',                        value: 'shows this message so you know which commands are available!' },
+				{ name: '/servers',                     value: 'list the top 10 servers available in the game!' },
+			);
+
 			await interaction.reply({ embeds: [helpEmbed], ephemeral: true});
 		}catch(error){
 			await interaction.reply({ content: `There was an error in the /help command, sorry.`, ephemeral: true});

@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ButtonStyle, ButtonBuilder, ActionRowBuilder } = require('discord.js')
+const { EmbedBuilder } = require('@discordjs/builders');
 const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 const storedProcedures = require('../utils/storedProcedures.js');
@@ -30,6 +31,29 @@ const addBasicInteractionOptions = (command) => {
             .setDescription('Optional evidence for the action')
             .setRequired(false)
     )
+}
+
+
+const createModerationActionEmbed = (moderationAction, actedUponMember, caseId, reason, handledBy, attachmentUrl) => {
+    const banEmbed = new EmbedBuilder()
+    .setColor(moderationAction.color)
+    .setTitle(`${moderationAction.name}: Case #${caseId}`)
+    .setTimestamp();
+
+    if (attachmentUrl != null && attachmentUrl.length > 0){
+        banEmbed.setImage(attachmentUrl)
+    }
+
+    // console.log("createModerationActionEmbed > actedUponMember", actedUponMember);
+
+    banEmbed.addFields(
+        { name: `User ${moderationAction.conjugation}:`,  value: `**${actedUponMember.displayName ?? actedUponMember.username}**\n${actedUponMember.id}`, inline: true },
+        { name: 'Handled by:',  value: `**${handledBy.displayName}**\n${handledBy.id}`, inline: true },
+        { name: `${moderationAction.name} reason:`,  value: reason, inline: false },
+    );
+
+
+    return banEmbed;
 }
 
 const command = {
@@ -121,7 +145,7 @@ const command = {
             const hoursofmessagestodelete   = interaction.options.getNumber('hoursofmessagestodelete') ?? 12;
 
             console.log(`\naction: ${actionName}\ntarget: ${target}\nreason: ${reason}\ntimeouttime: ${timeouttime}\ndirectmessage: ${directmessage}\nhoursofmessagestodelete: ${hoursofmessagestodelete}`);
-    
+
             const confirm = new ButtonBuilder()
                 .setCustomId('confirm')
                 .setLabel(`Confirm ${actionName}`)
@@ -159,7 +183,7 @@ const command = {
                     const userToBeActedUpon = action == bloonUtils.moderationActions.Unban ? target : await interaction.member.guild.members.fetch(target.id); // Only get the user if he's in the server.
                     const caseID            = await storedProcedures.moderationAction_GetNewId(action);
                     const channel           = await interaction.member.guild.channels.fetch(config.moderationActionsChannel);
-                    const actionEmbed       = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, reason, interaction.member, attachment?.url);
+                    const actionEmbed       = createModerationActionEmbed(action, userToBeActedUpon, caseID, reason, interaction.member, attachment?.url);
                     let   overrideMessage   = null; // Useful to try and catch unban errors.
                     
                     if (caseID == 0) {

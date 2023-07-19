@@ -1,12 +1,13 @@
 // say 0 0 https://cdn.discordapp.com/attachments/1123666656728715335/1124422436771872819/bloon_lived.mp4
 
 // Imports
-
-const fs = require('fs');
 const { Client, Collection, Events, GatewayIntentBits, GuildMember } = require('discord.js');
-const bloonUtils = require('./utils/utils.js');
-const config = bloonUtils.getConfig();
-const readline = require('readline');
+const fs 			= require('fs');
+const bloonUtils 	= require('./utils/utils.js');
+const config 		= bloonUtils.getConfig();
+const readline 		= require('readline');
+const path 			= require('path');
+const decache 		= require('decache');
 
 // Load initial config
 
@@ -167,7 +168,7 @@ async function handleCommands(command, client) {
 		if (command.startsWith("reload")){
 			var text  = bloonUtils.getQuotedText(command);
 			if (!text){
-				console.log("Say> No text input was found in the command")
+				console.log("Reload> No text input was found in the command")
 				return;
 			} 
 
@@ -179,12 +180,46 @@ async function handleCommands(command, client) {
 			if (!loadedCommand) {
 				console.log(`There is no command with the name \`${text}\`!`);
 			}else{
-				client.commands.delete(loadedCommand.data.name);
-				const newCommand = require(`./interactions/${loadedCommand.data.name}.js`);
-				client.commands.set(newCommand.data.name, newCommand);
+				client.commands.delete(loadedCommand.data.name); // Delete from command list
+				delete require.cache[require.resolve(`./interactions/${loadedCommand.data.name}.js`)]; // Delete from cache
+				const newCommand = require(`./interactions/${loadedCommand.data.name}.js`); // Require again
+				client.commands.set(newCommand.data.name, newCommand); // Add to command list
 				console.log(`Command \`${newCommand.data.name}\` was reloaded!`);
 				return;
 			}
+		}
+
+		if (command.startsWith("invalidate")){
+			var text  = bloonUtils.getQuotedText(command);
+			if (!text){
+				console.log("\nInvalidate> No text input was found in the command")
+				return;
+			} 
+
+			text = text.replace(/\"/g, "");
+
+			const externalFilePath = path.resolve(text);
+
+			console.log(`\nInvalidate> Searching for: ${externalFilePath}`)
+			
+			if (!fs.existsSync(externalFilePath)){
+				console.log(`\nInvalidate> No file found`);
+				return;
+			}
+
+			if (require.cache[externalFilePath] == null || require.cache[externalFilePath].length == 0){
+				console.log(`\nInvalidate> File not found on cache`);
+				return;
+			}
+
+			console.log(`\nInvalidate> Deleting ${externalFilePath}`);
+			decache(text);
+			console.log(`\nInvalidate> Requiring ${externalFilePath}`);
+			require(externalFilePath);
+			console.log(`\nInvalidate> Loaded ${externalFilePath}`);
+
+			
+
 		}
 	}catch(error){
 		console.error(`\nError in command: ${error}`);
