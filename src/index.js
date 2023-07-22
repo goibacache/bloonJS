@@ -7,7 +7,6 @@ const bloonUtils 	= require('./utils/utils.js');
 const config 		= bloonUtils.getConfig();
 const readline 		= require('readline');
 const path 			= require('path');
-const decache 		= require('decache');
 
 // Load initial config
 
@@ -191,38 +190,7 @@ async function handleCommands(command, client) {
 			}
 		}
 
-		if (command.startsWith("invalidate")){
-			var text  = bloonUtils.getQuotedText(command);
-			if (!text){
-				console.log("\nInvalidate> No text input was found in the command")
-				return;
-			} 
-
-			text = text.replace(/\"/g, "");
-
-			const externalFilePath = path.resolve(text);
-
-			console.log(`\nInvalidate> Searching for: ${externalFilePath}`)
-			
-			if (!fs.existsSync(externalFilePath)){
-				console.log(`\nInvalidate> No file found`);
-				return;
-			}
-
-			if (require.cache[externalFilePath] == null || require.cache[externalFilePath].length == 0){
-				console.log(`\nInvalidate> File not found on cache`);
-				return;
-			}
-
-			console.log(`\nInvalidate> Deleting ${externalFilePath}`);
-			decache(text);
-			console.log(`\nInvalidate> Requiring ${externalFilePath}`);
-			require(externalFilePath);
-			console.log(`\nInvalidate> Loaded ${externalFilePath}`);
-
-			
-
-		}
+		
 	}catch(error){
 		console.error(`\nError in command: ${error}`);
 	}

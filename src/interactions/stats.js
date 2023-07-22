@@ -41,7 +41,7 @@ const clearCachedLongerThanTimeStamp = () => {
 }
 
 module.exports = {
-	cooldown: 5,
+	cooldown: 60,
 	data: new SlashCommandBuilder()
 		.setName('stats')
 		.setDescription(`Shows stats`)
@@ -75,8 +75,6 @@ module.exports = {
 			console.log(`\stats.js: ${interaction.member.id}`);
 
             //#region fetch data
-
-            
             if (interaction.channel.id != config.bloonCommandsChannel){
 				await interaction.reply({ content: 'This command can only be used in the Bloon Commands Channel!', ephemeral: true });
 				console.log(`\stats.js: Interaction used in wrong channel.`);
