@@ -131,7 +131,7 @@ const deleteTagsFromText = (text) => {
 }
 
 const timePlayedToHours = (timePlayed) => {
-    return Math.trunc(timePlayed/60)+"H";
+    return Math.trunc(timePlayed/3600)+"H";
 }
 
 const truncateOrComplete = (text, maxLength = 28, padRight = false) => {
@@ -143,6 +143,28 @@ const truncateOrComplete = (text, maxLength = 28, padRight = false) => {
     }
     if (text.length > maxLength){
         text = text.substr(0, maxLength-3) + "...";
+    }
+
+    return text;
+}
+
+const hardTruncate = (text, maxLength = 28) => {
+    text = text+""; // Transform to text, just in case.
+    if (text.length > maxLength){
+        text = text.substr(0, maxLength);
+    }
+    return text;
+}
+
+const hardTruncateOrComplete = (text, maxLength = 28, padRight = false) => {
+    text = text+""; // Transform to text, just in case.
+    if (padRight){
+        text = text.padStart(maxLength); // Max is 28, fixed.
+    }else{
+        text = text.padEnd(maxLength); // Max is 28, fixed.    
+    }
+    if (text.length > maxLength){
+        text = text.substr(0, maxLength);
     }
 
     return text;
@@ -213,8 +235,11 @@ module.exports = {
     deleteTagsFromText,
     getRunArgs,
     getConfig,
-    moderationActions,
     moderationActionsToChoices,
     capitalizeFirstLetter,
-    truncateOrComplete
+    truncateOrComplete,
+    hardTruncateOrComplete,
+    hardTruncate,
+
+    moderationActions,
 }

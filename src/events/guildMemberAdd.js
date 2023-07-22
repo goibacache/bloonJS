@@ -12,13 +12,16 @@ const evnt = {
 			member.roles.add(agentRole);    // Assign it
 
 			// Welcome message
-			const channel 	= member.guild.channels.cache.get(config.intruderGeneralChannel);
-			const avatarURL	= member.user.avatarURL();
-			const dateJoined = new Date(member.user.createdAt).toDateString();
+			const channel 		= member.guild.channels.cache.get(config.intruderGeneralChannel);
+			const avatarURL		= member.user.avatarURL();
+			const dateJoined 	= new Date(member.user.createdAt).toDateString();
+			const createdToday 	= new Date(member.user.createdAt).toDateString() == new Date().toDateString();
+
+			// Check if account was created the same day!
 
 			// Creates the embed
 			const newUserEmbed = new EmbedBuilder()
-			.setColor(0x0099FF)
+			.setColor(createdToday ? 0xFF9900 : 0x0099FF)
 			.setTitle(`New User Joined | ${member.user.username}`)
 			.setThumbnail(avatarURL)
 			.addFields(

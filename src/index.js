@@ -16,6 +16,8 @@ client.events 		= new Collection(); // Events handler list
 client.commands 	= new Collection(); // Command handler list
 client.cooldowns 	= new Collection();
 
+process.noDeprecation = true; // Stops the "ExperimentalWarning"
+
 
 //#region import interactions
 const commandsPath = 'interactions';
