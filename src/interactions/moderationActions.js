@@ -144,8 +144,6 @@ const command = {
             const directmessage             = interaction.options.getBoolean('directmessage') ?? false;
             const hoursofmessagestodelete   = interaction.options.getNumber('hoursofmessagestodelete') ?? 12;
 
-            console.log(`\naction: ${actionName}\ntarget: ${target}\nreason: ${reason}\ntimeouttime: ${timeouttime}\ndirectmessage: ${directmessage}\nhoursofmessagestodelete: ${hoursofmessagestodelete}`);
-
             const confirm = new ButtonBuilder()
                 .setCustomId('confirm')
                 .setLabel(`Confirm ${actionName}`)
@@ -176,6 +174,8 @@ const command = {
                     await confirmation.update({ content: `${actionName} has been cancelled`, components: [] });
                     return;
                 }
+
+                console.log(`\nConfirmed moderationAction: ${actionName}\ntarget: ${target}\nreason: ${reason}\ntimeouttime: ${timeouttime}\ndirectmessage: ${directmessage}\nhoursofmessagestodelete: ${hoursofmessagestodelete}`);
     
                 if (confirmation.customId === 'confirm') {
                     // Store in DDBB and create EMBED
@@ -230,9 +230,9 @@ const command = {
     
                         case bloonUtils.moderationActions.Warn:
                             try{
-                                await target.send({content: `You have received a warning from ${interaction.member.displayName} for the following reason: ${reason}. ${attachment != null ? `\nThis warning had the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it.`})
+                                await target.send({content: `You have received a warning from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis warning had the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it.`})
                             }catch(error){
-                                confirmation.update({ content: `Sorry, can't send a DM to this user. Consider making a note.`, components: [] });
+                                confirmation.update({ content: `Sorry, can't send a DM to this user. Consider making a note and/or contact the user directly.`, components: [] });
                                 return;
                             }
                             break;

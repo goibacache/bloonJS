@@ -74,15 +74,14 @@ module.exports = {
 		try{
 			console.log(`\stats.js: ${interaction.member.id}`);
 
+            await interaction.deferReply(); // This makes it so it can take more than 3 seconds to reply.
+
             //#region fetch data
             if (interaction.channel.id != config.bloonCommandsChannel){
 				await interaction.reply({ content: 'This command can only be used in the Bloon Commands Channel!', ephemeral: true });
-				console.log(`\stats.js: Interaction used in wrong channel.`);
+				console.log(`\nstats.js: Interaction used in wrong channel.`);
 				return "noCooldown"; // Immediately remove cooldown
 			}
-            
-
-            await interaction.deferReply(); // This makes it so it can take more than 3 seconds to reply.
 
             const filterBy = interaction.options.getString('filterby');
 

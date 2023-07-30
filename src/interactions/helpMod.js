@@ -11,6 +11,10 @@ module.exports = {
         .setDMPermission(false),
 	async execute(interaction) {
         try{
+            console.log(`\nhelpmod.js: ${interaction.member.id}`);
+
+            await interaction.deferReply({ ephemeral: true }); // This makes it so it can take more than 3 seconds to reply.
+
             const helpEmbed = new EmbedBuilder()
             .setColor(0x0099FF)
             .setTitle(`Bloon Mods commands`)
@@ -24,9 +28,9 @@ module.exports = {
                 { name: '/moderationaction unban',          value: `Lifts a ban from an user and leaves a record in the evidence channel` },
             );
 
-            await interaction.reply({ embeds: [helpEmbed], ephemeral: true});
+            await interaction.editReply({ embeds: [helpEmbed], ephemeral: true});
         }catch(error){
-            await interaction.reply({ content: `There was an error in the /helpmod command, sorry.`, ephemeral: true});
+            await interaction.editReply({ content: `There was an error in the /helpmod command, sorry.`, ephemeral: true});
             console.error(`\nError in helpMod.js for ID ${interaction.member.id}: ` + error);
         }
 	},

@@ -9,6 +9,8 @@ module.exports = {
 	async execute(interaction) {
 		try{
 			console.log(`\nhelp.js: ${interaction.member.id}`);
+
+			await interaction.deferReply({ ephemeral: true }); // This makes it so it can take more than 3 seconds to reply.
 			
 			const helpEmbed = new EmbedBuilder()
 			.setColor(0x0099FF)
@@ -24,9 +26,9 @@ module.exports = {
 				{ name: '/servers',                     value: 'list the top 10 servers available in the game!' },
 			);
 
-			await interaction.reply({ embeds: [helpEmbed], ephemeral: true});
+			await interaction.editReply({ embeds: [helpEmbed], ephemeral: true});
 		}catch(error){
-			await interaction.reply({ content: `There was an error in the /help command, sorry.`, ephemeral: true});
+			await interaction.editReply({ content: `There was an error in the /help command, sorry.`, ephemeral: true});
 			console.error(`\nError in help.js for ID ${interaction.member.id}: ` + error);
 		}
 	},

@@ -15,6 +15,7 @@ module.exports = {
 	role_NowPlaying: 			"your-role-nowplaying",
 	role_Agent: 				"your-role-agent",
 	role_News: 					"your-role-news",
+	role_GameClub: 				"your-role-gameclub",
 
 	wikiURL:					"your-wiki-url",
 	wikiAPI:					"your-wiki-API-for-searchs",

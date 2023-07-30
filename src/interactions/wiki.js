@@ -3,7 +3,7 @@ const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 
 module.exports = {
-	cooldown: 5,
+	cooldown: 30,
 	data: new SlashCommandBuilder()
 		.setName('wiki')
 		.setDescription('Search the wiki for a specific article')
@@ -16,6 +16,9 @@ module.exports = {
 	async execute(interaction) {
 		try{
 			console.log(`\nwiki.js: ${interaction.member.id}`);
+
+			await interaction.deferReply(); // This makes it so it can take more than 3 seconds to reply.
+
 			// sharklootgilt.superbossgames.com/wiki/
 			const searchTerm = interaction.options.getString('searchterm');
 			const parameters = `?action=opensearch&format=json&formatversion=2&search=${searchTerm}&namespace=0&limit=1`
@@ -25,12 +28,12 @@ module.exports = {
 			const wikiDoc = result[3][0]; // Oh,god.
 
 			if (wikiDoc){
-				await interaction.reply(`${wikiDoc}`);	
+				await interaction.editReply(`${wikiDoc}`);	
 			}else{
-				await interaction.reply({ content: `Nothing was found under ${searchTerm}. The search is case sensitive.`, ephemeral: true });
+				await interaction.editReply({ content: `Nothing was found under ${searchTerm}. Remember that the search is case sensitive.` });
 			}
 		}catch(error){
-			await interaction.reply({ content: 'There was an error in /servers, sorry.', ephemeral: true });
+			await interaction.editReply({ content: 'There was an error in /servers, sorry.' });
 			console.error(`\nError in wiki.js for ID ${interaction.member.id}: ` + error);
 		}
 	},

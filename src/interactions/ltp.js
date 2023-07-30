@@ -11,6 +11,8 @@ module.exports = {
 		try{
 			console.log(`\nltp.js: ${interaction.member.id}`);
 
+			await interaction.deferReply({ ephemeral: true }); // This makes it so it can take more than 3 seconds to reply.
+
 			const 	member  	= interaction.guild.members.cache.get(interaction.member.id);  // Get current member
 			const 	ltpRole 	= await interaction.guild.roles.fetch(config.role_LookingToPlay);
 			const 	npRole  	= await interaction.guild.roles.fetch(config.role_NowPlaying);
@@ -22,12 +24,13 @@ module.exports = {
 				await member.roles.remove(npRole);    		// Remove
 				action = "removed";
 			}else{
+				// Check if the person is playing the game!
 				await member.roles.add(ltpRole);      		// Add
 			}
-			interaction.reply( { content: `Your "Looking to play" role has been ${action}`, ephemeral: true} );  	// Reply
+			await interaction.editReply( { content: `Your "Looking to play" role has been ${action}`, ephemeral: true} );  	// Reply
 		}catch(error){
 			console.log(`Error assigning Looking to play role to ${interaction.member.id}: ${error}`)
-			interaction.reply({ content: `Error assigning role: ${error}`, ephemeral: true })
+			interaction.editReply({ content: `Error assigning role: ${error}`, ephemeral: true })
 		}
 	},
 };

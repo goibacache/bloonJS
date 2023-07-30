@@ -7,6 +7,8 @@ const evnt = {
     name: Events.GuildMemberAdd,
 	async execute(member) {
 		try{
+			console.log(`GuildMemberAdd ${member.user.id}`);
+			
 			const agentRole = await member.guild.roles.fetch(config.role_Agent); // Lookup the "agent" role
 
 			member.roles.add(agentRole);    // Assign it

@@ -10,6 +10,9 @@ module.exports = {
 	async execute(interaction) {
         try{
             console.log(`\npug.js: ${interaction.member.id}`);
+
+            await interaction.deferReply({ ephemeral: true }); // This makes it so it can take more than 3 seconds to reply.
+
             const   member      = interaction.guild.members.cache.get(interaction.member.id);  // Get current member
             const   pugRole     = await interaction.guild.roles.fetch(config.role_Pug);
             let 	action 		= "assigned";
@@ -21,9 +24,9 @@ module.exports = {
             }else{
                 await member.roles.add(pugRole);      // Add
             }
-            interaction.reply( { content: `Your "PUG Players" role has been ${action}`, ephemeral: true} );  	// Reply
+            interaction.editReply( { content: `Your "PUG Players" role has been ${action}`, ephemeral: true} );  	// Reply
 		}catch(error){
-            await interaction.reply({ content: 'There was an error in /pug, sorry.', ephemeral: true });
+            await interaction.editReply({ content: 'There was an error in /pug, sorry.', ephemeral: true });
 			console.error(`\nError in pug.js for ID ${interaction.member.id}: ` + error);
 		}
 	},

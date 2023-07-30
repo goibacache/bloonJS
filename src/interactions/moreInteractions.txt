@@ -20,3 +20,5 @@ https://www.patreon.com/bloon
 // Bloon shoot @person. Bloon shooting to the camera.
 
 // Stats
+
+// Whenever LTP is added, check if the person is in game already!
