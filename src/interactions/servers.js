@@ -17,6 +17,8 @@ regionsToEmojis["IN"]   = "./assets/svg/in.svg";
 regionsToEmojis["RU"]   = "./assets/svg/ru.svg";
 regionsToEmojis["CN"]   = "./assets/svg/cn.svg";
 
+const lockEmoji         = "./assets/svg/lock.svg";
+
 module.exports = {
 	cooldown: 60,
 	data: new SlashCommandBuilder()
@@ -148,7 +150,16 @@ module.exports = {
 
                 let lock = "";
                 if (server.password){
-                    lock = "🔒";
+                    lock = " ";
+                }
+
+                // Draw lock SVG
+                if (lock.length > 0){
+                    const lockImg = new Image();
+                    lockImg.onload = function() {
+                        ctx.drawImage(lockImg, 95, 7 + baseYPosition + distanceBetweenColumns * i, 10, 10);
+                    }
+                    lockImg.src = lockEmoji;
                 }
 
 				const serverName = bloonUtils.hardTruncateOrComplete(bloonUtils.CyrillicOrStandard(bloonUtils.deleteTagsFromText(lock + server.name)), 40); // Max width: 40
