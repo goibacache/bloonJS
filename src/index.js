@@ -173,21 +173,53 @@ async function handleCommands(command, client) {
 				return;
 			} 
 
-			text = text.replace(/\"/g, "");
+			text = text.replace(/\"/g, "").toLowerCase();
 
 			// Check commands
 			const loadedCommand = client.commands.get(text);
 
-			if (!loadedCommand) {
-				console.log(`There is no command with the name \`${text}\`!`);
-			}else{
+			const commandRoute = `./interactions/${text}.js`;
+
+			if (loadedCommand){
 				client.commands.delete(loadedCommand.data.name); // Delete from command list
-				delete require.cache[require.resolve(`./interactions/${loadedCommand.data.name}.js`)]; // Delete from cache
-				const newCommand = require(`./interactions/${loadedCommand.data.name}.js`); // Require again
+				delete require.cache[require.resolve(commandRoute)]; // Delete from cache
+				console.log(`The command \`${text}\` was deleted from the command list!`);
+			}else{
+				console.log(`Command \`${text}\` was not found. Could not unloaded from the command list.`);
+			}
+
+			if (fs.existsSync(commandRoute)) {
+				console.log(`\`${commandRoute}\` appears to exists!`);
+				const newCommand = require(commandRoute); // Require again
 				client.commands.set(newCommand.data.name, newCommand); // Add to command list
-				console.log(`Command \`${newCommand.data.name}\` was reloaded!`);
+				console.log(`Command \`${newCommand.data.name}\` was loaded or reloaded!`);
+			}else{
+				console.log(`Command \`${text}\` was not found. Could not be loaded or reloaded.`);
+			}
+
+			return;
+		}
+
+		if (command.startsWith("fakejoin")){
+			let args = command.split(" ");
+			if (args.length < 2){
+				console.log(`fakejoin> command needs at least 2 inputs. ie: 'fakejoin [userID].'`);
 				return;
 			}
+
+			if (args[1] == "0"){
+				console.log(`fakejoin> command needs a valid discord ID. ie: 'fakejoin [userID].'`);
+				return;
+			}
+
+			// Fake me entering the server ;)
+			const list = await client.guilds.fetch(config.bloonGuildId); 
+			// Iterate through the collection of GuildMembers from the Guild getting the username property of each member 
+			const whoJoined = await list.members.fetch(args[1].replace(/"/g, ""));
+			//console.log("member, me: ", me);
+			client.emit(Events.GuildMemberAdd, whoJoined);
+			
+			return;
 		}
 
 		

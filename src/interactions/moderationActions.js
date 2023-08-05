@@ -28,7 +28,7 @@ const addBasicInteractionOptions = (command) => {
     .addAttachmentOption(option => 
         option
             .setName('evidence')
-            .setDescription('Optional evidence for the action')
+            .setDescription('[Default: empty] Optional evidence for the action')
             .setRequired(false)
     )
 }
@@ -86,12 +86,12 @@ const command = {
                     .addBooleanOption(option =>
                         option.setName('directmessage')
                         .setRequired(false)
-                        .setDescription('Whether or not a DM will be sent towards the user')
+                        .setDescription('[Default: False] Whether or not a DM will be sent towards the user')
                     )
                     .addNumberOption(option => 
                         option
                             .setName('timeouttime')
-                            .setDescription('Time in minutes to timeout a person')
+                            .setDescription('[Default: 10] Time in minutes to timeout a person')
                             .setRequired(false)
                     );
         })
@@ -104,7 +104,7 @@ const command = {
                     .addBooleanOption(option =>
                         option.setName('directmessage')
                         .setRequired(false)
-                        .setDescription('Whether or not a DM will be sent towards the user')
+                        .setDescription('[Default: False] Whether or not a DM will be sent towards the user')
                     )
         })
         .addSubcommand(subcommand => {
@@ -115,12 +115,12 @@ const command = {
                     .addBooleanOption(option =>
                         option.setName('directmessage')
                         .setRequired(false)
-                        .setDescription('Whether or not a DM will be sent towards the user')
+                        .setDescription('[Default: False] Whether or not a DM will be sent towards the user')
                     )
                     .addNumberOption(option => 
                         option.setName('hoursofmessagestodelete')
                         .setRequired(false)
-                        .setDescription('Number of hours of messages to delete, must be between 0 and 168 (7 days), inclusive')
+                        .setDescription('[Default: 12] Number of hours of messages to delete, must be between 0 and 168 (7 days), inclusive')
                         .setMinValue(0)
                         .setMaxValue(168)
                     )
@@ -171,6 +171,7 @@ const command = {
             await response.awaitMessageComponent({ filter: collectorFilter, time: 60000 })
             .then(async (confirmation) => {
                 if (confirmation.customId === 'cancel') {
+                    console.log(`\nmoderationactions.js: cancelled by ${interaction.member.id}`);
                     await confirmation.update({ content: `${actionName} has been cancelled`, components: [] });
                     return;
                 }
@@ -195,7 +196,18 @@ const command = {
                         case bloonUtils.moderationActions.Timeout:
                             try{
                                 const userToBeMuted   = await interaction.member.guild.members.fetch(target.id);
-                                await userToBeMuted.timeout(timeouttime * 60 * 1000);
+                                if (config.moderationActionsOn != "false"){
+                                    if (directmessage){
+                                        await target.send({content: `You have been timed out from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis time out had the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it.`})
+                                    }
+                                    await userToBeMuted.timeout(timeouttime * 60 * 1000);
+                                }
+
+                                // Borrar después D:<
+                                if (directmessage){
+                                    await target.send({content: `You have been timed out from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis time out had the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it.`})
+                                }
+                                
                             }catch(error){
                                 confirmation.update({ content: `Sorry, can't mute a server administrator.`, components: [] });
                                 return;
@@ -204,11 +216,13 @@ const command = {
     
                         case bloonUtils.moderationActions.Kick:
                             try{
-                                if (directmessage){
-                                    await target.send({content: `You have been kicked from the server for the following reason: ${reason}`})
-                                    .catch(() => confirmation.update({ content: `Couldn't DM the user.`, components: [] }));
+                                if (config.moderationActionsOn != "false"){
+                                    if (directmessage){
+                                        await target.send({content: `You have been kicked from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis kick had the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it.`})
+                                        .catch(() => confirmation.update({ content: `Couldn't DM the user.`, components: [] }));
+                                    }
+                                    await interaction.guild.members.kick(target, reason);
                                 }
-                                await interaction.guild.members.kick(target, reason);
                             }catch(error){
                                 confirmation.update({ content: `Sorry, there was an error kicking that person. Error: ${error}`, components: [] });
                                 return;
@@ -217,11 +231,13 @@ const command = {
                             break;
                         case bloonUtils.moderationActions.Ban:
                             try{
-                                if (directmessage){
-                                    await target.send({content: `You have been banned from the server for the following reason: ${reason}`})
-                                    .catch(() => confirmation.update({ content: `Couldn't DM the user.`, components: [] }));
+                                if (config.moderationActionsOn != "false"){
+                                    if (directmessage){
+                                        await target.send({content: `You have been banned from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis ban had the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it.`})
+                                        .catch(() => confirmation.update({ content: `Couldn't DM the user.`, components: [] }));
+                                    }
+                                    await interaction.guild.bans.create(target, { reason, deleteMessageSeconds: hoursofmessagestodelete * 3600 }); // 12 hours.
                                 }
-                                await interaction.guild.bans.create(target, { reason, deleteMessageSeconds: hoursofmessagestodelete * 3600 }); // 12 hours.
                             }catch(error){
                                 confirmation.update({ content: `Couldn't find the user to be banned. Error: ${error}`, components: [] });
                                 return;
@@ -239,20 +255,22 @@ const command = {
     
                         case bloonUtils.moderationActions.Unban:
                             try{
-                                const bans = await interaction.guild.bans.fetch()
-                            
-                                if (bans.size == 0) {
-                                    overrideMessage = `There are no banned user on this server.`;
-                                    return;
+                                if (config.moderationActionsOn != "false"){
+                                    const bans = await interaction.guild.bans.fetch()
+                                
+                                    if (bans.size == 0) {
+                                        overrideMessage = `There are no banned user on this server.`;
+                                        return;
+                                    }
+        
+                                    const bannedUser = await bans.find(ban => ban.user.id === target.id);
+                                    if (!bannedUser) {
+                                        overrideMessage = `The ID stated is not banned from this server.`;
+                                        return;
+                                    }
+                                    // Removes the ban
+                                    await interaction.guild.bans.remove(target.id, reason);
                                 }
-    
-                                const bannedUser = await bans.find(ban => ban.user.id === target.id);
-                                if (!bannedUser) {
-                                    overrideMessage = `The ID stated is not banned from this server.`;
-                                    return;
-                                }
-                                // Removes the ban
-                                await interaction.guild.bans.remove(target.id, reason);
                             }catch(error){
                                 overrideMessage = `There was an error unbaning the user. Error: ${error}`
                             }

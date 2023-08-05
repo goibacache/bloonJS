@@ -1,5 +1,28 @@
 const { EmbedBuilder } = require('@discordjs/builders');
+const { AttachmentBuilder } = require('discord.js')
 const https = require('https');
+
+//#region initialization
+
+const maxRoomsForEmbed = 10;
+
+const regionsToEmojis   = [];
+regionsToEmojis["EU"]   = "<:eu:1125796021574844520>";
+regionsToEmojis["US"]   = "<:us:1125796012263481456>";
+regionsToEmojis["USW"]  = "<:us:1125796012263481456>";
+regionsToEmojis["Asia"] = "<:Asia:1125796013454667787>";
+regionsToEmojis["JP"]   = "<:jp:1125796026092093601>";
+regionsToEmojis["AU"]   = "<:au:1125796016097083543>";
+regionsToEmojis["SA"]   = "<:br:1125796009428144188> ";
+regionsToEmojis["CAE"]  = "<:ca:1125796017909014579>";
+regionsToEmojis["KR"]   = "<:kr:1125796028369616968>";
+regionsToEmojis["IN"]   = "<:in:1125796023147704370>";
+regionsToEmojis["RU"]   = "<:ru:1125796030777131078>";
+regionsToEmojis["CN"]   = "<:cn:1125796020090048545>"; // Unused?
+
+const transliterate = {"Ё":"YO","Й":"I","Ц":"TS","У":"U","К":"K","Е":"E","Н":"N","Г":"G","Ш":"SH","Щ":"SCH","З":"Z","Х":"H","Ъ":"'","ё":"yo","й":"i","ц":"ts","у":"u","к":"k","е":"e","н":"n","г":"g","ш":"sh","щ":"sch","з":"z","х":"h","ъ":"'","Ф":"F","Ы":"I","В":"V","А":"A","П":"P","Р":"R","О":"O","Л":"L","Д":"D","Ж":"ZH","Э":"E","ф":"f","ы":"i","в":"v","а":"a","п":"p","р":"r","о":"o","л":"l","д":"d","ж":"zh","э":"e","Я":"Ya","Ч":"CH","С":"S","М":"M","И":"I","Т":"T","Ь":"'","Б":"B","Ю":"YU","я":"ya","ч":"ch","с":"s","м":"m","и":"i","т":"t","ь":"'","б":"b","ю":"yu"};
+
+// #endregion
 
 const getHHTPResult = (requestURL) => {
     return new Promise((resolve, reject) => {
@@ -45,22 +68,6 @@ const getHHTPResult = (requestURL) => {
     });
 }
 
-const maxRoomsForEmbed = 10;
-
-const regionsToEmojis   = [];
-regionsToEmojis["EU"]   = "<:eu:1125796021574844520>";
-regionsToEmojis["US"]   = "<:us:1125796012263481456>";
-regionsToEmojis["USW"]  = "<:us:1125796012263481456>";
-regionsToEmojis["Asia"] = "<:Asia:1125796013454667787>";
-regionsToEmojis["JP"]   = "<:jp:1125796026092093601>";
-regionsToEmojis["AU"]   = "<:au:1125796016097083543>";
-regionsToEmojis["SA"]   = "<:br:1125796009428144188> ";
-regionsToEmojis["CAE"]  = "<:ca:1125796017909014579>";
-regionsToEmojis["KR"]   = "<:kr:1125796028369616968>";
-regionsToEmojis["IN"]   = "<:in:1125796023147704370>";
-regionsToEmojis["RU"]   = "<:ru:1125796030777131078>";
-regionsToEmojis["CN"]   = "<:cn:1125796020090048545>"; // Unused?
-
 /**
  * Creates the embeded message for current rooms. Beware, Embed descriptions are limited to 4096 characters.
  * @param {rooms.data from intruder https://api.intruderfps.com/rooms} rooms 
@@ -78,33 +85,24 @@ const createRoomEmbed = (rooms) => {
     let totalPlayersOnlist = 0;
     rooms.map(x => totalPlayersOnlist += x.agentCount);
 
-    // just do the max ammount of them.
+    // just do the max amount of them.
     if (rooms.length > maxRoomsForEmbed+1){
         rooms = rooms.slice(0, maxRoomsForEmbed);
     }
 
     // Create description with the code tag.
     let description =  "";
-    description     += `\`Re\` | \`${truncateOrComplete("Name")}\` | \`Agents\`\n`;
-
-    // Rooms
-    rooms.forEach((room, index) => {
-        if (index > maxRoomsForEmbed) return;
-
-        const emojiFlag = regionsToEmojis[room.region];
-        description += `${emojiFlag == undefined ? "❓" : emojiFlag} | \`${truncateOrComplete(deleteTagsFromText(room.name.trim()))}\` | \`[${room.agentCount.toString().padStart(2)}/${room.maxAgents.toString().padStart(2)}]\`\n`;
-    });
+    let title = `Listed ${rooms.length} rooms`;
 
     // Rooms left, only if they're
     if (roomsLeftOut > 0){
-        description += `\nAnd ${roomsLeftOut} more rooms.\n`    
+        description = `There's ${roomsLeftOut} more rooms online.\n`;
+        title = "Listed 10 rooms";
     }
 
     // Close the code tag
-    //description += "";
-
     roomEmbed.addFields(
-        { name: '\u200B',  value: description }
+        { name: title,  value: description }
     );
 
     const extensions = `<:chrome:1125641298213339167> [**Chrome**](https://chrome.google.com/webstore/detail/intruder-notifications/aoebpknpfcepopfgnbnikaipjeekalim) | [**Firefox**](https://addons.mozilla.org/en-US/firefox/addon/intruder-notifications/) <:firefox:1125641317565857833>`;
@@ -128,6 +126,12 @@ const getQuotedText = (text) => {
 const deleteTagsFromText = (text) => {
     text = text.replace(/`/g, `'`); // Fix the ` in room names
     return text.replace(/\<(.*?)>/g, "");
+}
+
+const CyrillicOrStandard = (string) => {
+    return string.split('').map(function (char) { 
+        return transliterate[char] || char; 
+    }).join("");
 }
 
 const timePlayedToHours = (timePlayed) => {
@@ -240,6 +244,6 @@ module.exports = {
     truncateOrComplete,
     hardTruncateOrComplete,
     hardTruncate,
-
+    CyrillicOrStandard,
     moderationActions,
 }

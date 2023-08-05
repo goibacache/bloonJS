@@ -72,7 +72,7 @@ module.exports = {
             ),
 	async execute(interaction) {
 		try{
-			console.log(`\stats.js: ${interaction.member.id}`);
+			console.log(`\nstats.js: ${interaction.member.id}`);
 
             await interaction.deferReply(); // This makes it so it can take more than 3 seconds to reply.
 
@@ -108,7 +108,7 @@ module.exports = {
                         bloonUtils.getHHTPResult(`https://api.intruderfps.com/agents/${agent.steamId}/stats`)
                         .then(result => {
                             result["steamId"] = agent.steamId;
-                            result["name"] = agent.name;
+                            result["name"] = bloonUtils.CyrillicOrStandard(agent.name);
                             result["avatarUrl"] = agent.avatarUrl;
                             result["timestamp"]  = new Date(new Date().getTime() + 10*60000); // The timestamp is set to expire in 10 minutes
                             playerCache.push(result);

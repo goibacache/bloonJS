@@ -10,7 +10,7 @@ const commands  = [".rule34"];
 const evnt = {
     name: Events.MessageCreate,
 	async execute(message) {
-        // Not reply to itself
+        // Avoid replying to itself
         if (message.author.id === config.clientId){
             return;
         }
@@ -18,7 +18,7 @@ const evnt = {
         // All messages should be lower case to be processed
         message.content = message.content.toLowerCase();
 
-        // Handle regexs replies in the general / help & mapmaking channels
+        // Handle regexs replies in the general / help & map making channels
         if (isInChannel(message, config.intruderGeneralChannel) || isInChannel(message, config.intruderHelpChannel) || isInChannel(message, config.intruderMapmakingChannel) ) {
             regexs.forEach(reg => {
                 if(reg.regex.test(message)){
