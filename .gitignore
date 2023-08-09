@@ -6,3 +6,4 @@ config.superboss.js
 config.develop.js
 .vscode/settings.json
 src/canvasTest/
+src/localMemory/lastWikiEdit.bak

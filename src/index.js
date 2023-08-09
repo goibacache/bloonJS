@@ -110,8 +110,14 @@ client.on(Events.InteractionCreate, async interaction => {
 client.once(Events.ClientReady, async c => {
 	console.log(`Ready! Logged in as ${c.user.tag} 😎`);
 
+	// Every 2.5 minutes check the wiki for changes!
+	setInterval(() => {
+		client.emit("wikiedit", client);
+	}, (2.5 * 60) * 1000);
+
+	// Giant loop to allow input
 	while (1 == 1){
-		const command = await askQuestion("BLOON V6 console> ");
+		const command = await askQuestion("");
 		handleCommands(command, client);
 	}
 });

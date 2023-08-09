@@ -9,6 +9,7 @@ module.exports = {
 	bloonCommandsChannel:		"your-bloon-commands-channel",
 	moderationActionsChannel:	"your-moderation-actions-channel",
 	offTopicChannel:			"your-off-topic-channel",
+	wikiChannel:				"your-wiki-channel",
 
 	role_Pug: 					"your-role-pug-players",
 	role_LookingToPlay: 		"your-role-lookingToPlay",
