@@ -7,6 +7,7 @@ const bloonUtils 	= require('./utils/utils.js');
 const config 		= bloonUtils.getConfig();
 const readline 		= require('readline');
 const path 			= require('path');
+const { clearInterval } = require('timers');
 
 // Load initial config
 
@@ -17,6 +18,7 @@ client.cooldowns 	= new Collection();
 
 process.noDeprecation = true; // Stops the "ExperimentalWarning"
 
+let wikieditInterval = null;
 
 //#region import interactions
 const commandsPath = 'interactions';
@@ -111,7 +113,7 @@ client.once(Events.ClientReady, async c => {
 	console.log(`Ready! Logged in as ${c.user.tag} 😎`);
 
 	// Every 2.5 minutes check the wiki for changes!
-	setInterval(() => {
+	wikieditInterval = setInterval(() => {
 		client.emit("wikiedit", client);
 	}, (2.5 * 60) * 1000);
 
@@ -226,6 +228,20 @@ async function handleCommands(command, client) {
 			client.emit(Events.GuildMemberAdd, whoJoined);
 			
 			return;
+		}
+
+		if (command.startsWith("wiki")){
+			if (wikieditInterval == null){
+				console.log("wikiedit fetch started.")
+				// Every 2.5 minutes check the wiki for changes!
+				wikieditInterval = setInterval(() => {
+					client.emit("wikiedit", client);
+				}, (2.5 * 60) * 1000);
+			}else{
+				console.log("wikiedit fetch stopped.")
+				clearInterval(wikieditInterval);
+				wikieditInterval = null;
+			}
 		}
 
 		

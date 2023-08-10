@@ -26,7 +26,7 @@ const evnt = {
     name: "wikiedit",
 	async execute(client) {
         try{
-
+            console.log("Querying wiki edits...")
             // Load channel and guild
             const guild = await client.guilds.fetch(config.bloonGuildId);
             const channel = await guild.channels.cache.get(config.wikiChannel) || await guild.channels.fetch(config.wikiChannel);
@@ -48,18 +48,23 @@ const evnt = {
 
             for(change of changes.filter(x => x.rcid > lastRCID)){
 
-                console.log("change:", change);
+                const changeURL             = `${config.wikiURL}index.php/${change.title.replace(/ /g, "_")}`;
+                const dateModified 	        = new Date(change.timestamp).toUTCString();
 
-                const changeURL = `${config.wikiURL}index.php/${change.title.replace(/ /g, "_")}`;
-                const changeComparisonUrl = `${config.wikiURL}index.php?title=${change.title.replace(/ /g, "_")}&type=revision&diff=${change.revid}&oldid=${change.old_revid}`;
+                // Create the "see the differences" text if there are any.
+                let differenceText          = "";
+                if (change.old_revid != 0){
+                    const changeComparisonUrl   = `${config.wikiURL}index.php?title=${change.title.replace(/ /g, "_")}&type=revision&diff=${change.revid}&oldid=${change.old_revid}`;
+                    differenceText = ` See the [differences](${changeComparisonUrl})`;
+                }
 
                 const wikiEmbed = new EmbedBuilder()
                 .setColor(0xFFCC00)
                 // .setTitle(`Wiki change in ${change.title}`)
                 .setURL(changeURL)
-                .setDescription(`New ${change.type} by ${change.user} in [${change.title}](${changeURL}). See the [differences](${changeComparisonUrl})`)
+                .setDescription(`New ${change.type} by ${change.user} in [${change.title}](${changeURL}).${differenceText}`)
                 .setTimestamp()
-                .setFooter({ text: `SuperbossGames Wiki | ` });
+                .setFooter({ text: `SuperbossGames Wiki | Modification date ${dateModified}` });
 
                 await channel.send({ embeds: [wikiEmbed] });
 
@@ -70,7 +75,6 @@ const evnt = {
 
             if (lastRcidInList != 0){
                 SaveRCID(lastRcidInList);
-                console.log(`lastRcid is ${lastRcidInList}`)
             }
            
         }catch(error){
