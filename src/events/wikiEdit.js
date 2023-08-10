@@ -26,16 +26,13 @@ const evnt = {
     name: "wikiedit",
 	async execute(client) {
         try{
-            console.log("Querying wiki edits...")
             // Load channel and guild
             const guild = await client.guilds.fetch(config.bloonGuildId);
             const channel = await guild.channels.cache.get(config.wikiChannel) || await guild.channels.fetch(config.wikiChannel);
 
-
             lastRCID = readSavedRCID();
 
             const response = await bloonUtils.getHHTPResult('https://sharklootgilt.superbossgames.com/wiki/api.php?action=query&format=json&list=recentchanges&rcprop=title|ids|sizes|flags|user|timestamp');
-            //const lists = changes;
 
             const changes = response.query.recentchanges;
 
@@ -46,6 +43,7 @@ const evnt = {
 
             let lastRcidInList = 0;
 
+            // Only create a message for the ones we haven't sent
             for(change of changes.filter(x => x.rcid > lastRCID)){
 
                 const changeURL             = `${config.wikiURL}index.php/${change.title.replace(/ /g, "_")}`;
@@ -78,7 +76,7 @@ const evnt = {
             }
            
         }catch(error){
-            console.error(`\nError in wikiedit.js: ${error}`);
+            console.error(`Error in wikiedit.js: ${error}`);
         }
 	},
 };
