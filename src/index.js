@@ -1,7 +1,16 @@
-// say 0 0 https://cdn.discordapp.com/attachments/1123666656728715335/1124422436771872819/bloon_lived.mp4
+/*************************************************************************
+	Welcome to Bloon's source code. This is it, where the magic happens.
+
+	This source code was mainly made by @Xixo following the discordjs 
+	guide right here: https://discordjs.guide/
+
+	If you want to take this code and make your own code, go ahead!
+
+	If you find a bug, please tell me or make a PR :^)
+**************************************************************************/
 
 // Imports
-const { Client, Collection, Events, GatewayIntentBits, GuildMember } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const fs 			= require('fs');
 const bloonUtils 	= require('./utils/utils.js');
 const config 		= bloonUtils.getConfig();
@@ -19,6 +28,8 @@ client.cooldowns 	= new Collection();
 process.noDeprecation = true; // Stops the "ExperimentalWarning"
 
 let wikieditInterval = null;
+
+const wikiCheckInterval = 5;
 
 //#region import interactions
 const commandsPath = 'interactions';
@@ -112,10 +123,10 @@ client.on(Events.InteractionCreate, async interaction => {
 client.once(Events.ClientReady, async c => {
 	console.log(`Ready! Logged in as ${c.user.tag} 😎`);
 
-	// Every 2.5 minutes check the wiki for changes!
+	// Every X minutes check the wiki for changes!
 	wikieditInterval = setInterval(() => {
 		client.emit("wikiedit", client);
-	}, (2.5 * 60) * 1000);
+	}, (wikiCheckInterval * 60) * 1000);
 
 	// Giant loop to allow input
 	while (1 == 1){
@@ -230,13 +241,46 @@ async function handleCommands(command, client) {
 			return;
 		}
 
+		if (command.startsWith("leave")){
+			let args = command.split(" ");
+			if (args.length < 2){
+				console.log("Listing current servers the bot is in:");
+				client.guilds.cache.forEach(guild => {
+					//guild.leave()
+					console.log(`${guild.id} with the name: ${guild.name}.`);
+				});
+				return;
+			}
+
+			const guildId = args[1];
+
+			console.log(`trying to get guild ${guildId}`)
+			const guilds = await client.guilds.fetch(guildId); 
+
+			if (guilds.length == 0){
+				console.log(`No guild found for id: ${guildId}`);
+				return;
+			}
+
+			if (guilds.id == config.bloonGuildId){
+				console.log(`Can't leave the main bloon guild: ${guildId}`);
+				return;
+			}
+
+			console.log(`Found guild ${guilds.id} with the name: ${guilds.name}`);
+
+			console.log("Leaving!..");
+
+			guilds.leave();
+		}
+
 		if (command.startsWith("wiki")){
 			if (wikieditInterval == null){
 				console.log("wikiedit fetch started.")
-				// Every 2.5 minutes check the wiki for changes!
+				// Every X minutes check the wiki for changes!
 				wikieditInterval = setInterval(() => {
 					client.emit("wikiedit", client);
-				}, (2.5 * 60) * 1000);
+				}, (wikiCheckInterval * 60) * 1000);
 			}else{
 				console.log("wikiedit fetch stopped.")
 				clearInterval(wikieditInterval);

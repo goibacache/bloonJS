@@ -28,7 +28,16 @@ module.exports = {
 
 			await interaction.editReply({ embeds: [helpEmbed], ephemeral: true});
 		}catch(error){
-			await interaction.editReply({ content: `There was an error in the /help command, sorry.`, ephemeral: true});
+			const answer = { content: `There was an error in the /help command, sorry.`, ephemeral: true};
+			
+			if (interaction.deferred && !interaction.replied) {
+                await interaction.editReply(answer);
+            } else if (interaction.deferred && interaction.replied) {
+                await interaction.followUp(answer);
+            } else {
+                await interaction.reply(answer);
+            }
+			
 			console.error(`\nError in help.js for ID ${interaction.member.id}: ` + error);
 		}
 	},

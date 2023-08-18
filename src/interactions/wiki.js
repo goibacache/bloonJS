@@ -33,7 +33,16 @@ module.exports = {
 				await interaction.editReply({ content: `Nothing was found under ${searchTerm}. Remember that the search is case sensitive.` });
 			}
 		}catch(error){
-			await interaction.editReply({ content: 'There was an error in /servers, sorry.' });
+			const answer = { content: 'There was an error in /servers, sorry.' };
+            
+			if (interaction.deferred && !interaction.replied) {
+                await interaction.editReply(answer);
+            } else if (interaction.deferred && interaction.replied) {
+                await interaction.followUp(answer);
+            } else {
+                await interaction.reply(answer);
+            }
+
 			console.error(`\nError in wiki.js for ID ${interaction.member.id}: ` + error);
 		}
 	},

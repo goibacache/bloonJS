@@ -288,7 +288,16 @@ const command = {
             });
     
         }catch(error){
-            await interaction.editReply({ content: 'There was an error in /moderationActions, sorry.', components: [] });
+            const answer = { content: 'There was an error in /moderationActions, sorry.', components: [], ephemeral: true };
+            
+			if (interaction.deferred && !interaction.replied) {
+                await interaction.editReply(answer);
+            } else if (interaction.deferred && interaction.replied) {
+                await interaction.followUp(answer);
+            } else {
+                await interaction.reply(answer);
+            }
+
             console.error(`\nError in moderationActions.js for ID ${interaction.member.id}, action ${interaction.options.getString('type')}: ` + error);
         }
     }

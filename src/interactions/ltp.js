@@ -29,8 +29,17 @@ module.exports = {
 			}
 			await interaction.editReply( { content: `Your "Looking to play" role has been ${action}`, ephemeral: true} );  	// Reply
 		}catch(error){
-			console.log(`Error assigning Looking to play role to ${interaction.member.id}: ${error}`)
-			interaction.editReply({ content: `Error assigning role: ${error}`, ephemeral: true })
+            const answer = { content: `Error assigning role: ${error}`, ephemeral: true };
+			
+			if (interaction.deferred && !interaction.replied) {
+                await interaction.editReply(answer);
+            } else if (interaction.deferred && interaction.replied) {
+                await interaction.followUp(answer);
+            } else {
+                await interaction.reply(answer);
+            }
+
+			console.log(`Error assigning Looking to play role to ${interaction.member.id}: ${error}`);
 		}
 	},
 };

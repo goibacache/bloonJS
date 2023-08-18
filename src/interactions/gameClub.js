@@ -27,8 +27,17 @@ module.exports = {
 			}
 			await interaction.editReply( { content: `Your "Game Club" role has been ${action}`, ephemeral: true} );  	// Reply
 		}catch(error){
+			const answer = { content: `Error assigning role: ${error}`, ephemeral: true };
+			
+			if (interaction.deferred && !interaction.replied) {
+                await interaction.editReply(answer);
+            } else if (interaction.deferred && interaction.replied) {
+                await interaction.followUp(answer);
+            } else {
+                await interaction.reply(answer);
+            }
+
 			console.log(`Error assigning Game Club role to ${interaction.member.id}: ${error}`)
-			interaction.editReply({ content: `Error assigning role: ${error}`, ephemeral: true })
 		}
 	},
 };

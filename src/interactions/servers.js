@@ -196,7 +196,13 @@ module.exports = {
 
 			//#endregion
 		}catch(error){
-			await interaction.editReply({ content: 'There was an error in /servers, sorry.' });
+            if (interaction.deferred && !interaction.replied) {
+                await interaction.editReply({ content: 'There was an error in /servers, sorry.' });
+            } else if (interaction.deferred && interaction.replied) {
+                await interaction.followUp({ content: 'There was an error in /servers, sorry.' });
+            } else {
+                await interaction.reply({ content: 'There was an error in /servers, sorry.' });
+            }
 			console.error(`\nError in servers.js for ID ${interaction.member.id}: ` + error);
 		}
 	},

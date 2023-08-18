@@ -26,7 +26,16 @@ module.exports = {
             }
             interaction.editReply( { content: `Your "News" role has been ${action}`, ephemeral: true} );  	// Reply
 		}catch(error){
-            await interaction.editReply({ content: 'There was an error in /news, sorry.', ephemeral: true });
+            const answer = { content: 'There was an error in /news, sorry.', ephemeral: true };
+            
+			if (interaction.deferred && !interaction.replied) {
+                await interaction.editReply(answer);
+            } else if (interaction.deferred && interaction.replied) {
+                await interaction.followUp(answer);
+            } else {
+                await interaction.reply(answer);
+            }
+
 			console.error(`\nError in news.js for ID ${interaction.member.id}: ` + error);
 		}
 	},

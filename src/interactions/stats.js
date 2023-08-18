@@ -255,8 +255,17 @@ module.exports = {
             const attachment = canvas.toBuffer('image/png', { compressionLevel: 3, filters: canvas.PNG_FILTER_NONE })
 	        await interaction.editReply({ files: [attachment] });
 		}catch(error){
+            const answer = { content: `There was an error in the /stats command, sorry.`};
+            
+			if (interaction.deferred && !interaction.replied) {
+                await interaction.editReply(answer);
+            } else if (interaction.deferred && interaction.replied) {
+                await interaction.followUp(answer);
+            } else {
+                await interaction.reply(answer);
+            }
+
             console.error(`\nError in stats.js for ID ${interaction.member.id}: ` + error);
-			await interaction.editReply({ content: `There was an error in the /stats command, sorry.`});
 		}
 	},
 };
