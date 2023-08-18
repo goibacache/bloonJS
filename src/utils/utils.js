@@ -1,6 +1,7 @@
 const { EmbedBuilder } = require('@discordjs/builders');
 const { AttachmentBuilder } = require('discord.js')
 const https = require('https');
+const { registerFont, createCanvas, Image } = require('canvas');
 
 //#region initialization
 
@@ -111,6 +112,100 @@ const createRoomEmbed = (rooms) => {
     roomEmbed.setFooter({ text: `SuperbossGames | #current-server-info | Total Agents: ${totalPlayersOnlist}` });
     
     return roomEmbed;
+}
+
+// Canvas config
+const width     = 640;
+const height    = 475;
+const titleBoxWidth = 160;
+const titleBoxHeight = 50;
+const bottomTablePadding = 105;
+const baseYPosition = 65;
+const columnsPositionX = [90, 530, 600];
+const distanceBetweenColumns = 33;
+
+const setupCanvas = () => {
+
+    // Register font
+    registerFont('./assets/ShareTechMono-Regular.ttf', { family: 'Share Tech Mono' })
+
+    // Create canvas
+    const canvas = createCanvas(width, height);
+    const ctx    = canvas.getContext('2d');
+
+    // Create bg gradient
+    const grd_bg = ctx.createRadialGradient(height/2,width/2,50,200,height,width);
+    grd_bg.addColorStop(0,"#263138");
+    grd_bg.addColorStop(1,"#212930");
+
+    // Create divider gradient
+    const grd_divider = ctx.createLinearGradient(30, 0, width-60, 0);
+    grd_divider.addColorStop(0,     "#263138");
+    grd_divider.addColorStop(0.5,   "#63676A");
+    grd_divider.addColorStop(1,     "#263138");
+
+    // Create title gradient
+    const grd_title = ctx.createLinearGradient(0, 0, 0, titleBoxHeight);
+    for (let i = 0; i <= 30; i++) {
+        if (i % 2 == 0){
+            grd_title.addColorStop(i/30, "#939596");
+        }else{
+            grd_title.addColorStop(i/30, "#6d6f73");
+        }
+    }
+
+    // Fill with gradient
+    ctx.fillStyle = grd_bg;
+    ctx.fillRect(0, 0, width, height);
+
+    // Title place
+    ctx.fillStyle = grd_title;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(titleBoxWidth, 0);
+    ctx.lineTo(titleBoxWidth-30, titleBoxHeight);
+    ctx.lineTo(0, titleBoxHeight);
+    ctx.closePath();
+    ctx.fill();
+
+    // The table BG
+    ctx.fillStyle = "#263138";
+    ctx.fillRect(20, 60, width-40, height-bottomTablePadding)
+
+    // The table Border
+    ctx.strokeStyle = "#FFFFFF";
+    ctx.strokeRect(20, 60, width-40, height-bottomTablePadding);
+
+    // Last, the window Border
+    ctx.strokeStyle = "#FFFFFF";
+    ctx.strokeRect(1, 1, width-2, height-2);
+
+    //#endregion
+
+    //#region draw canvas text
+
+    // Draw texts:
+    ctx.font = '20px "Share Tech Mono"'; // set font
+    ctx.fillStyle = "white";
+
+    // Title
+    ctx.fillStyle = "#383838";
+    ctx.textAlign = "start";
+    ctx.textBaseline = "hanging";
+    ctx.fillText("> SERVERS", 20, 15);
+    
+    // Table Header
+    ctx.fillStyle = "#BBBBBB";
+    ctx.textAlign = "end";
+    ctx.fillText("Region",                                       columnsPositionX[0], baseYPosition);
+    ctx.fillText("Name                                    ",     columnsPositionX[1], baseYPosition);
+    ctx.fillText(hardTruncateOrComplete("Agents", 7), columnsPositionX[2], baseYPosition);
+
+    // First separation
+    ctx.fillStyle = grd_divider;
+    ctx.fillRect(30, baseYPosition + distanceBetweenColumns*0.75, width-60, 2);
+
+    return canvas;
 }
 
 const getQuotedText = (text) => {
@@ -235,6 +330,7 @@ module.exports = {
     getHHTPResult,
     timePlayedToHours,
     createRoomEmbed,
+    setupCanvas,
     getQuotedText,
     deleteTagsFromText,
     getRunArgs,
