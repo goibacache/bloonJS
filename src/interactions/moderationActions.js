@@ -133,7 +133,7 @@ const command = {
         }),
     async execute(interaction) {
         try{
-            console.log(`\nmoderationactions.js: ${interaction.member.id}`);
+            console.log(`moderationactions.js: ${interaction.member.id}`);
             const subCommand                = interaction.options.getSubcommand();
             const actionName                = bloonUtils.capitalizeFirstLetter(subCommand); // Actually value, but eh.
             const action                    = bloonUtils.moderationActions[actionName];
@@ -165,23 +165,27 @@ const command = {
     
             const collectorFilter = i => i.user.id === interaction.user.id; // Only the same user can use the buttons
     
-    
-            //const confirmation = await response.awaitMessageComponent({ filter: collectorFilter, time: 60000 });
-    
             await response.awaitMessageComponent({ filter: collectorFilter, time: 60000 })
             .then(async (confirmation) => {
                 if (confirmation.customId === 'cancel') {
-                    console.log(`\nmoderationactions.js: cancelled by ${interaction.member.id}`);
+                    console.log(`moderationactions.js: cancelled by ${interaction.member.id}`);
                     await confirmation.update({ content: `${actionName} has been cancelled`, components: [] });
                     return;
                 }
 
-                console.log(`\nConfirmed moderationAction: ${actionName}\ntarget: ${target}\nreason: ${reason}\ntimeouttime: ${timeouttime}\ndirectmessage: ${directmessage}\nhoursofmessagestodelete: ${hoursofmessagestodelete}`);
+                console.log(`Confirmed moderationAction: ${actionName}\ntarget: ${target}\nreason: ${reason}\ntimeouttime: ${timeouttime}\ndirectmessage: ${directmessage}\nhoursofmessagestodelete: ${hoursofmessagestodelete}`);
     
                 if (confirmation.customId === 'confirm') {
                     // Store in DDBB and create EMBED
+
+                    let userToBeActedUpon;
+                    try{
+                        userToBeActedUpon = await interaction.member.guild.members.fetch(target.id);
+                    }catch(error){
+                        userToBeActedUpon = target;
+                    }
                     
-                    const userToBeActedUpon = action == bloonUtils.moderationActions.Unban ? target : await interaction.member.guild.members.fetch(target.id); // Only get the user if he's in the server.
+                    //const userToBeActedUpon = await interaction.member.guild.members.fetch(target.id) ?? target; // Only get the user if he's in the server.
                     const caseID            = await storedProcedures.moderationAction_GetNewId(action);
                     const channel           = await interaction.member.guild.channels.fetch(config.moderationActionsChannel);
                     const actionEmbed       = createModerationActionEmbed(action, userToBeActedUpon, caseID, reason, interaction.member, attachment?.url);
@@ -284,7 +288,7 @@ const command = {
             })
             .catch(async error => {
                 await interaction.editReply({ content: 'Confirmation not received within 1 minute, cancelling. Error: ' + error, components: [] });
-                console.error(`\nPossible error in moderationActions.js for ID ${interaction.member.id}, action ${action.name}: ` + error);
+                console.error(`Possible error in moderationActions.js for ID ${interaction.member.id}, action ${action.name}: ` + error);
             });
     
         }catch(error){
@@ -298,7 +302,7 @@ const command = {
                 await interaction.reply(answer);
             }
 
-            console.error(`\nError in moderationActions.js for ID ${interaction.member.id}, action ${interaction.options.getString('type')}: ` + error);
+            console.error(`Error in moderationActions.js for ID ${interaction.member.id}, action ${interaction.options.getString('type')}: ` + error);
         }
     }
 }

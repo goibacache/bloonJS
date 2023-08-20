@@ -134,6 +134,7 @@ module.exports = {
 
                 // Only usable by the person who used the command.
                 if (userId != m.user.id){
+                    m.reply({ content: `Sorry, this action can only be used by the person who used the /server command.`, ephemeral: true });
                     return;
                 }
 
