@@ -1,9 +1,6 @@
-const { EmbedBuilder } = require('@discordjs/builders');
 const https = require('https');
 
 //#region initialization
-
-const maxRoomsForEmbed = 10;
 
 const regionsToEmojis   = [];
 regionsToEmojis["EU"]   = "<:eu:1125796021574844520>";
@@ -66,53 +63,6 @@ const getHHTPResult = (requestURL) => {
 
     });
 }
-
-/**
- * Creates the embeded message for current rooms. Beware, Embed descriptions are limited to 4096 characters.
- * @param {rooms.data from intruder https://api.intruderfps.com/rooms} rooms 
- * @returns 
- */
-const createRoomEmbed = (rooms) => {
-    const roomEmbed = new EmbedBuilder()
-    .setColor(0x0099FF)
-    .setTitle(`Current Server Information`)
-    .setURL("https://intruderfps.com/rooms")
-    .setTimestamp();
-
-    // How many left
-    let roomsLeftOut = rooms.length - maxRoomsForEmbed;
-    let totalPlayersOnlist = 0;
-    rooms.map(x => totalPlayersOnlist += x.agentCount);
-
-    // just do the max amount of them.
-    if (rooms.length > maxRoomsForEmbed+1){
-        rooms = rooms.slice(0, maxRoomsForEmbed);
-    }
-
-    // Create description with the code tag.
-    let description =  "";
-    let title = `Listed ${rooms.length} rooms`;
-
-    // Rooms left, only if they're
-    if (roomsLeftOut > 0){
-        description = `There's ${roomsLeftOut} more rooms online.\n`;
-        title = "Listed 10 rooms";
-    }
-
-    // Close the code tag
-    roomEmbed.addFields(
-        { name: title,  value: description }
-    );
-
-    const extensions = `<:chrome:1125641298213339167> [**Chrome**](https://chrome.google.com/webstore/detail/intruder-notifications/aoebpknpfcepopfgnbnikaipjeekalim) | [**Firefox**](https://addons.mozilla.org/en-US/firefox/addon/intruder-notifications/) <:firefox:1125641317565857833>`;
-    roomEmbed.addFields({ name: "Browser Extensions", value: extensions });
-
-    roomEmbed.setFooter({ text: `SuperbossGames | #current-server-info | Total Agents: ${totalPlayersOnlist}` });
-    
-    return roomEmbed;
-}
-
-
 
 const getQuotedText = (text) => {
     var re = new RegExp(/"(.*)"/g);
@@ -189,7 +139,7 @@ const getRunArgs = () => {
 };
 
 /**
- * Gets the actuall configuration file needed
+ * Gets the actual configuration file needed
  * @returns require('../config.<environment>.js');
  */
 const getConfig = () => {
@@ -211,7 +161,6 @@ const moderationActions = {
 
 const moderationActionsToChoices = () => {
     let choices = [];
-    let count = 0;
     for (const key in moderationActions){
         choices.push({
             name: moderationActions[key].name,
@@ -235,7 +184,6 @@ const capitalizeFirstLetter = (text) => {
 module.exports = {
     getHHTPResult,
     timePlayedToHours,
-    createRoomEmbed,
     getQuotedText,
     deleteTagsFromText,
     getRunArgs,

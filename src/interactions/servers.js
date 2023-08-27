@@ -1,7 +1,10 @@
 const { SlashCommandBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType} = require('discord.js')
+const { EmbedBuilder } = require('@discordjs/builders');
 const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 const { registerFont, createCanvas, Image } = require('canvas');
+
+const maxRoomsForEmbed = 10;
 
 const regionsToEmojis   = [];
 regionsToEmojis["EU"]   = "./assets/svg/eu.svg";
@@ -26,11 +29,11 @@ module.exports = {
 		.setDescription(`Provides information about Intruder's servers.`),
 	async execute(interaction) {
 		try{
-			console.log(`\nservers.js: ${interaction.member.id}`);
+			console.log(`servers.js: ${interaction.member.id}`);
 
 			if (interaction.channel.id != config.bloonCommandsChannel){
 				await interaction.reply({ content: 'This command can only be used in the Bloon Commands Channel!', ephemeral: true });
-				console.log(`\nservers.js: Interaction used in wrong channel.`);
+				console.log(`servers.js: Interaction used in wrong channel.`);
 				return "noCooldown"; // Inmediatly remove cooldown
 			}
 
@@ -51,16 +54,15 @@ module.exports = {
             const distanceBetweenColumns = 33;
 
             // Creates a canvas page for, all the pages.
-            for (let p = 0; p <= lastPage; p++) {
+            for (let page = 0; page <= lastPage; page++) {
                 const canvas = setupCanvas();
                 const ctx = canvas.getContext('2d');
 
                 // Rows
                 let i = 1;
-                for (let s = p * 10; s < servers.data.length && s < (p * 10) + 10; s++) {
-                    const server = servers.data[s];
+                for (let _server = page * 10; _server < servers.data.length && _server < (page * 10) + 10; _server++) {
+                    const server = servers.data[_server];
 
-                    //const thirdColumn = agentStat[optionDictionary[filterBy].key] ?? bloonUtils.timePlayedToHours(agentStat.timePlayed);
                     ctx.fillStyle = "white";
                     const img = new Image();
                     img.onload = function() {
@@ -103,8 +105,14 @@ module.exports = {
 			//#region maybe add it as as a RoomEmbed
 
             const attachment = new AttachmentBuilder(pages[currentPage].toBuffer('image/png'), { name: 'serverlist.png' }); 
-			const roomEmbed = bloonUtils.createRoomEmbed(servers.data);
+			const roomEmbed = createRoomEmbed(servers.data);
 			roomEmbed.setImage('attachment://serverlist.png');
+
+            // If there's only one page break execution with no buttons.
+            if (currentPage == lastPage){
+                await interaction.editReply({ embeds: [roomEmbed], files: [attachment]});
+                return;
+            }
 
             const previousButton = new ButtonBuilder()
                 .setCustomId('previous_button')
@@ -161,7 +169,7 @@ module.exports = {
                 buttonRow = new ActionRowBuilder().addComponents(previousButton, nextButton);
 
                 const attachment = new AttachmentBuilder(pages[currentPage].toBuffer('image/png'), { name: 'serverlist.png' }); 
-                const roomEmbed = bloonUtils.createRoomEmbed(servers.data);
+                const roomEmbed = createRoomEmbed(servers.data);
                 roomEmbed.setImage('attachment://serverlist.png');
 
                 m.update({ embeds: [roomEmbed], files: [attachment], components: [buttonRow] });
@@ -176,10 +184,59 @@ module.exports = {
             } else {
                 await interaction.reply({ content: 'There was an error in /servers, sorry.', components: [] });
             }
-			console.error(`\nError in servers.js for ID ${interaction.member.id}: ` + error);
+            console.error("error in servers.js:", error);
+			console.error(`Error in servers.js for ID ${interaction.member.id}.\nName: ${error.name}\nmessage: ${error.message}`);
 		}
 	},
 };
+
+/**
+ * Creates the embedded message for current rooms. Beware, Embed descriptions are limited to 4096 characters.
+ * @param {rooms.data from intruder https://api.intruderfps.com/rooms} rooms 
+ * @returns 
+ */
+const createRoomEmbed = (rooms) => {
+    const roomEmbed = new EmbedBuilder()
+    .setColor(0x0099FF)
+    .setTitle(`Current Server Information`)
+    .setURL("https://intruderfps.com/rooms")
+    .setTimestamp();
+
+    // How many left
+    const roomsLeftOut = rooms.length - maxRoomsForEmbed;
+    // Count total players
+    let totalPlayersOnlist = 0;
+    rooms.map(x => totalPlayersOnlist += x.agentCount);
+    // Count total rooms
+    const totalRooms = rooms.length;
+
+    // just do the max amount of them.
+    if (rooms.length > maxRoomsForEmbed+1){
+        rooms = rooms.slice(0, maxRoomsForEmbed);
+    }
+
+    // Create description with the code tag.
+    let description =  '\u200B'; // Empty description.
+    let title = `Listed ${rooms.length} rooms`;
+
+    // Rooms left, only if they're
+    if (roomsLeftOut > 0){
+        title = `Listed ${maxRoomsForEmbed} rooms`;
+        description = `There's a total of ${totalRooms} rooms online.\n`;
+    }
+
+    // Close the code tag
+    roomEmbed.addFields(
+        { name: title,  value: description }
+    );
+
+    const extensions = `<:chrome:1125641298213339167> [**Chrome**](https://chrome.google.com/webstore/detail/intruder-notifications/aoebpknpfcepopfgnbnikaipjeekalim) | [**Firefox**](https://addons.mozilla.org/en-US/firefox/addon/intruder-notifications/) <:firefox:1125641317565857833>`;
+    roomEmbed.addFields({ name: "Browser Extensions", value: extensions });
+
+    roomEmbed.setFooter({ text: `SuperbossGames | #current-server-info | Total Agents: ${totalPlayersOnlist}` });
+    
+    return roomEmbed;
+}
 
 // Canvas config
 const width     = 640;
@@ -192,6 +249,8 @@ const columnsPositionX = [90, 530, 600];
 const distanceBetweenColumns = 33;
 
 const setupCanvas = () => {
+
+    //#region background
 
     // Register font
     registerFont('./assets/ShareTechMono-Regular.ttf', { family: 'Share Tech Mono' })
@@ -265,7 +324,7 @@ const setupCanvas = () => {
     ctx.fillStyle = "#BBBBBB";
     ctx.textAlign = "end";
     ctx.fillText("Region",                                          columnsPositionX[0], baseYPosition);
-    ctx.fillText("Name",                                            columnsPositionX[1], baseYPosition);
+    ctx.fillText(bloonUtils.hardTruncateOrComplete("Name", 40),     columnsPositionX[1], baseYPosition);
     ctx.fillText(bloonUtils.hardTruncateOrComplete("Agents", 7),    columnsPositionX[2], baseYPosition);
 
     // First separation

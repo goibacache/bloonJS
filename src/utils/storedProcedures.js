@@ -10,7 +10,7 @@ const moderationAction_Insert = async(moderationAction, banedUserDiscordId, banR
 
         const [rows] = await connection.execute(query, [moderationAction.id, banedUserDiscordId, banReason, handledByDiscordId]);
 
-        return parseInt(rows[0][0]['res']); // Awfull, but eh.
+        return parseInt(rows[0][0]['res']); // Awful, but eh.
 
     }catch(error){
         console.error("Error in sp_banInsert: ", error);
@@ -19,13 +19,55 @@ const moderationAction_Insert = async(moderationAction, banedUserDiscordId, banR
 }
 
 const moderationAction_GetNewId = async(moderationAction) => {
-    const query = `CALL moderationAction_GetNewId(?)`;
+    try{
+        const query = `CALL moderationAction_GetNewId(?)`;
 
-    const connection = await createConnection();
+        const connection = await createConnection();
+    
+        const [rows] = await connection.execute(query, [moderationAction.id]);
+    
+        return parseInt(rows[0][0]['res']); // Awful, but eh.
+    }catch(error){
+        console.error("Error in moderationAction_GetNewId: ", error);
+        return 0;
+    }
+}
 
-    const [rows] = await connection.execute(query, [moderationAction.id]);
+const kofi_GetKofiPhrase = async(_userName) => {
+    try{
+        const query = `CALL kofiphrase_get(?)`;
 
-    return parseInt(rows[0][0]['res']); // Awfull, but eh.
+        const connection = await createConnection();
+
+        const [rows] = await connection.execute(query, [_userName]);
+
+        return rows[0]; // Awful, but eh.
+    }catch(error){
+        console.error("Error in kofiphrase_get: ", error);
+        return null;
+    }
+}
+
+/**
+ * 
+ * @param {string} _userName    username with no spaces and all in lower case to trigger a response
+ * @param {string} _phrase      the phrase the bot will answer when asked for the user
+ * @param {boolean} _renewal    the bit that sets if it's just a renewal or if it's trying to add a new or update an old phrase
+ * @returns 
+ */
+const kofi_InsertOrUpdate = async(_userName, _phrase = '', _renewal = null) => {
+    try{
+        const query = `CALL kofiphrase_InsertOrUpdate(?, ?, ?)`;
+
+        const connection = await createConnection();
+
+        const [rows] = await connection.execute(query, [_userName, _phrase, _renewal ?? 0]);
+
+        return rows[0]; // Awful, but eh.
+    }catch(error){
+        console.error("Error in kofiphrase_InsertOrUpdate: ", error);
+        return null;
+    }
 }
 
 const createConnection = async () => {
@@ -38,40 +80,10 @@ const createConnection = async () => {
     });
 }
 
-const execSP = (query) => {
-    const connection = createConnection();
-
-    connection.connect(function(err) {
-        if (err) {
-            //return console.error('SQL connection error: ' + err.message);
-            return false;
-        }
-    
-        //console.log('Connected to SQL!');
-    
-        connection.query(query, function (err, result, fields) {
-            if (err) {
-                //console.error("SQL query error: ", err);
-                return false;
-            };
-
-            // console.log("SQL RESULT: ", result);
-            
-            /* CLOSE CONECTION */
-            connection.end(function(err) {
-                if (err) {
-                    //return console.log('SQL connection end error:' + err.message);
-                    return false;
-                }
-                //console.log('Closed the database connection!');
-                return true;
-            });
-        });
-    });
-}
-
 
 module.exports = {
     moderationAction_Insert,
-    moderationAction_GetNewId
+    moderationAction_GetNewId,
+    kofi_GetKofiPhrase,
+    kofi_InsertOrUpdate
 }

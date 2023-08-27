@@ -17,6 +17,7 @@ const config 		= bloonUtils.getConfig();
 const readline 		= require('readline');
 const path 			= require('path');
 const { clearInterval } = require('timers');
+const { kofi_InsertOrUpdate } = require('./utils/storedProcedures.js');
 
 // Load initial config
 
@@ -286,6 +287,40 @@ async function handleCommands(command, client) {
 				clearInterval(wikieditInterval);
 				wikieditInterval = null;
 			}
+		}
+
+		if (command.startsWith("kofi")){
+			const commands = command.split(' ');
+
+			if (commands.length < 2){
+				console.log(`kofi command expects 2 parameters: kofi [new/renewal]`);
+				return;
+			}
+
+			if (commands[1] == "renewal"){
+				// Check it the username comes
+				if (commands.length < 3){
+					console.log("kofi renewal expects the username to be renewed");
+					return;
+				}
+
+				await kofi_InsertOrUpdate(commands[2].toLowerCase(), '', true);
+				console.log(`New kofi renwal for userName ${commands[2].toLowerCase()}`);
+				return;
+			}
+
+			if (commands[1] == "new" || commands[1] == "update"){
+				if (commands.length < 4){
+					console.log("kofi renewal expects the username and the phrase to be added / updated");
+					return;
+				}
+
+				var phrase  = bloonUtils.getQuotedText(command);
+				await kofi_InsertOrUpdate(commands[2].toLowerCase(), phrase.replace(/\"/g, ""), false);
+				console.log(`New kofi answer created/updated for userName ${commands[2].toLowerCase()}`);
+				return;
+			}
+			
 		}
 
 		
