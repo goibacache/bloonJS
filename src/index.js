@@ -10,7 +10,7 @@
 **************************************************************************/
 
 // Imports
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, Partials } = require('discord.js');
 const fs 			= require('fs');
 const bloonUtils 	= require('./utils/utils.js');
 const config 		= bloonUtils.getConfig();
@@ -21,7 +21,7 @@ const { kofi_InsertOrUpdate } = require('./utils/storedProcedures.js');
 
 // Load initial config
 
-const client 		= new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences] }); // Create a new client instance
+const client 		= new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessageReactions], partials: [Partials.Channel, Partials.Message, Partials.Reaction] }); // Create a new client instance
 client.events 		= new Collection(); // Events handler list
 client.commands 	= new Collection(); // Command handler list
 client.cooldowns 	= new Collection();
@@ -180,8 +180,8 @@ async function handleCommands(command, client) {
 				return;
 			}
 	
-			const guild = await client.guilds.fetch(args[1] == 0 ? config.bloonGuildId : args[1] == 0);
-			const channel = await guild.channels.fetch(args[2] == 0 ? config.intruderGeneralChannel : args[2] == 0);
+			const guild = await client.guilds.fetch(args[1] == 0 ? config.bloonGuildId : args[1]);
+			const channel = await guild.channels.fetch(args[2] == 0 ? config.intruderGeneralChannel : args[2]);
 			console.log("sending text: " + text.replace(/\"/g, ""));
 			channel.send(text.replace(/\"/g, ""));
 		}
@@ -238,6 +238,28 @@ async function handleCommands(command, client) {
 			const whoJoined = await list.members.fetch(args[1].replace(/"/g, ""));
 			//console.log("member, me: ", me);
 			client.emit(Events.GuildMemberAdd, whoJoined);
+			
+			return;
+		}
+
+		if (command.startsWith("fakeleave")){
+			let args = command.split(" ");
+			if (args.length < 2){
+				console.log(`fakeleave> command needs at least 2 inputs. ie: 'fakeleave [userID].'`);
+				return;
+			}
+
+			if (args[1] == "0"){
+				console.log(`fakeleave> command needs a valid discord ID. ie: 'fakeleave [userID].'`);
+				return;
+			}
+
+			// Fake me leaving the server ;)
+			const list = await client.guilds.fetch(config.bloonGuildId); 
+			// Iterate through the collection of GuildMembers from the Guild getting the username property of each member 
+			const whoJoined = await list.members.fetch(args[1].replace(/"/g, ""));
+			//console.log("member, me: ", me);
+			client.emit(Events.GuildMemberRemove, whoJoined);
 			
 			return;
 		}
@@ -309,7 +331,7 @@ async function handleCommands(command, client) {
 				return;
 			}
 
-			if (commands[1] == "new" || commands[1] == "update"){
+			if (commands[1] == "new" || commands[1] == "add" || commands[1] == "update"){
 				if (commands.length < 4){
 					console.log("kofi renewal expects the username and the phrase to be added / updated");
 					return;

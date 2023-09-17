@@ -8,40 +8,47 @@ const { Events }        = require('discord.js');
 
 const   commands            = [".rule34"];
 let     messageCount        = 1;
-let     messageCountTrigger = 1000;
+const   messageCountTrigger = 2000;
+const   spamMessages = [
+    `Want to support Bloon's development?\nWant to also have your custom answer when people ask bloon about you?\nYou can do both by clicking [here](https://ko-fi.com/bloon/commissions)`,
+    `You can join the "looking to play" role using the \`/ltp\` command. That way you'll get alerted when people create a server and want you to join!`,
+    `You can check all of the available commands using the \`/help\` command.`
+];
 
 const evnt = {
     name: Events.MessageCreate,
 	async execute(message) {
         try {
-            // // Check if it mentions bloon, if it does, check if they have the answer in the database
-            if (message.mentions.users.some(x => x.id == config.clientId)){
-                // Regex to split the question.
-                const re = new RegExp(/who('s|.is).(.*)\?/g);
-                const messageSplit = message.content.toLowerCase().split(re);
-
-                if (messageSplit.length > 2){ // it has an user to look for
-                    const userToFind = messageSplit[2].replace(/ /g, '');
-                    // Not empty
-                    if (userToFind.length == 0){
-                        return;
-                    }
-
-                    // Check response and that it exists
-                    const response = await storedProcedures.kofi_GetKofiPhrase(userToFind);
-                    console.log("who is response:", response[0].phrase);
-                    if (response.length == 0 || response[0].phrase.length == 0){
-                        return;
-                    }
-
-                    await message.reply({ content: response[0].phrase});
-                }
-            }
 
             // Avoid replying to itself
             if (message.author.id === config.clientId){
                 return;
             }
+
+        
+            // Regex to split the question.
+            const re = new RegExp(/who('s|.is).(.*)\?/g);
+            const messageSplit = message.content.toLowerCase().split(re);
+
+            if (messageSplit.length > 2){ // it has an user to look for
+                const userToFind = messageSplit[2].replace(/ /g, '').trim();
+                // Not empty
+                if (userToFind.length == 0){
+                    return;
+                }
+
+                // Check response and that it exists
+                const response = await storedProcedures.kofi_GetKofiPhrase(userToFind.replace(/’/g, "'"));
+                if (response.length == 0 || response[0].phrase.length == 0){
+                    // console.log(`response not found for question: ${userToFind}`);
+                    return;
+                }
+
+                console.log("who is response:", response[0].phrase);
+                await message.reply({ content: response[0].phrase});
+            }
+
+
 
             // Check if the message is NOT on PUG and count, if it gets to the message count trigger, then "spam"
             if (!isInChannel(message, config.pugChannel)){
@@ -51,7 +58,7 @@ const evnt = {
                     console.log(`Spam sent to intruder general: ${messageCount}`);
                     messageCount = 1;
                     const channel = message.guild.channels.cache.get(config.intruderGeneralChannel) || message.guild.channels.fetch(config.intruderGeneralChannel);
-                    await channel.send({ content: `You want to have your custom answer for bloon? Support the development and get yours by clicking [here](https://ko-fi.com/bloon/commissions)` });
+                    await channel.send({ content: getRandomSpamMessage() });
                 }
             }
             
@@ -94,6 +101,11 @@ const evnt = {
 
 function isInChannel(message, channel){
     return message.channelId == channel;
+}
+
+function getRandomSpamMessage(){
+    const messageIndex = Math.floor(Math.random() * spamMessages.length);
+    return spamMessages[messageIndex];
 }
 
 
