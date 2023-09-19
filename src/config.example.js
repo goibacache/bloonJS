@@ -11,6 +11,9 @@ module.exports = {
 	offTopicChannel:			"your-off-topic-channel",
 	wikiChannel:				"your-wiki-channel",
 	pugChannel:					"your-pug-channel",
+	bloonsideChannel:			"your-bloonside-channel",
+
+	newsSubscribeMessageId:		"your-subscribe-to-news-message-id",
 
 	role_Pug: 					"your-role-pug-players",
 	role_LookingToPlay: 		"your-role-lookingToPlay",

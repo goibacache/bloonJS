@@ -13,7 +13,7 @@ const optionDictionary = {
 
     tarrests:           { name: 'Top arrests',              query: `OrderBy=stats.Arrests:desc`,          lastColumnTitle: 'Arrests',       key: 'arrests'},
     tgotarrested:       { name: 'Top got arrested',         query: `OrderBy=stats.gotArrested:desc`,      lastColumnTitle: 'Arrested',      key: 'gotArrested'},
-    tdeaths:            { name: 'Top deaths',               query: `OrderBy=stats.knockdowns:desc`,       lastColumnTitle: 'Deaths',        key: 'deaths'},
+    tdeaths:            { name: 'Top deaths',               query: `OrderBy=stats.deaths:desc`,           lastColumnTitle: 'Deaths',        key: 'deaths'},
 
     tteamkills:         { name: 'Top team kills',           query: `OrderBy=stats.teamKills:desc`,        lastColumnTitle: 'Team K',        key: 'teamKills'},
     tteamdamage:        { name: 'Top team damage',          query: `OrderBy=stats.teamDamage:desc`,       lastColumnTitle: 'Team D',        key: 'teamDamage'},
@@ -78,7 +78,7 @@ module.exports = {
 
             //#region fetch data
             if (interaction.channel.id != config.bloonCommandsChannel){
-				await interaction.reply({ content: 'This command can only be used in the Bloon Commands Channel!', ephemeral: true });
+				await interaction.editReply({ content: 'This command can only be used in the Bloon Commands Channel!', ephemeral: true });
 				console.log(`\nstats.js: Interaction used in wrong channel.`);
 				return "noCooldown"; // Immediately remove cooldown
 			}

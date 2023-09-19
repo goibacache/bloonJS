@@ -1,5 +1,6 @@
 const https = require('https');
 
+
 //#region initialization
 
 const regionsToEmojis   = [];

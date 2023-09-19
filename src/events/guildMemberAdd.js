@@ -33,9 +33,16 @@ const evnt = {
 
 			// Sends the embed into the General channel.
 			console.log(`GuildMemberAdd ${member.user.id}: Sending welcome message...`);
-			const channel = member.guild.channels.cache.get(config.intruderGeneralChannel) || member.guild.channels.fetch(config.intruderGeneralChannel);
-			channel.send({ embeds: [newUserEmbed] });
-			console.log(`GuildMemberAdd ${member.user.id}: Welcome message sent.`);
+			const generalChannel = member.guild.channels.cache.get(config.intruderGeneralChannel) || member.guild.channels.fetch(config.intruderGeneralChannel);
+			generalChannel.send({ embeds: [newUserEmbed] });
+
+			console.log(`GuildMemberAdd ${member.user.id}: Welcome message sent to general.`);
+
+			const bloonsideChannel = member.guild.channels.cache.get(config.bloonsideChannel) || member.guild.channels.fetch(config.bloonsideChannel);
+			bloonsideChannel.send({ embeds: [newUserEmbed] });
+			console.log(`GuildMemberAdd ${member.user.id}: Welcome message sent to bloonside.`);
+
+			
 		}catch(error){
 			console.error("Error in guildMemberAdd.js: " + error);
 		}
