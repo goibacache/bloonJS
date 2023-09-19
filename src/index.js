@@ -345,6 +345,12 @@ async function handleCommands(command, client) {
 			
 		}
 
+		if (command.startsWith("update")){
+			const guild = await client.guilds.fetch(config.bloonGuildId);
+			const channel = await guild.channels.fetch(config.intruderGeneralChannel);
+			channel.send({ content: `**New bloon update**\n\nThis is what's new:\n\n* Added the ability to react to the news emoji and be added to the "news" role [here](<https://discord.com/channels/103933666417217536/892796013759303760/892811060413886504>).\n* Added a player stats viewer that you can use in [bloon-commands](<https://discord.com/channels/103933666417217536/934126841206308905>) with the \`/playerstats\` command. \n* You no longer need to mention bloon to answer your kofi "who is" questions.` });
+		}
+
 		
 	}catch(error){
 		console.error(`\nError in command: ${error}`);
