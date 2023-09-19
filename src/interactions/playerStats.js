@@ -25,13 +25,11 @@ module.exports = {
         ),
 	async execute(interaction) {
 		try{
-            /*
             if (interaction.channel.id != config.bloonCommandsChannel){
 				await interaction.reply({ content: 'This command can only be used in the Bloon Commands Channel!', ephemeral: true });
 				console.log(`playerStats.js: Interaction used in wrong channel.`);
 				return "noCooldown"; // Inmediatly remove cooldown
 			}
-            */
 
 			console.log(`playerStats.js: ${interaction.member.id}`);
 

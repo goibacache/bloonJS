@@ -24,6 +24,7 @@ module.exports = {
 				{ name: '/wiki',                        value: 'search directly in the wiki for a specified article, if found, it will be posted as an answer for everyone to see!' },
 				{ name: '/help',                        value: 'shows this message so you know which commands are available!' },
 				{ name: '/servers',                     value: 'list the top 10 servers available in the game!' },
+				{ name: '/playerstats',                 value: 'see your intruder stats!' },
 			);
 
 			await interaction.editReply({ embeds: [helpEmbed], ephemeral: true});
