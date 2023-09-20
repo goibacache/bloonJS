@@ -19,7 +19,7 @@ module.exports = {
         .addStringOption(option => 
             option.setName('steamid')
             .setRequired(true)
-            .setDescription(`The user steam's ID`)
+            .setDescription(`The user's numeric steam ID`)
             .setMaxLength(17)
             .setMinLength(15)
         ),
