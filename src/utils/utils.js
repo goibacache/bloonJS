@@ -80,6 +80,10 @@ const deleteTagsFromText = (text) => {
     return text.replace(/\<(.*?)>/g, "");
 }
 
+const deleteCodeBlocksFromText = (text) => {
+    return text.replace(/```/g, '');
+}
+
 const CyrillicOrStandard = (string) => {
     return string.split('').map(function (char) { 
         return transliterate[char] || char; 
@@ -196,4 +200,5 @@ module.exports = {
     hardTruncate,
     CyrillicOrStandard,
     moderationActions,
+    deleteCodeBlocksFromText,
 }
