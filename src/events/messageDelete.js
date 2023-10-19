@@ -14,17 +14,19 @@ const evnt = {
 
 			const textDecorator = "```";
 
-			// Starts text w decoration
-			const msg = textDecorator + bloonUtils.deleteCodeBlocksFromText(message.content) + textDecorator;
+			const msg = `${textDecorator}${message.content.length > 0 ? bloonUtils.deleteCodeBlocksFromText(message.content) : " "}${textDecorator}`;
 
 			// Attached files:
 			let attachments = "";
+			if (message.attachments.size > 0){
+				attachments += `_Attachments_:\n`;
+			}
 			message.attachments.forEach((attachment) => {
 				attachments += `[${attachment.name}](<${attachment.url}>)	`
 			});
 
 			const channel = message.guild.channels.cache.get(config.bloonServerLogs);
-			await channel.send({ content: `🧹 New deletion by <@${message.author.id}> (${message.author.username}) in <#${message.channelId}> \n\n_Deleted message_:\n${msg}\n_Attachments_: \n${attachments}`, allowedMentions: { parse: [] }});
+			await channel.send({ content: `🧹 New deletion by <@${message.author.id}> (${message.author.username}) in <#${message.channelId}> \n\n_Deleted message_:\n${msg}${attachments}`, allowedMentions: { parse: [] }});
 		}catch(error){
 			console.error("Error in messageDelete.js: " + error);
 		}
