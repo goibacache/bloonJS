@@ -40,15 +40,37 @@ const evnt = {
                 // Check response and that it exists
                 const response = await storedProcedures.kofi_GetKofiPhrase(userToFind.replace(/’/g, "'"));
                 if (response.length == 0 || response[0].phrase.length == 0){
-                    // console.log(`response not found for question: ${userToFind}`);
+                    console.log(`response not found for question: ${userToFind}`);
                     return;
                 }
 
+                // Check if it has a local attachment
+                const reg = RegExp(/\[att:.*\]/g);
+                let attachmentName = response[0].phrase.match(reg);
+
+                // Instantly send message and exit
+                if (attachmentName == null || attachmentName.length == 0){
+                    console.log("who is response:", response[0].phrase);
+                    await message.reply({ content: response[0].phrase });
+                    return; // Kill process
+                }
+
+                // If there's an attachment:
+                attachmentName = attachmentName[0].replace('[att:', '').replace(']', '');
+                const attachmentLocalDir = `./assets/attachments/${attachmentName}`;
+
+                // Clean response
+                response[0].phrase = response[0].phrase.replace(reg, '');
+
                 console.log("who is response:", response[0].phrase);
-                await message.reply({ content: response[0].phrase});
+                console.log("who is attachment:", attachmentLocalDir);
+                
+                await message.reply({ content: response[0].phrase, files: [{
+                    attachment: attachmentLocalDir,
+                    name: attachmentName
+                 }] });
+                 return; // Kill process
             }
-
-
 
             // Check if the message is NOT on PUG and count, if it gets to the message count trigger, then "spam"
             if (!isInChannel(message, config.pugChannel)){

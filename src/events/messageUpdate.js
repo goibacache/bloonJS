@@ -1,4 +1,4 @@
-const { Events } = require('discord.js');
+const { Events, messageLink } = require('discord.js');
 const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 
@@ -13,7 +13,10 @@ const evnt = {
 			if (!newMessage.editedAt) return;
 			if (oldMessage.content == newMessage.content) return; // Just a stupid fix for when the bot was not present
 
+			//console.log(oldMessage);
 			console.log(`Message updated: ${oldMessage.content} -> ${newMessage.content}`);
+
+			const messageLink = `https://discord.com/channels/${newMessage.guildId}/${newMessage.channelId}/${newMessage.id}`;
 
 			const textDecorator = "```";
 			const oldMessageText = `${textDecorator}${oldMessage.content.length > 0 ? bloonUtils.deleteCodeBlocksFromText(oldMessage.content) : " "}${textDecorator}`;
@@ -44,7 +47,7 @@ const evnt = {
 			}
 
 			const channel = newMessage.guild.channels.cache.get(config.bloonServerLogs);
-			await channel.send({ content: `📝 New edit by <@${newMessage.author.id}> (${newMessage.author.username}) in <#${newMessage.channelId}> \n_Old message:_${oldMessageText}${oldAttachments}\n_New message_:${newMessageText}${newAttachments}`, allowedMentions: { parse: [] }});
+			await channel.send({ content: `📝 New edit by <@${newMessage.author.id}> (${newMessage.author.username}) in ${messageLink} \n_Old message:_${oldMessageText}${oldAttachments}\n_New message_:${newMessageText}${newAttachments}`, allowedMentions: { parse: [] }});
 		}catch(error){
 			console.error("Error in messageUpdate.js: " + error);
 		}
