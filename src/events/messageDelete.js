@@ -18,8 +18,6 @@ const evnt = {
 				type: AuditLogEvent.MessageDelete
 			}).catch(console.error);
 
-			console.log("fechedLog entries: ", fetchedLogs.entries);
-
 			const auditEntry = fetchedLogs.entries.find(a =>
 				// Small filter function to make use of the little discord provides to narrow down the correct audit entry.
 				a.target.id === message.author.id &&
@@ -28,19 +26,13 @@ const evnt = {
 				Date.now() - a.createdTimestamp < 20000
 			);
 
-			console.log("auditEntry", auditEntry);
-
 			let modUser = null;
 			// If entry exists, grab the user that deleted the message and display username + tag, if none, display 'Unknown'. 
 			if (auditEntry != null){
 				modUser = auditEntry.executor.id != auditEntry.target.id ? auditEntry.executor : null;
 			}
 
-			console.log("modUser", modUser);
-
 			const wasItAMod = modUser != null ? `by third-party <@${modUser.id}> (${modUser.username}) ` : "";
-
-			console.log("wasItAMod?", wasItAMod);
 
 			const textDecorator = "```";
 
