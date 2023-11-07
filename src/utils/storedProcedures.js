@@ -48,6 +48,21 @@ const kofi_GetKofiPhrase = async(_userName) => {
     }
 }
 
+const moderationAction_Profile = async(_userId) => {
+    try{
+        const query = `CALL moderationAction_Profile(?)`;
+
+        const connection = await createConnection();
+
+        const [rows] = await connection.execute(query, [_userId]);
+
+        return rows[0]; // Awful, but eh.
+    }catch(error){
+        console.error("Error in moderationAction_Profile: ", error);
+        return null;
+    }
+}
+
 /**
  * 
  * @param {string} _userName    username with no spaces and all in lower case to trigger a response
@@ -85,5 +100,6 @@ module.exports = {
     moderationAction_Insert,
     moderationAction_GetNewId,
     kofi_GetKofiPhrase,
-    kofi_InsertOrUpdate
+    kofi_InsertOrUpdate,
+    moderationAction_Profile
 }
