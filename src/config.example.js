@@ -12,6 +12,7 @@ module.exports = {
 	wikiChannel:				"your-wiki-channel",
 	pugChannel:					"your-pug-channel",
 	bloonsideChannel:			"your-bloonside-channel",
+	modChatChannel:				"your-mod-chat-channel",
 
 	newsSubscribeMessageId:		"your-subscribe-to-news-message-id",
 

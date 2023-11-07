@@ -21,7 +21,7 @@ const { kofi_InsertOrUpdate } = require('./utils/storedProcedures.js');
 
 // Load initial config
 
-const client 		= new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessageReactions], partials: [Partials.Channel, Partials.Message, Partials.Reaction] }); // Create a new client instance
+const client 		= new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessageReactions], partials: [Partials.Channel, Partials.Reaction] }); // Create a new client instance
 client.events 		= new Collection(); // Events handler list
 client.commands 	= new Collection(); // Command handler list
 client.cooldowns 	= new Collection();
@@ -34,7 +34,7 @@ const wikiCheckInterval = 5;
 
 //#region import interactions
 const commandsPath = 'interactions';
-const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js') || file.endsWith('.ts'));
 
 for (const file of commandFiles) {
 	const folderRoute = `./${commandsPath}/${file}`;
@@ -48,7 +48,7 @@ for (const file of commandFiles) {
 
 //#region import events
 const eventsPath = 'events';
-const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js') || file.endsWith('.ts'));
 
 for (const eventFile of eventFiles) {
 	const folderRoute = `./events/${eventFile}`;
@@ -61,7 +61,7 @@ for (const eventFile of eventFiles) {
 		client.on(event.evnt.name, (...args) => event.evnt.execute(...args));
 	}
 
-	client.events.set(eventFile.replace(/.js/g, ''), event.evnt.execute);
+	client.events.set(eventFile.replace(/.js/g, '').replace(/.ts/g, ''), event.evnt.execute);
 }
 
 //#endregion
