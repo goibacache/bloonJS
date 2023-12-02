@@ -27,7 +27,8 @@ module.exports = {
                 { name: '🦶 /moderationaction kick ',                           value: `Kicks an user and creates a log in the evidence channel. If the offending user receives a DM from bloon explaining the kick reason can be set as  an optional parameter, by default it's set to off.` },
                 { name: '🔨 /moderationaction ban ',                            value: `Bans an user and creates a log in the evidence channel. If the offending user receives a DM from bloon explaining the ban reason can be set as  an optional parameter, by default it's set to off.` },
                 { name: '🛠 /moderationaction unban ',                           value: `Lifts a ban from an user and leaves a record in the evidence channel` },
-                { name: '❓ Still lost? Please check this video:', value: `https://www.youtube.com/watch?v=DppjWmeFWH0` },
+                { name: '🔍 /moderationprofile',                                value: `Shows a list of actions taken on an user. Will only be displayed in #mod-chat` },
+                { name: '❓ Still lost? Please check this video:',              value: `https://www.youtube.com/watch?v=DppjWmeFWH0` },
             );
 
             await interaction.editReply({ embeds: [helpEmbed], ephemeral: true});

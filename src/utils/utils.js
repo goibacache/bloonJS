@@ -161,7 +161,7 @@ const moderationActions = {
     Ban:        { name: 'Ban',      id: 3, conjugation: "Banned",   color: 0xDD0000   }, // name & value used for options | colors: Red
     Warn:       { name: 'Warn',     id: 4, conjugation: "Warned",   color: 0x000000   }, // name & value used for options | colors: Black
     Unban:      { name: 'Unban',    id: 5, conjugation: "Unbanned", color: 0xFFFFFF   },  // name & value used for options | colors: White
-    Note:       { name: 'Note',     id: 5, conjugation: "Noted",    color: 0xFFFFFF   }  // name & value used for options | colors: White
+    Note:       { name: 'Note',     id: 6, conjugation: "Noted",    color: 0xFFFFFF   }  // name & value used for options | colors: White
 };
 
 const moderationActionsToChoices = () => {

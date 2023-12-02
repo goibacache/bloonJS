@@ -11,8 +11,8 @@ const evnt = {
             if (oldPresence == null) return;
             if (newPresence == null) return;
 
-            const userId        = oldPresence.userId;
-            const user          = await oldPresence.guild.members.fetch(userId);
+            const userId        = newPresence.userId;
+            const user          = await newPresence.guild.members.fetch(userId);
 
             // Check roles
             const hasLookingToPlay  = user.roles.cache.some(role => role.id === config.role_LookingToPlay);
@@ -24,17 +24,20 @@ const evnt = {
                 return;
             }
 
-            if(oldPresence.activities.some(x => x.name === activityName) == true && newPresence.activities.some(x => x.name === activityName) == false){
+            const wasPlaying = oldPresence.activities.some(x => x.name === activityName);
+            const isPlaying = newPresence.activities.some(x => x.name === activityName);
+
+            if(wasPlaying == true && !isPlaying){
                 //console.log("Player LTP");
-                user.roles.remove(config.role_NowPlaying);
-                user.roles.add(config.role_LookingToPlay);
+                await user.roles.remove(config.role_NowPlaying);
+                await user.roles.add(config.role_LookingToPlay);
                 return;
             }
 
-            if(oldPresence.activities.some(x => x.name === activityName) == false && newPresence.activities.some(x => x.name === activityName) == true){
+            if(!wasPlaying && isPlaying){
                 //console.log("Player NP");
-                user.roles.remove(config.role_LookingToPlay);
-                user.roles.add(config.role_NowPlaying);
+                await user.roles.remove(config.role_LookingToPlay);
+                await user.roles.add(config.role_NowPlaying);
                 return;
             }
         }catch(error){
