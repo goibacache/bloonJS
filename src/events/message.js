@@ -12,8 +12,13 @@ const   messageCountTrigger = 2000;
 const   spamMessages = [
     `Want to support Bloon's development?\nWant to also have your custom answer when people ask bloon about you?\nYou can do both by clicking [here](https://ko-fi.com/bloon/commissions)`,
     `You can join the "looking to play" role using the \`/ltp\` command. That way you'll get alerted when people create a server and want you to join!`,
-    `You can check all of the available commands using the \`/help\` command.`
+    `You can check all of the available commands using the \`/help\` command.`,
+    `The developer of this bot really likes rum. You can help him buy one if you also really enjoy rum, [here](<https://ko-fi.com/bloon>)`
 ];
+const regWhoIs = new RegExp(/who('s|.is).(.*)\?/g);
+const regAttch = RegExp(/\[att:.*\]/g);
+const regSpam = RegExp(/\b\+18\b|\b18\b|\bnude?3?s?5?\b|\bna?4?ke?3?d\b|\bnitro\b|\bfre?3?e?3?\b|\bnft\b|\broblox\b|\bstea?4?m\b|\bdi?l?1?scord\b|\ba?4?dul?1?ts?\b/g);
+const regUrl = RegExp(/\bhttps?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)\b/g);
 
 const evnt = {
     name: Events.MessageCreate,
@@ -27,8 +32,7 @@ const evnt = {
 
         
             // Regex to split the question.
-            const re = new RegExp(/who('s|.is).(.*)\?/g);
-            const messageSplit = message.content.toLowerCase().split(re);
+            const messageSplit = message.content.toLowerCase().split(regWhoIs);
 
             if (messageSplit.length > 2){ // it has an user to look for
                 const userToFind = messageSplit[2].replace(/ /g, '').trim();
@@ -45,8 +49,7 @@ const evnt = {
                 }
 
                 // Check if it has a local attachment
-                const reg = RegExp(/\[att:.*\]/g);
-                let attachmentName = response[0].phrase.match(reg);
+                let attachmentName = response[0].phrase.match(regAttch);
 
                 // Instantly send message and exit
                 if (attachmentName == null || attachmentName.length == 0){
@@ -60,7 +63,7 @@ const evnt = {
                 const attachmentLocalDir = `./assets/attachments/${attachmentName}`;
 
                 // Clean response
-                response[0].phrase = response[0].phrase.replace(reg, '');
+                response[0].phrase = response[0].phrase.replace(regAttch, '');
 
                 console.log("who is response:", response[0].phrase);
                 console.log("who is attachment:", attachmentLocalDir);
@@ -70,6 +73,60 @@ const evnt = {
                     name: attachmentName
                  }] });
                  return; // Kill process
+            }
+
+            // All messages should be lower case to be processed
+            message.content = message.content.toLowerCase();
+
+            // Handle regexs replies in the general / help & map making channels
+            if (isInChannel(message, config.intruderGeneralChannel) || isInChannel(message, config.intruderHelpChannel) || isInChannel(message, config.intruderMapmakingChannel) || isInChannel(message, config.pugChannel) ) {
+                regexs.forEach(reg => {
+                    if(reg.regex.test(message)){
+                        message.reply(reg.answer); // Answer accordingly
+                    }
+                    return; // Stop the foreach
+                });
+            }
+
+            // Instantly delete if it mentions everyone && the user doesn't have the mod or aug role <- TODO!
+            if (message.mentions.everyone){
+                // Check if it's a mod or a hidden manager
+                const userWhoMentionedEveryone = await message.guild.members.fetch(message.author.id);
+                const isMod = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Mod).size > 0;
+                const isHiddenManager = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_HiddenManager).size > 0
+                if (!(isMod || isHiddenManager)){
+                    await message.delete();
+                    return;
+                }
+            }
+
+            // Check if it's spam or +18
+            if (message.content.match(regSpam)?.length > 1){
+                // and if it has an URL then kill it
+                if (regUrl.test(message.content)){
+
+                    // Check if it's a mod or a hidden manager
+                    const userWhoMentionedEveryone = await message.guild.members.fetch(message.author.id);
+                    const isMod = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Mod).size > 0;
+                    const isHiddenManager = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_HiddenManager).size > 0
+                    if (!(isMod || isHiddenManager)){
+                        await message.delete();
+                        return;
+                    }
+                }
+            }
+
+            // Includes a command but not in the right channel.
+            if (commands.includes(message.content.trim()) && !isInChannel(message, config.offTopicChannel)){
+                message.react("🚫");        // React
+                return;
+            }
+
+            // .rule34
+            if (message.content === ".rule34" && isInChannel(message, config.offTopicChannel)) {
+                message.react("💦");                                                        // React
+                message.reply({ content: 'https://www.youtube.com/watch?v=gb8wRhHZxNc' });  // Answer accordingly
+                return;
             }
 
             // Check if the message is NOT on PUG and count, if it gets to the message count trigger, then "spam"
@@ -84,37 +141,6 @@ const evnt = {
                 }
             }
             
-            
-            // All messages should be lower case to be processed
-            message.content = message.content.toLowerCase();
-
-            // Handle regexs replies in the general / help & map making channels
-            if (isInChannel(message, config.intruderGeneralChannel) || isInChannel(message, config.intruderHelpChannel) || isInChannel(message, config.intruderMapmakingChannel) || isInChannel(message, config.pugChannel) ) {
-                regexs.forEach(reg => {
-                    if(reg.regex.test(message)){
-                        message.reply(reg.answer); // Answer accordingly
-                    }
-                    return; // Stop the foreach
-                });
-            }
-            
-            // Doesn't include a command.
-            if (!commands.includes(message.content.trim())){
-                return;
-            }       
-
-            // Includes a command but not in the right channel.
-            if (commands.includes(message.content.trim()) && !isInChannel(message, config.offTopicChannel)){
-                message.react("🚫");        // React
-                return;
-            }
-
-            // .rule34
-            if (message.content === ".rule34" && isInChannel(message, config.offTopicChannel)) {
-                message.react("💦");                                                        // React
-                message.reply({ content: 'https://www.youtube.com/watch?v=gb8wRhHZxNc' });  // Answer accordingly
-                return;
-            }
         } catch (error) {
             console.log(`Error in message.js: ${error}`);
         }
