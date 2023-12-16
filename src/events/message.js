@@ -17,8 +17,8 @@ const   spamMessages = [
 ];
 const regWhoIs = new RegExp(/who('s|.is).(.*)\?/g);
 const regAttch = RegExp(/\[att:.*\]/g);
-const regSpam = RegExp(/\b\+18\b|\b18\b|\bnude?3?s?5?\b|\bna?4?ke?3?d\b|\bnitro\b|\bfre?3?e?3?\b|\bnft\b|\broblox\b|\bstea?4?m\b|\bdi?l?1?scord\b|\ba?4?dul?1?ts?\b/g);
-const regUrl = RegExp(/\bhttps?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)\b/g);
+const regSpam = /\b\+18\b|\b18\b|\bnude?3?s?5?\b|\bna?4?ke?3?d\b|\bnitro\b|\bfre?3?e?3?\b|\bnft\b|\broblox\b|\bstea?4?m\b|\bdi?l?1?scord\b|\ba?4?dul?1?ts?\b|cry?l?i?1?pto?0?\b|\bpro?0?mo?0?\b|\bbtc\b/gi;
+const regUrl = /https?:\/\/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)?/gi;
 
 const evnt = {
     name: Events.MessageCreate,
@@ -102,14 +102,17 @@ const evnt = {
 
             // Check if it's spam or +18
             if (message.content.match(regSpam)?.length > 1){
+                console.log("SPAM FILTER: Message appears to be spam");
                 // and if it has an URL then kill it
-                if (regUrl.test(message.content)){
+                if (message.content.match(regUrl)?.length > 0){
+                    console.log("SPAM FILTER: Message contains URL");
 
                     // Check if it's a mod or a hidden manager
                     const userWhoMentionedEveryone = await message.guild.members.fetch(message.author.id);
                     const isMod = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Mod).size > 0;
                     const isHiddenManager = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_HiddenManager).size > 0
                     if (!(isMod || isHiddenManager)){
+                        console.log("SPAM FILTER: Message from random (not that one) user, deleting.");
                         await message.delete();
                         return;
                     }
