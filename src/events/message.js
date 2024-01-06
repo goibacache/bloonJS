@@ -15,9 +15,9 @@ const   spamMessages = [
     `You can check all of the available commands using the \`/help\` command.`,
     `The developer of this bot really likes rum. You can help him buy one if you also really enjoy rum, [here](<https://ko-fi.com/bloon>)`
 ];
-const regWhoIs = new RegExp(/who('s|.is).(.*)\?/g);
+const regWhoIs = new RegExp(/who('s|.is|.are).(.*)\?/g);
 const regAttch = RegExp(/\[att:.*\]/g);
-const regSpam = /\b\+18\b|\b18\b|\bnude?3?s?5?\b|\bna?4?ke?3?d\b|\bnitro\b|\bfre?3?e?3?\b|\bnft\b|\broblox\b|\bstea?4?m\b|\bdi?l?1?scord\b|\ba?4?dul?1?ts?\b|cry?l?i?1?pto?0?\b|\bpro?0?mo?0?\b|\bbtc\b/gi;
+const regSpam = /\b\+18\b|\b18\b|\bnude?3?s?5?\b|\bna?4?ke?3?d\b|\bnitro\b|\bfre?3?e?3?\b|\bnft\b|\broblox\b|\bstea?4?m\b|\bdi?l?1?sco?0?rd(?!.com\/channels\/)\b|\ba?4?dul?1?ts?\b|cry?l?i?1?pto?0?\b|\bpro?0?mo?0?\b|\bbtc\b/gi;
 const regUrl = /https?:\/\/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)?/gi;
 
 const evnt = {
@@ -95,6 +95,8 @@ const evnt = {
                 const isMod = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Mod).size > 0;
                 const isHiddenManager = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_HiddenManager).size > 0
                 if (!(isMod || isHiddenManager)){
+                    console.log("SPAM FILTER: Message mentions everyone. Deleted");
+                    console.log(`SPAM FILTER: Deleted message: ${message.content}`);
                     await message.delete();
                     return;
                 }
@@ -113,6 +115,7 @@ const evnt = {
                     const isHiddenManager = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_HiddenManager).size > 0
                     if (!(isMod || isHiddenManager)){
                         console.log("SPAM FILTER: Message from random (not that one) user, deleting.");
+                        console.log(`SPAM FILTER: Deleted message: ${message.content}`);
                         await message.delete();
                         return;
                     }
