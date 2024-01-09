@@ -66,21 +66,21 @@ const command = {
         .addSubcommand(subcommand => {
             subcommand
                 .setName('note')
-                .setDescription('Creates a note about an user');
+                .setDescription('Creates a note about a user');
     
             return addBasicInteractionOptions(subcommand)
         })
         .addSubcommand(subcommand => {
             subcommand
                 .setName('warn')
-                .setDescription('Warns an user directly via DM and adds a note');
+                .setDescription('Warns a user directly via DM and adds a note');
     
             return addBasicInteractionOptions(subcommand);
         })
         .addSubcommand(subcommand => {
             subcommand
                 .setName('timeout')
-                .setDescription('Timeouts an user');
+                .setDescription('Timeouts a user');
     
             return  addBasicInteractionOptions(subcommand)
                     .addBooleanOption(option =>
@@ -98,7 +98,7 @@ const command = {
         .addSubcommand(subcommand => {
             subcommand
                 .setName('kick')
-                .setDescription('Kicks an user from the server and creates a note');
+                .setDescription('Kicks a user from the server and creates a note');
     
             return  addBasicInteractionOptions(subcommand)
                     .addBooleanOption(option =>
@@ -110,7 +110,7 @@ const command = {
         .addSubcommand(subcommand => {
             subcommand
                 .setName('ban')
-                .setDescription('Bans an user from the server and creates a note');
+                .setDescription('Bans a user from the server and creates a note');
             return  addBasicInteractionOptions(subcommand)
                     .addBooleanOption(option =>
                         option.setName('directmessage')
@@ -128,7 +128,7 @@ const command = {
         .addSubcommand(subcommand => {
             subcommand
                 .setName('unban')
-                .setDescription('Removes the ban from an user');
+                .setDescription('Removes the ban from a user');
             return addBasicInteractionOptions(subcommand);
         }),
     async execute(interaction) {

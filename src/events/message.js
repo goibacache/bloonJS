@@ -34,7 +34,7 @@ const evnt = {
             // Regex to split the question.
             const messageSplit = message.content.toLowerCase().split(regWhoIs);
 
-            if (messageSplit.length > 2){ // it has an user to look for
+            if (messageSplit.length > 2){ // it has a user to look for
                 const userToFind = messageSplit[2].replace(/ /g, '').trim();
                 // Not empty
                 if (userToFind.length == 0){
