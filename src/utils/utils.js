@@ -156,12 +156,12 @@ const getConfig = () => {
 };
 
 const moderationActions = {
-    Timeout:    { name: 'Timeout',  id: 1, conjugation: "Timeout",  color: 0x00DD00   }, // name & value used for options | colors: Green
-    Kick:       { name: 'Kick',     id: 2, conjugation: "Kicked",   color: 0xDDDD00   }, // name & value used for options | colors: Yellow
-    Ban:        { name: 'Ban',      id: 3, conjugation: "Banned",   color: 0xDD0000   }, // name & value used for options | colors: Red
-    Warn:       { name: 'Warn',     id: 4, conjugation: "Warned",   color: 0x000000   }, // name & value used for options | colors: Black
-    Unban:      { name: 'Unban',    id: 5, conjugation: "Unbanned", color: 0xFFFFFF   },  // name & value used for options | colors: White
-    Note:       { name: 'Note',     id: 6, conjugation: "Noted",    color: 0xFFFFFF   }  // name & value used for options | colors: White
+    Timeout:    { name: 'Timeout',  id: 1, conjugation: "Timeout",  color: 0x00DD00, emoji: '⏰'   }, // name & value used for options | colors: Green
+    Kick:       { name: 'Kick',     id: 2, conjugation: "Kicked",   color: 0xDDDD00, emoji: '🦶'   }, // name & value used for options | colors: Yellow
+    Ban:        { name: 'Ban',      id: 3, conjugation: "Banned",   color: 0xDD0000, emoji: '🔥'   }, // name & value used for options | colors: Red
+    Warn:       { name: 'Warn',     id: 4, conjugation: "Warned",   color: 0x000000, emoji: '⚡'   }, // name & value used for options | colors: Black
+    Unban:      { name: 'Unban',    id: 5, conjugation: "Unbanned", color: 0xFFFFFF, emoji: '😇'   },  // name & value used for options | colors: White
+    Note:       { name: 'Note',     id: 6, conjugation: "Noted",    color: 0xFFFFFF, emoji: '📄'   }  // name & value used for options | colors: White
 };
 
 const moderationActionsToChoices = () => {
@@ -182,8 +182,37 @@ const capitalizeFirstLetter = (text) => {
     }else{
         return text.charAt(0).toUpperCase();
     }
-    
 }
+
+const groupBy = (key, array) => {
+    let result = [];
+    for (let i = 0; i < array.length; i++) {
+        let added = false;
+        for (let j = 0; j < result.length; j++) {
+        if (result[j][key] == array[i][key]) {
+            result[j].items.push(array[i]);
+            added = true;
+            break;
+        }
+        }
+        if (!added) {
+        let entry = {items: []};
+        entry[key] = array[i][key];
+        entry.items.push(array[i]);
+        result.push(entry);
+        }
+    }
+    return result;
+}
+
+const actionToEmoji = [];
+actionToEmoji["Timeout"]    = "⏰";
+actionToEmoji["Mute"]       = "🔉";
+actionToEmoji["Kick"]       = "🦶";
+actionToEmoji["Ban"]        = "🔥";
+actionToEmoji["Warn"]       = "⚡";
+actionToEmoji["Unban"]      = "😇";
+actionToEmoji["Note"]       = "📄";
 
 
 module.exports = {
@@ -201,4 +230,6 @@ module.exports = {
     CyrillicOrStandard,
     moderationActions,
     deleteCodeBlocksFromText,
+    actionToEmoji,
+    groupBy,
 }
