@@ -16,6 +16,8 @@ module.exports = {
 
 	newsSubscribeMessageId:		"your-subscribe-to-news-message-id",
 
+	role_Mod: 					"your-role-mod",
+	role_HiddenManager:			"your-role-hidden-manager",
 	role_Pug: 					"your-role-pug-players",
 	role_LookingToPlay: 		"your-role-lookingToPlay",
 	role_NowPlaying: 			"your-role-nowplaying",
