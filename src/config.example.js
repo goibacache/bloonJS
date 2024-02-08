@@ -18,6 +18,7 @@ module.exports = {
 	rulesMessageId:				"your-rules-message-id",
 	newsSubscribeMessageId:		"your-subscribe-to-news-message-id",
 
+
 	role_Developer:				"your-developer-role",
 	role_Mod:					"your-mod-role",
 	role_Aug:					"your-aug-role",

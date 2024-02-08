@@ -7,7 +7,7 @@ module.exports = {
 	cooldown: 5,
 	data: new SlashCommandBuilder()
 		.setName('moderationprofile')
-		.setDescription(`Lists all of the moderation actions an user has. No one else will be able to see this reply.`)
+		.setDescription(`Lists all of the moderation actions a user has. No one else will be able to see this reply.`)
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers | PermissionFlagsBits.AttachFiles)
         .setDMPermission(false)
         .addUserOption(option =>

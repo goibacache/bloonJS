@@ -36,6 +36,7 @@ const evnt = {
 
 			const textDecorator = "```";
 
+			// TODO: FIX IF MESSAGE IS TOO LONG D:<
 			const msg = `${textDecorator}${message.content.length > 0 ? bloonUtils.deleteCodeBlocksFromText(message.content) : " "}${textDecorator}`;
 
 			// Attached files:

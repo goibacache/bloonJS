@@ -105,7 +105,7 @@ client.on(Events.InteractionCreate, async interaction => {
 	try {
 		const result = await command.execute(interaction);
 
-		// Handle "noCooldown" for when an user is advised to use the command in another channel
+		// Handle "noCooldown" for when a user is advised to use the command in another channel
 		if (result == "noCooldown"){
 			timestamps.delete(interaction.user.id); // Deletes the timestamp immediately
 		}
