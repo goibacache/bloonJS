@@ -2,7 +2,7 @@ const bloonUtils = require('../utils/utils.js');
 const mysql = require('mysql2/promise');
 const config = bloonUtils.getConfig();
 
-const moderationAction_Insert = async(moderationAction, banedUserDiscordId, banReason, handledByDiscordId) => {
+const moderationAction_Insert = async(moderationAction, banedUserDiscordId, banReason, handledByDiscordId, evidence = null) => {
     try{
         const query = `CALL moderationAction_Insert(?, ?, ?, ?)`;
     

@@ -5,7 +5,7 @@ const config = bloonUtils.getConfig();
 
 const commands = [];
 
-// Add all commands programaticly to commands array
+// Add all commands programmatically to commands array
 const commandsPath = 'interactions';
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 

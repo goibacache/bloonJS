@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits, ButtonStyle, ButtonBuilder, ActionRowBuilder } = require('discord.js')
+const { SlashCommandBuilder, PermissionFlagsBits, ButtonStyle, ButtonBuilder, ActionRowBuilder, ComponentType } = require('discord.js')
 const { EmbedBuilder } = require('@discordjs/builders');
 const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
@@ -44,8 +44,6 @@ const createModerationActionEmbed = (moderationAction, actedUponMember, caseId, 
         banEmbed.setImage(attachmentUrl)
     }
 
-    // console.log("createModerationActionEmbed > actedUponMember", actedUponMember);
-
     banEmbed.addFields(
         { name: `User ${moderationAction.conjugation}:`,  value: `**${actedUponMember.displayName ?? actedUponMember.username}**\n${actedUponMember.id}`, inline: true },
         { name: 'Handled by:',  value: `**${handledBy.displayName}**\n${handledBy.id}`, inline: true },
@@ -54,6 +52,100 @@ const createModerationActionEmbed = (moderationAction, actedUponMember, caseId, 
 
 
     return banEmbed;
+}
+
+/*
+interface ModerationProfile(    
+    handledByDiscordId;
+    reason;
+    timeStamp;
+    Type;
+    userDiscordId;
+)
+*/
+
+const resolveButtonState = (currentActionIndex, maxActionIndex, previousButton, nextButton) => {
+    if (currentActionIndex == 0){
+        previousButton.setDisabled(true);
+    }else{
+        previousButton.setDisabled(false);
+    }
+
+    if (currentActionIndex == maxActionIndex){
+        nextButton.setDisabled(true);
+    }else{
+        nextButton.setDisabled(false);
+    }
+}
+
+/**
+ * Loads and creates the moderation embeds
+ * @param {number} userId 
+ * @returns moderationProfileEmbeds, moderationProfile
+ */
+const loadModerationProfileEmbeds = async (moderationProfile) => {
+    let moderationProfileEmbeds = [];
+
+    let resume = ``;
+
+    if (moderationProfile.length == 0){
+        resume += `😇 This profile has **no** previous moderation actions\n`;
+    }else{
+        const groupedByType = bloonUtils.groupBy('Type', moderationProfile);
+
+        groupedByType.forEach((group, index) => {
+            console.log("group.Type: ", group.Type);
+            const emoji = bloonUtils.moderationActions[group.Type].emoji;
+            console.log("emoji found:", emoji);
+            if (index > 0){
+                resume += `\n`;
+            }
+            resume += `${emoji} **${group.Type}**: ${group.items.length}`;      
+        });          
+    }
+
+    if (moderationProfile.length == 0){
+        const roomEmbed = new EmbedBuilder()
+        .setColor(0x0099FF)
+        .setTitle(`Moderation profile`)
+        .setTimestamp();
+    
+        roomEmbed.addFields({ name: `No moderation actions found for this user`, value: `-` });
+    
+        roomEmbed.setFooter({ text: `SuperbossGames | #moderation action` });
+    
+        moderationProfileEmbeds.push(roomEmbed);
+    }else{
+        // TODO: Do 3 mod actions in ONE embed.
+
+        moderationProfile.forEach((current, index) => {
+            const roomEmbed = new EmbedBuilder()
+            .setColor(0x0099FF)
+            .setTitle(`Moderation profile`)
+            .setTimestamp();
+
+            roomEmbed.addFields({ name: `Moderation resume`, value: resume }); // Load resume
+
+            // Create current embed
+            const date = new Date(current.timeStamp);
+            const dateText = `${date.toLocaleDateString("en-US", {day: 'numeric', month: 'long', year: 'numeric', timeZone: 'utc'})} ${date.toLocaleTimeString("en-US")}`;
+        
+            const emoji = bloonUtils.moderationActions[current.Type].emoji;
+
+            roomEmbed.addFields({ name: `Moderation action Nº ${index+1}`, value: `${emoji} **${current.Type}**\n**Reason:** \`\`${current.reason}\`\` \n\`\`${dateText}\`\`` });
+
+            roomEmbed.setFooter({ text: `SuperbossGames | #moderation action` });
+        
+            moderationProfileEmbeds.push(roomEmbed);
+        });
+    }
+
+    return moderationProfileEmbeds;
+};
+
+const getModerationProfileEmbed = (currentActionIndex, moderationProfileEmbeds, previousButton, nextButton) => {
+    resolveButtonState(currentActionIndex, moderationProfileEmbeds.length - 1, previousButton, nextButton);
+    return moderationProfileEmbeds[currentActionIndex];
 }
 
 const command = {
@@ -144,40 +236,87 @@ const command = {
             const directmessage             = interaction.options.getBoolean('directmessage') ?? false;
             const hoursofmessagestodelete   = interaction.options.getNumber('hoursofmessagestodelete') ?? 12;
 
+
+            await interaction.deferReply({ ephemeral: true }); // This makes it so it can take more than 3 seconds to reply.
+
+            //#region Button configuration
             const confirm = new ButtonBuilder()
-                .setCustomId('confirm')
-                .setLabel(`Confirm ${actionName}`)
-                .setStyle(ButtonStyle.Danger);
-    
+            .setCustomId('confirm')
+            .setLabel(`Confirm`)
+            .setStyle(ButtonStyle.Danger);
+
             const cancel = new ButtonBuilder()
-                .setCustomId('cancel')
-                .setLabel('Cancel')
-                .setStyle(ButtonStyle.Primary);
-    
-            const row = new ActionRowBuilder()
-                .addComponents(confirm, cancel);
-    
-            const response = await interaction.reply({
-                content: `Are you sure you want to ${actionName} ${target} for the following reason: ${reason}?`,
-                components: [row],
-                ephemeral: true
+            .setCustomId('cancel')
+            .setLabel('Cancel')
+            .setStyle(ButtonStyle.Primary);
+
+            const previousButton = new ButtonBuilder()
+            .setCustomId('previous')
+            .setLabel('Previous action')
+            .setStyle(ButtonStyle.Secondary);
+
+            const nextButton = new ButtonBuilder()
+            .setCustomId('next')
+            .setLabel('Next action')
+            .setStyle(ButtonStyle.Secondary);
+
+            const acceptDenyButtons = new ActionRowBuilder()
+            .addComponents(confirm, cancel, previousButton, nextButton);
+
+            //#endregion
+
+            // Get log of actions of a user
+            let     currentActionIndex      = 0;
+            const   moderationProfile       = await storedProcedures.moderationAction_Profile(target.id);
+            const   moderationProfileEmbeds = await loadModerationProfileEmbeds(moderationProfile);
+            let     moderationHistoryEmbed  = getModerationProfileEmbed(0, moderationProfileEmbeds, previousButton, nextButton);
+
+            // Initial response:
+            await interaction.editReply({
+                content: `Are you sure you want to **${actionName}** ${target} for the following reason: ${reason}?`,
+                components: [acceptDenyButtons],
+                embeds: [moderationHistoryEmbed]
             });
+
+            // Activate buttons:
+            const currentMessage = await interaction.fetchReply();
+            const collector = currentMessage.createMessageComponentCollector({time: 300_000, componentType: ComponentType.Button}); // 5 minutes
+
+            // triggers when the times runs out, removes buttons
+            collector.on('end', () => {
+                interaction.editReply({ components: [] });
+            });
+                        
+            // triggers when the buttons are pressed
+            collector.on('collect', async (m) => {
+
+                if (m.customId === 'previous' || m.customId === 'next'){
+                    if (m.customId === 'previous' && currentActionIndex > 0){
+                        console.log(`Previous moderationAction: ${actionName}\ntarget: ${target}\nreason: ${reason}\ntimeouttime: ${timeouttime}\ndirectmessage: ${directmessage}\nhoursofmessagestodelete: ${hoursofmessagestodelete}`);
+                        currentActionIndex--;
+                    }
     
-            const collectorFilter = i => i.user.id === interaction.user.id; // Only the same user can use the buttons
+                    if (m.customId === 'next' && currentActionIndex < moderationProfileEmbeds.length){
+                        console.log(`Next moderationAction: ${actionName}\ntarget: ${target}\nreason: ${reason}\ntimeouttime: ${timeouttime}\ndirectmessage: ${directmessage}\nhoursofmessagestodelete: ${hoursofmessagestodelete}`);
+                        currentActionIndex++;
+                    }
     
-            await response.awaitMessageComponent({ filter: collectorFilter, time: 60000 })
-            .then(async (confirmation) => {
-                if (confirmation.customId === 'cancel') {
-                    console.log(`moderationactions.js: cancelled by ${interaction.member.id}`);
-                    await confirmation.update({ content: `${actionName} has been cancelled`, components: [] });
+                    let moderationHistoryEmbed = getModerationProfileEmbed(currentActionIndex, moderationProfileEmbeds, previousButton, nextButton);
+    
+                    m.update({ embeds: [moderationHistoryEmbed], files: [], components: [acceptDenyButtons] });
+                }
+
+                if (m.customId === 'cancel') {
+                    console.log(`Canceled moderationAction: ${actionName}\ntarget: ${target}\nreason: ${reason}\ntimeouttime: ${timeouttime}\ndirectmessage: ${directmessage}\nhoursofmessagestodelete: ${hoursofmessagestodelete}`);
+                    await m.update({ content: `${actionName} has been cancelled`, components: [], embeds: [] });
                     return;
                 }
 
-                console.log(`Confirmed moderationAction: ${actionName}\ntarget: ${target}\nreason: ${reason}\ntimeouttime: ${timeouttime}\ndirectmessage: ${directmessage}\nhoursofmessagestodelete: ${hoursofmessagestodelete}`);
-    
-                if (confirmation.customId === 'confirm') {
-                    // Store in DDBB and create EMBED
+                if (m.customId === 'confirm') {
 
+                    console.log(`Confirmed moderationAction: ${actionName}\ntarget: ${target}\nreason: ${reason}\ntimeouttime: ${timeouttime}\ndirectmessage: ${directmessage}\nhoursofmessagestodelete: ${hoursofmessagestodelete}`);
+
+                    // Store in DDBB and create EMBED
                     let userToBeActedUpon;
                     try{
                         userToBeActedUpon = await interaction.member.guild.members.fetch(target.id);
@@ -189,108 +328,117 @@ const command = {
                     const caseID            = await storedProcedures.moderationAction_GetNewId(action);
                     const channel           = await interaction.member.guild.channels.fetch(config.moderationActionsChannel);
                     const actionEmbed       = createModerationActionEmbed(action, userToBeActedUpon, caseID, reason, interaction.member, attachment?.url);
-                    let   overrideMessage   = null; // Useful to try and catch unban errors.
                     
                     if (caseID == 0) {
-                        await confirmation.update({ content: `Couldn't save ${actionName} in database.`, components: [] });
+                        await interaction.editReply({ content: `Couldn't save ${actionName} in database.`, components: [] });
                         return;
                     }
-    
+
                     switch(action){
                         case bloonUtils.moderationActions.Timeout:
                             try{
                                 const userToBeMuted   = await interaction.member.guild.members.fetch(target.id);
-                                if (directmessage){
-                                    await target.send({content: `You have been timed out from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis time out had the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it.`})
-                                }
                                 await userToBeMuted.timeout(timeouttime * 60 * 1000);
+                                if (directmessage){
+                                    await target.send({content: `You have been timed out from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis timeout has the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it and remember that continuously breaking the server rules will result in either a kick or a ban`})
+                                    .then(() => interaction.editReply({ content: `The user was timed out and the DM was delivered 🔥.`, components: [], embeds: [] }))
+                                    .catch(() => interaction.editReply({ content: `The user was timed out but I couldn't send a DM, sorry.`, components: [], embeds: [] }));
+                                }else{
+                                    interaction.editReply({ content: `${target.username} has been timed out correctly. **No** DM was sent`, components: [], embeds: [] });
+                                }
                             }catch(error){
-                                confirmation.update({ content: `Sorry, can't mute a server administrator.`, components: [] });
+                                console.log(`⚠ Error in Timeout: ${error}`)
+                                interaction.editReply({ content: `Sorry, couldn't mute that user. Maybe he's a server admin?`, components: [], embeds: [] });
                                 return;
                             }
+
                             break;
-    
                         case bloonUtils.moderationActions.Kick:
                             try{
-                                if (directmessage){
-                                    await target.send({content: `You have been kicked from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis kick had the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it.`})
-                                    .catch(() => confirmation.update({ content: `Couldn't DM the user.`, components: [] }));
-                                }
                                 await interaction.guild.members.kick(target, reason);
+                                if (directmessage){
+                                    await target.send({content: `You have been kicked from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis kick had the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it and remember that continuously breaking the server rules will result in either a timeout, kick or a ban.`})
+                                    .then(() => interaction.editReply({ content: `The user was kicked and the DM was delivered 🔥.`, components: [], embeds: [] }))
+                                    .catch(() => interaction.editReply({ content: `The user was kicked but I couldn't send a DM, sorry.`, components: [], embeds: [] }));
+                                }else{
+                                    interaction.editReply({ content: `${target.username} has been kicked correctly. **No** DM was sent`, components: [], embeds: [] });
+                                }
                             }catch(error){
-                                confirmation.update({ content: `Sorry, there was an error kicking that person. Error: ${error}`, components: [] });
+                                console.log(`⚠ Error in Kick: ${error}`);
+                                interaction.editReply({ content: `Sorry, there was an error when trying to kick that user.\n${error.message}`, components: [], embeds: [] });
                                 return;
                             }
-    
+
                             break;
                         case bloonUtils.moderationActions.Ban:
                             try{
-                                if (directmessage){
-                                    await target.send({content: `You have been banned from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis ban had the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it.`})
-                                    .catch(() => confirmation.update({ content: `Couldn't DM the user.`, components: [] }));
-                                }
                                 await interaction.guild.bans.create(target, { reason, deleteMessageSeconds: hoursofmessagestodelete * 3600 }); // 12 hours by default.
+                                if (directmessage){
+                                    await target.send({content: `You have been banned from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis ban had the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it and remember that continuously breaking the server rules will result in either a kick or a ban.`})
+                                    .then(() => interaction.editReply({ content: `The user was banned and the DM was delivered 🔥.`, components: [], embeds: [] }))
+                                    .catch(() => interaction.editReply({ content: `Couldn't DM the user.`, components: [], embeds: [] }));
+                                }else{
+                                    interaction.editReply({ content: `${target.username} has been banned correctly. **No** DM was sent`, components: [], embeds: [] });
+                                }
                             }catch(error){
-                                confirmation.update({ content: `Couldn't find the user to be banned. Error: ${error}`, components: [] });
+                                console.log(`⚠ Error in Ban: ${error}`);
+                                interaction.editReply({ content: `There was an error banning the user. Error: ${error}`, components: [], embeds: [] });
                                 return;
                             }
+
                             break;
-    
                         case bloonUtils.moderationActions.Warn:
                             try{
-                                await target.send({content: `You have received a warning from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis warning had the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it.`})
+                                await target.send({content: `You have received a warning from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis warning had the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it and remember that continuously breaking the server rules will result in either a kick or a ban.`})
+                                .then(() => interaction.editReply({ content: `The warning was delivered via DM 🔥.`, components: [], embeds: [] }))
                             }catch(error){
-                                confirmation.update({ content: `Sorry, can't send a DM to this user. Consider making a note and/or contact the user directly.`, components: [] });
-                                return;
+                                console.log(`⚠ Error in Warn: ${error}`);
+                                interaction.editReply({ content: `Couldn't DM the user, sorry. Consider making a note and/or contact the user directly.`, components: [], embeds: [] });
+                                return; // Stop the process.
                             }
+
                             break;
-    
                         case bloonUtils.moderationActions.Unban:
                             try{
-                                const bans = await interaction.guild.bans.fetch()
+                                const bans = await interaction.guild.bans.fetch();
                             
                                 if (bans.size == 0) {
-                                    overrideMessage = `There are no banned user on this server.`;
+                                    interaction.editReply({ content: `There are no banned user on this server.`, components: [], embeds: [] });
                                     return;
                                 }
-    
+
                                 const bannedUser = await bans.find(ban => ban.user.id === target.id);
                                 if (!bannedUser) {
-                                    overrideMessage = `The ID stated is not banned from this server.`;
+                                    interaction.editReply({ content: `The user ID provided is not banned from this server.`, components: [], embeds: [] });
                                     return;
                                 }
                                 // Removes the ban
-                                await interaction.guild.bans.remove(target.id, reason);
-                            
+                                await interaction.guild.bans.remove(target.id, reason);   
+                                interaction.editReply({ content: `The user was unbanned successfully.`, components: [], embeds: [] });                         
                             }catch(error){
-                                overrideMessage = `There was an error unbanning the user. Error: ${error}`
+                                console.log(`⚠ Error in Unban: ${error}`);
+                                interaction.editReply({ content: `There was an error unbanning the user.`, components: [], embeds: [] });
                             }
                             
                             break;
-    
+
                         case bloonUtils.moderationActions.Note:
-                            //  For real it doesn't have to do anything, it's all handled after this :D
+                            try{
+                                interaction.editReply({ content: `Note created successfully.`, components: [], embeds: [] });
+                            }catch(error){
+                                console.log(`⚠ Error in Note: ${error}`);
+                                interaction.editReply({ content: `There was an error creating the note for the user.`, components: [], embeds: [] });
+                            }
+
                             break;
                     }
-    
-                    // If overrideMessage is set, that's the message, if not, the standard one.
-                    let content = overrideMessage ?? `${target.username} has been ${action.conjugation} for the following reason: ${reason}`;
-    
-                    await confirmation.update({ content: content, components: [] });      
-    
-                    // If nothing overwrote the message, then write the moderation action in the chat to log it in the DDBB
-                    if (overrideMessage == null){
-                        channel.send({ embeds: [actionEmbed]});
-                        await storedProcedures.moderationAction_Insert(action, target.id, reason, interaction.member.id); // Also save it on the DB :D
-                    }
-    
+
+                    // Write the moderation action in the chat to log it in the DDBB
+                    channel.send({ embeds: [actionEmbed]});
+                    // TODO: upload attachment as blob.
+                    await storedProcedures.moderationAction_Insert(action, target.id, reason, interaction.member.id); // Also save it on the DB :D
                 }
-            })
-            .catch(async error => {
-                await interaction.editReply({ content: 'Confirmation not received within 1 minute, cancelling. Error: ' + error, components: [] });
-                console.error(`Possible error in moderationActions.js for ID ${interaction.member.id}, action ${action.name}: ` + error);
             });
-    
         }catch(error){
             const answer = { content: 'There was an error in /moderationActions, sorry.', components: [], ephemeral: true };
             

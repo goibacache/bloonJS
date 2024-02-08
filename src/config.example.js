@@ -3,6 +3,7 @@ module.exports = {
 	clientId: 					"your-client-id",
 	bloonGuildId: 				"your-guild-id",
 	
+	rulesAndInfoChannel:		"your-news-and-info-channel",
 	intruderGeneralChannel:		"your-general-channel-id",
 	intruderHelpChannel:		"your-help-channel-id",
 	intruderMapmakingChannel:	"your-mapmaking-channel-id",
@@ -14,10 +15,14 @@ module.exports = {
 	bloonsideChannel:			"your-bloonside-channel",
 	modChatChannel:				"your-mod-chat-channel",
 
+	rulesMessageId:				"your-rules-message-id",
 	newsSubscribeMessageId:		"your-subscribe-to-news-message-id",
 
-	role_Mod: 					"your-role-mod",
-	role_HiddenManager:			"your-role-hidden-manager",
+
+	role_Developer:				"your-developer-role",
+	role_Mod:					"your-mod-role",
+	role_Aug:					"your-aug-role",
+	role_HiddenManager:			"your-hidden-manager-role",
 	role_Pug: 					"your-role-pug-players",
 	role_LookingToPlay: 		"your-role-lookingToPlay",
 	role_NowPlaying: 			"your-role-nowplaying",
@@ -30,6 +35,13 @@ module.exports = {
 
 	chromeEmoji: 				"<:your-chrome-emoji:0000000000>",
 	firefoxEmoji:				"<:your-firefox-emoji:0000000000>",
+	youtubeEmoji:				"<:your-youtube-emoji:0000000000>",
+	twitterEmoji:				"<:your-twitter-emoji:0000000000>",
+	helpraceEmoji:				"<:your-helprace-emoji:0000000000>",
+	redditEmoji:				"<:your-reddit-emoji:0000000000>",
+	twitchEmoji:				"<:your-twch-emoji:0000000000>",
+	discordEmoji:				"<:your-discord-emoji:0000000000>",
+	wikiEmoji:					"<:your-wiki-emoji:0000000000>",
 
 	mysqlHost:					"your-sql-host",
 	mysqlDDBB:					"your-ddbb-name",

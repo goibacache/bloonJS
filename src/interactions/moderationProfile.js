@@ -1,16 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle, ComponentType } = require('discord.js')
 const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
-const { moderationAction_Profile } = require('../utils/storedProcedures.js')
-
-const actionToEmoji = [];
-actionToEmoji["Timeout"]    = "⏰";
-actionToEmoji["Mute"]       = "🔉";
-actionToEmoji["Kick"]       = "🦶";
-actionToEmoji["Ban"]        = "🔥";
-actionToEmoji["Warn"]       = "⚡";
-actionToEmoji["Unban"]      = "😇";
-actionToEmoji["Note"]       = "📄";
+const { moderationAction_Profile } = require('../utils/storedProcedures.js');
 
 module.exports = {
 	cooldown: 5,
@@ -34,7 +25,7 @@ module.exports = {
                 return;
             }
 
-			await interaction.deferReply({ ephemeral: false }); // This makes it so it can take more than 3 seconds to reply.
+			await interaction.deferReply({ ephemeral: true }); // This makes it so it can take more than 3 seconds to reply.
 
             const target = interaction.options.getUser('target');
             if (target == null){
@@ -74,7 +65,7 @@ module.exports = {
                 for(const action of res.slice(index * 10, index*10 + 10)){
                     const date = new Date(action.timeStamp);
                     const dateText = `${date.toLocaleDateString("en-US", {day: 'numeric', month: 'long', year: 'numeric', timeZone: 'utc'})} ${date.toLocaleTimeString("en-US")}`;
-                    mpEmbed.addFields({ name: `-${actionIndex.toString().padStart(maxAmountOfChars)}-   ${actionToEmoji[action.Type]} ${action.Type}`, value: `\`${dateText}\`\n**Reason:** ${action.reason}\n` });
+                    mpEmbed.addFields({ name: `-${actionIndex.toString().padStart(maxAmountOfChars)}-   ${bloonUtils.actionToEmoji[action.Type]} ${action.Type}`, value: `\`${dateText}\`\n**Reason:** ${action.reason}\n` });
                     actionIndex++;
                 }
                 
