@@ -1,4 +1,6 @@
-const https = require('https');
+const { EmbedBuilder } = require('discord.js');
+const https         = require('https');
+
 
 
 //#region initialization
@@ -157,6 +159,8 @@ const getConfig = () => {
 
 const moderationActions = {
     Timeout:    { name: 'Timeout',  id: 1, conjugation: "Timeout",  color: 0x00DD00, emoji: '⏰'   }, // name & value used for options | colors: Green
+    Mute:       { name: 'Timeout',  id: 1, conjugation: "Timeout",  color: 0x00DD00, emoji: '⏰'   }, // name & value used for options | colors: Green
+    // Where did mute come from o.O?
     Kick:       { name: 'Kick',     id: 2, conjugation: "Kicked",   color: 0xDDDD00, emoji: '🦶'   }, // name & value used for options | colors: Yellow
     Ban:        { name: 'Ban',      id: 3, conjugation: "Banned",   color: 0xDD0000, emoji: '🔥'   }, // name & value used for options | colors: Red
     Warn:       { name: 'Warn',     id: 4, conjugation: "Warned",   color: 0x000000, emoji: '⚡'   }, // name & value used for options | colors: Black
@@ -205,6 +209,55 @@ const groupBy = (key, array) => {
     return result;
 }
 
+const createRulesAndInfoEmbed = () => {
+    // Load config from self.
+    const config 		= getConfig();
+
+    // Creates the embed parts
+
+    const description = 
+        `**1**. Be respectful, no racism or derogatory attitude
+        **2**. No NSFW/shocking/pornographic and political nature posts
+        **3**. No trolling.
+        **4**. No spamming or text abusing.
+        **5**. Do not over message/mention staff.
+        **6**. No alternate accounts to dodge moderation action.
+        **7**. Post in the correct channels.
+        **8**. Chat in English only.
+        **9**. No advertising non-Intruder content.
+        **10**. Respect the staff and follow instructions. Mods are doing their best to make a friendly environment.
+        **11**. No discussion of moderator actions in public chats. Contact <@104389223280295936> if you feel wrongfully moderated in accordance with the rules listed above.`;
+
+    const roles = 
+        `<@&${config.role_Developer}> : The developers of Intruder!
+        <@&${config.role_Developer}> : Official staff partners working along with the developer for community management.
+        <@&${config.role_Mod}> : The amazing community volunteers assisting the team to keep the peace.
+        <@&${config.role_Aug}> : A group of serious players who engage the community.
+        <@&${config.role_Agent}> : All members of the community.`; // Fixed for now D:<
+
+    const importantLinks = 
+        `${config.youtubeEmoji} | [**Youtube**](https://www.youtube.com/superbossgames)
+        ${config.twitterEmoji} | [**Twitter**](https://twitter.com/SuperbossGames/)
+        ${config.helpraceEmoji} | [**Helprace**](https://superbossgames.helprace.com/)
+        ${config.redditEmoji} | [**Reddit**](https://www.reddit.com/r/Intruder)
+        ${config.twitchEmoji} | [**Twitch**](https://www.twitch.tv/superbossgames)
+        ${config.discordEmoji} | [**Server Invite**](https://discord.gg/superbossgames)
+        ${config.wikiEmoji} | [**Wiki**](https://wiki.superbossgames.com/)`;
+
+    const rulesAndInfoEmbed = new EmbedBuilder()
+    .setColor(0x1799b1)
+    .setTitle(`**Welcome to the Official Intruders Discord server!**`)
+    .setTimestamp()
+    .setDescription(description)
+    .setFooter({ text: `SuperbossGames Discord - #rules-and-info | Last updated ` });
+
+    rulesAndInfoEmbed.addFields({ name: `Roles`, value: roles });
+
+    rulesAndInfoEmbed.addFields({ name: `Important Links`, value: importantLinks });
+
+    return rulesAndInfoEmbed;
+}
+
 const actionToEmoji = [];
 actionToEmoji["Timeout"]    = "⏰";
 actionToEmoji["Mute"]       = "🔉";
@@ -232,4 +285,5 @@ module.exports = {
     deleteCodeBlocksFromText,
     actionToEmoji,
     groupBy,
+    createRulesAndInfoEmbed,
 }

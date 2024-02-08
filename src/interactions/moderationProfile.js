@@ -25,7 +25,7 @@ module.exports = {
                 return;
             }
 
-			await interaction.deferReply({ ephemeral: false }); // This makes it so it can take more than 3 seconds to reply.
+			await interaction.deferReply({ ephemeral: true }); // This makes it so it can take more than 3 seconds to reply.
 
             const target = interaction.options.getUser('target');
             if (target == null){

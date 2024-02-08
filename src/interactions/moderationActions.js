@@ -94,7 +94,9 @@ const loadModerationProfileEmbeds = async (moderationProfile) => {
         const groupedByType = bloonUtils.groupBy('Type', moderationProfile);
 
         groupedByType.forEach((group, index) => {
+            console.log("group.Type: ", group.Type);
             const emoji = bloonUtils.moderationActions[group.Type].emoji;
+            console.log("emoji found:", emoji);
             if (index > 0){
                 resume += `\n`;
             }
@@ -338,15 +340,16 @@ const command = {
                                 const userToBeMuted   = await interaction.member.guild.members.fetch(target.id);
                                 await userToBeMuted.timeout(timeouttime * 60 * 1000);
                                 if (directmessage){
-                                    await target.send({content: `You have been timed out from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis timeout has the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it and remember that continuously breaking the server rules will result in a kick or a ban`})
+                                    await target.send({content: `You have been timed out from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis timeout has the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it and remember that continuously breaking the server rules will result in either a kick or a ban`})
                                     .then(() => interaction.editReply({ content: `The user was timed out and the DM was delivered 🔥.`, components: [], embeds: [] }))
                                     .catch(() => interaction.editReply({ content: `The user was timed out but I couldn't send a DM, sorry.`, components: [], embeds: [] }));
                                 }else{
-                                    interaction.editReply({ content: `${target.username} has been timed out correctly and no DM was sent`, components: [], embeds: [] });
+                                    interaction.editReply({ content: `${target.username} has been timed out correctly. **No** DM was sent`, components: [], embeds: [] });
                                 }
                             }catch(error){
-                                console.log(`⚠ Error in Kick: ${error}`)
+                                console.log(`⚠ Error in Timeout: ${error}`)
                                 interaction.editReply({ content: `Sorry, couldn't mute that user. Maybe he's a server admin?`, components: [], embeds: [] });
+                                return;
                             }
 
                             break;
@@ -354,15 +357,16 @@ const command = {
                             try{
                                 await interaction.guild.members.kick(target, reason);
                                 if (directmessage){
-                                    await target.send({content: `You have been kicked from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis kick had the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it and remember that continuously breaking the server rules will result in a kick or a ban.`})
+                                    await target.send({content: `You have been kicked from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis kick had the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it and remember that continuously breaking the server rules will result in either a timeout, kick or a ban.`})
                                     .then(() => interaction.editReply({ content: `The user was kicked and the DM was delivered 🔥.`, components: [], embeds: [] }))
                                     .catch(() => interaction.editReply({ content: `The user was kicked but I couldn't send a DM, sorry.`, components: [], embeds: [] }));
                                 }else{
-                                    interaction.editReply({ content: `${target.username} has been kicked correctly and no DM was sent`, components: [], embeds: [] });
+                                    interaction.editReply({ content: `${target.username} has been kicked correctly. **No** DM was sent`, components: [], embeds: [] });
                                 }
                             }catch(error){
-                                console.log(`Error in Kick: ${error}`)
+                                console.log(`⚠ Error in Kick: ${error}`);
                                 interaction.editReply({ content: `Sorry, there was an error when trying to kick that user.\n${error.message}`, components: [], embeds: [] });
+                                return;
                             }
 
                             break;
@@ -370,52 +374,49 @@ const command = {
                             try{
                                 await interaction.guild.bans.create(target, { reason, deleteMessageSeconds: hoursofmessagestodelete * 3600 }); // 12 hours by default.
                                 if (directmessage){
-                                    await target.send({content: `You have been banned from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis ban had the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it and remember that continuously breaking the server rules will result in a kick or a ban.`})
+                                    await target.send({content: `You have been banned from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis ban had the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it and remember that continuously breaking the server rules will result in either a kick or a ban.`})
                                     .then(() => interaction.editReply({ content: `The user was banned and the DM was delivered 🔥.`, components: [], embeds: [] }))
-                                    .catch(() => confirmation.update({ content: `Couldn't DM the user.`, components: [], embeds: [] }));
+                                    .catch(() => interaction.editReply({ content: `Couldn't DM the user.`, components: [], embeds: [] }));
                                 }else{
-                                    interaction.editReply({ content: `${target.username} has been banned correctly and no DM was sent`, components: [], embeds: [] });
+                                    interaction.editReply({ content: `${target.username} has been banned correctly. **No** DM was sent`, components: [], embeds: [] });
                                 }
                             }catch(error){
-                                interaction.editReply({ content: `Couldn't find the user to be banned. Error: ${error}`, components: [], embeds: [] });
+                                console.log(`⚠ Error in Ban: ${error}`);
+                                interaction.editReply({ content: `There was an error banning the user. Error: ${error}`, components: [], embeds: [] });
                                 return;
                             }
 
                             break;
                         case bloonUtils.moderationActions.Warn:
                             try{
-                                await target.send({content: `You have received a warning from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis warning had the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it and remember that continuously breaking the server rules will result in a kick or a ban.`})
+                                await target.send({content: `You have received a warning from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis warning had the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it and remember that continuously breaking the server rules will result in either a kick or a ban.`})
                                 .then(() => interaction.editReply({ content: `The warning was delivered via DM 🔥.`, components: [], embeds: [] }))
-                                .catch(() => confirmation.update({ content: `Couldn't DM the user, sorry`, components: [], embeds: [] }));
                             }catch(error){
-                                interaction.editReply({ content: `Sorry, can't send a DM to this user. Consider making a note and/or contact the user directly.`, components: [], embeds: [] });
-                                return;
+                                console.log(`⚠ Error in Warn: ${error}`);
+                                interaction.editReply({ content: `Couldn't DM the user, sorry. Consider making a note and/or contact the user directly.`, components: [], embeds: [] });
+                                return; // Stop the process.
                             }
 
                             break;
                         case bloonUtils.moderationActions.Unban:
                             try{
                                 const bans = await interaction.guild.bans.fetch();
-
-                                let unbanMessage = ``;
                             
                                 if (bans.size == 0) {
-                                    unbanMessage = `There are no banned user on this server.`;
+                                    interaction.editReply({ content: `There are no banned user on this server.`, components: [], embeds: [] });
                                     return;
                                 }
 
                                 const bannedUser = await bans.find(ban => ban.user.id === target.id);
                                 if (!bannedUser) {
-                                    unbanMessage = `The ID stated is not banned from this server.`;
+                                    interaction.editReply({ content: `The user ID provided is not banned from this server.`, components: [], embeds: [] });
                                     return;
                                 }
                                 // Removes the ban
-                                await interaction.guild.bans.remove(target.id, reason);
-
-                                interaction.editReply({ content: unbanMessage, components: [], embeds: [] });
-                            
+                                await interaction.guild.bans.remove(target.id, reason);   
+                                interaction.editReply({ content: `The user was unbanned successfully.`, components: [], embeds: [] });                         
                             }catch(error){
-                                console.log(`Unban Error: ${error}`)
+                                console.log(`⚠ Error in Unban: ${error}`);
                                 interaction.editReply({ content: `There was an error unbanning the user.`, components: [], embeds: [] });
                             }
                             
@@ -425,7 +426,7 @@ const command = {
                             try{
                                 interaction.editReply({ content: `Note created successfully.`, components: [], embeds: [] });
                             }catch(error){
-                                console.log(`Note Error: ${error}`)
+                                console.log(`⚠ Error in Note: ${error}`);
                                 interaction.editReply({ content: `There was an error creating the note for the user.`, components: [], embeds: [] });
                             }
 

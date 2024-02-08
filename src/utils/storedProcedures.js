@@ -4,11 +4,11 @@ const config = bloonUtils.getConfig();
 
 const moderationAction_Insert = async(moderationAction, banedUserDiscordId, banReason, handledByDiscordId, evidence = null) => {
     try{
-        const query = `CALL moderationAction_Insert(?, ?, ?, ?, ?)`;
+        const query = `CALL moderationAction_Insert(?, ?, ?, ?)`;
     
         const connection = await createConnection();
 
-        const [rows] = await connection.execute(query, [moderationAction.id, banedUserDiscordId, banReason, handledByDiscordId, evidence]);
+        const [rows] = await connection.execute(query, [moderationAction.id, banedUserDiscordId, banReason, handledByDiscordId]);
 
         return parseInt(rows[0][0]['res']); // Awful, but eh.
 

@@ -351,6 +351,25 @@ async function handleCommands(command, client) {
 			channel.send({ content: `**New bloon update**\n\nThis is what's new:\n\n* Added the ability to react to the news emoji and be added to the "news" role [here](<https://discord.com/channels/103933666417217536/892796013759303760/892811060413886504>).\n* Added a player stats viewer that you can use in [bloon-commands](<https://discord.com/channels/103933666417217536/934126841206308905>) with the \`/playerstats\` command. \n* You no longer need to mention bloon to answer your kofi "who is" questions.` });
 		}
 
+		if (command.startsWith("rulesPost")){
+			const rulesAndInfoEmbed = bloonUtils.createRulesAndInfoEmbed();
+			const guild = await client.guilds.fetch(config.bloonGuildId);
+			const channel = await guild.channels.fetch(config.rulesAndInfoChannel);
+			if (channel){
+				channel.send({ content: ``, embeds: [rulesAndInfoEmbed] });
+			}
+		}
+
+		if (command.startsWith("rulesUpdate")){
+			const rulesAndInfoEmbed = bloonUtils.createRulesAndInfoEmbed();
+			const guild = await client.guilds.fetch(config.bloonGuildId);
+			const channel = await guild.channels.fetch(config.rulesAndInfoChannel);
+			if (!channel) { console.log("Couldn't find rule's channel"); return; };
+			const message = await channel.messages.fetch(config.rulesMessageId);
+			if (!message) { console.log("Couldn't find rule's message"); return; };
+			await message.edit({ embeds: [rulesAndInfoEmbed] });
+		}
+
 		
 	}catch(error){
 		console.error(`\nError in command: ${error}`);
