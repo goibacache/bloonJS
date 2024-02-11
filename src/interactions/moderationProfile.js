@@ -65,7 +65,7 @@ module.exports = {
                 for(const action of res.slice(index * 10, index*10 + 10)){
                     const date = new Date(action.timeStamp);
                     const dateText = `${date.toLocaleDateString("en-US", {day: 'numeric', month: 'long', year: 'numeric', timeZone: 'utc'})} ${date.toLocaleTimeString("en-US")}`;
-                    mpEmbed.addFields({ name: `-${actionIndex.toString().padStart(maxAmountOfChars)}-   ${bloonUtils.actionToEmoji[action.Type]} ${action.Type}`, value: `\`${dateText}\`\n**Reason:** ${action.reason}\n` });
+                    mpEmbed.addFields({ name: `-${actionIndex.toString().padStart(maxAmountOfChars)}-   ${bloonUtils.moderationActions[action.Type].emoji} ${action.Type}`, value: `\`${dateText}\`\n**Reason:** ${action.reason}\n` });
                     actionIndex++;
                 }
                 

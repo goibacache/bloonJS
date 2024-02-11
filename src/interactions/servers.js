@@ -40,7 +40,7 @@ module.exports = {
 			await interaction.deferReply(); // This makes it so it can take more than 3 seconds to reply.
 
             // Load servers
-            let servers = await bloonUtils.getHHTPResult("https://api.intruderfps.com/rooms?OrderBy=agentCount%3Adesc");
+            let servers = await bloonUtils.getHTTPResult("https://api.intruderfps.com/rooms?OrderBy=agentCount%3Adesc");
             servers.data = servers.data.filter(x => x.version != 7777); // Let's get those developer rooms out of the way :^)
 
             let currentPage = 0;

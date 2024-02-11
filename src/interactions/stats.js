@@ -85,7 +85,7 @@ module.exports = {
 
             const filterBy = interaction.options.getString('filterby');
 
-            const agents = await bloonUtils.getHHTPResult(`https://api.intruderfps.com/agents?PerPage=10&${optionDictionary[filterBy].query}`)
+            const agents = await bloonUtils.getHTTPResult(`https://api.intruderfps.com/agents?PerPage=10&${optionDictionary[filterBy].query}`)
 
             // For every agent bring extra info.
             const agentsStats = [];
@@ -105,7 +105,7 @@ module.exports = {
                         }
 
                         // Get new result and cache it
-                        bloonUtils.getHHTPResult(`https://api.intruderfps.com/agents/${agent.steamId}/stats`)
+                        bloonUtils.getHTTPResult(`https://api.intruderfps.com/agents/${agent.steamId}/stats`)
                         .then(result => {
                             result["steamId"] = agent.steamId;
                             result["name"] = bloonUtils.CyrillicOrStandard(agent.name);

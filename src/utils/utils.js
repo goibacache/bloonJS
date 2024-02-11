@@ -5,6 +5,9 @@ const https         = require('https');
 
 //#region initialization
 
+/**
+ * Array of regions to their emoji equivalents
+ */
 const regionsToEmojis   = [];
 regionsToEmojis["EU"]   = "<:eu:1125796021574844520>";
 regionsToEmojis["US"]   = "<:us:1125796012263481456>";
@@ -19,11 +22,40 @@ regionsToEmojis["IN"]   = "<:in:1125796023147704370>";
 regionsToEmojis["RU"]   = "<:ru:1125796030777131078>";
 regionsToEmojis["CN"]   = "<:cn:1125796020090048545>"; // Unused?
 
+// const actionToEmoji = [];
+// actionToEmoji["Timeout"]    = "⏰";
+// actionToEmoji["Mute"]       = "🔉";
+// actionToEmoji["Kick"]       = "🦶";
+// actionToEmoji["Ban"]        = "🔥";
+// actionToEmoji["Warn"]       = "⚡";
+// actionToEmoji["Unban"]      = "😇";
+// actionToEmoji["Note"]       = "📄";
+
+/**
+ * Definition of moderation actions
+ */
+const moderationActions = {
+    Timeout:    { name: 'Timeout',  id: 1, conjugation: "Timeout",  color: 0x00DD00, emoji: '⏰'   }, // name & value used for options | colors: Green
+    Kick:       { name: 'Kick',     id: 2, conjugation: "Kicked",   color: 0xDDDD00, emoji: '🦶'   }, // name & value used for options | colors: Yellow
+    Ban:        { name: 'Ban',      id: 3, conjugation: "Banned",   color: 0xDD0000, emoji: '🔥'   }, // name & value used for options | colors: Red
+    Warn:       { name: 'Warn',     id: 4, conjugation: "Warned",   color: 0x000000, emoji: '⚡'   }, // name & value used for options | colors: Black
+    Unban:      { name: 'Unban',    id: 5, conjugation: "Unbanned", color: 0xFFFFFF, emoji: '😇'   },  // name & value used for options | colors: White
+    Note:       { name: 'Note',     id: 6, conjugation: "Noted",    color: 0xFFFFFF, emoji: '📄'   }  // name & value used for options | colors: White
+};
+
+/**
+ * Used to translate Cyrillic to "standard" characters since the font don't support them
+ */
 const transliterate = {"Ё":"YO","Й":"I","Ц":"TS","У":"U","К":"K","Е":"E","Н":"N","Г":"G","Ш":"SH","Щ":"SCH","З":"Z","Х":"H","Ъ":"'","ё":"yo","й":"i","ц":"ts","у":"u","к":"k","е":"e","н":"n","г":"g","ш":"sh","щ":"sch","з":"z","х":"h","ъ":"'","Ф":"F","Ы":"I","В":"V","А":"A","П":"P","Р":"R","О":"O","Л":"L","Д":"D","Ж":"ZH","Э":"E","ф":"f","ы":"i","в":"v","а":"a","п":"p","р":"r","о":"o","л":"l","д":"d","ж":"zh","э":"e","Я":"Ya","Ч":"CH","С":"S","М":"M","И":"I","Т":"T","Ь":"'","Б":"B","Ю":"YU","я":"ya","ч":"ch","с":"s","м":"m","и":"i","т":"t","ь":"'","б":"b","ю":"yu"};
 
 // #endregion
 
-const getHHTPResult = (requestURL) => {
+/**
+ * Gets an HTTP result from any place you want and returns the result in the JSON format
+ * @param {string} requestURL 
+ * @returns 
+ */
+const getHTTPResult = (requestURL) => {
     return new Promise((resolve, reject) => {
         https.get(requestURL, (res) => {
             var { statusCode } = res;
@@ -67,6 +99,11 @@ const getHHTPResult = (requestURL) => {
     });
 }
 
+/**
+ * Searches for the quoted text in a given string
+ * @param {string} text 
+ * @returns 
+ */
 const getQuotedText = (text) => {
     var re = new RegExp(/"(.*)"/g);
     var match = text.match(re);
@@ -77,25 +114,53 @@ const getQuotedText = (text) => {
     }
 }
 
+/**
+ * Delete the ` from a text
+ * @param {string} text 
+ * @returns 
+ */
 const deleteTagsFromText = (text) => {
     text = text.replace(/`/g, `'`); // Fix the ` in room names
-    return text.replace(/\<(.*?)>/g, "");
+    return text.replace(/<(.*?)>/g, "");
 }
 
+/**
+ * Deletes the code block from a text
+ * @param {string} text 
+ * @returns 
+ */
 const deleteCodeBlocksFromText = (text) => {
     return text.replace(/```/g, '');
 }
 
+/**
+ * Transform from Cyrillic to "standard"
+ * @param {string} string 
+ * @returns 
+ */
 const CyrillicOrStandard = (string) => {
     return string.split('').map(function (char) { 
         return transliterate[char] || char; 
     }).join("");
 }
 
+/**
+ * Returns the time played from seconds to hours
+ * @param {number} timePlayed 
+ * @returns 
+ */
 const timePlayedToHours = (timePlayed) => {
     return Math.trunc(timePlayed/3600)+"H";
 }
 
+/**
+ * Helper for the server list.
+ * Creates an ellipsis and the end of the text and fills the rest with padding.
+ * @param {string} text 
+ * @param {number} maxLength 
+ * @param {number} padRight 
+ * @returns 
+ */
 const truncateOrComplete = (text, maxLength = 28, padRight = false) => {
     text = text+""; // Transform to text, just in case.
     if (padRight){
@@ -110,14 +175,14 @@ const truncateOrComplete = (text, maxLength = 28, padRight = false) => {
     return text;
 }
 
-const hardTruncate = (text, maxLength = 28) => {
-    text = text+""; // Transform to text, just in case.
-    if (text.length > maxLength){
-        text = text.substr(0, maxLength);
-    }
-    return text;
-}
-
+/**
+ * Helper for the server list.
+ * Truncates the text to the exact number, no ellipsis and fills the rest with padding
+ * @param {string} text 
+ * @param {number} maxLength 
+ * @param {number} padRight 
+ * @returns 
+ */
 const hardTruncateOrComplete = (text, maxLength = 28, padRight = false) => {
     text = text+""; // Transform to text, just in case.
     if (padRight){
@@ -129,6 +194,20 @@ const hardTruncateOrComplete = (text, maxLength = 28, padRight = false) => {
         text = text.substr(0, maxLength);
     }
 
+    return text;
+}
+
+/**
+ * Truncates the text, always, no padding.
+ * @param {string} text 
+ * @param {number} maxLength 
+ * @returns 
+ */
+const hardTruncate = (text, maxLength = 28) => {
+    text = text+""; // Transform to text, just in case.
+    if (text.length > maxLength){
+        text = text.substring(0, maxLength);
+    }
     return text;
 }
 
@@ -155,17 +234,6 @@ const getConfig = () => {
 
     const environment = args[0];
     return require(`../config.${environment}.js`);
-};
-
-const moderationActions = {
-    Timeout:    { name: 'Timeout',  id: 1, conjugation: "Timeout",  color: 0x00DD00, emoji: '⏰'   }, // name & value used for options | colors: Green
-    Mute:       { name: 'Timeout',  id: 1, conjugation: "Timeout",  color: 0x00DD00, emoji: '⏰'   }, // name & value used for options | colors: Green
-    // Where did mute come from o.O?
-    Kick:       { name: 'Kick',     id: 2, conjugation: "Kicked",   color: 0xDDDD00, emoji: '🦶'   }, // name & value used for options | colors: Yellow
-    Ban:        { name: 'Ban',      id: 3, conjugation: "Banned",   color: 0xDD0000, emoji: '🔥'   }, // name & value used for options | colors: Red
-    Warn:       { name: 'Warn',     id: 4, conjugation: "Warned",   color: 0x000000, emoji: '⚡'   }, // name & value used for options | colors: Black
-    Unban:      { name: 'Unban',    id: 5, conjugation: "Unbanned", color: 0xFFFFFF, emoji: '😇'   },  // name & value used for options | colors: White
-    Note:       { name: 'Note',     id: 6, conjugation: "Noted",    color: 0xFFFFFF, emoji: '📄'   }  // name & value used for options | colors: White
 };
 
 const moderationActionsToChoices = () => {
@@ -258,18 +326,31 @@ const createRulesAndInfoEmbed = () => {
     return rulesAndInfoEmbed;
 }
 
-const actionToEmoji = [];
-actionToEmoji["Timeout"]    = "⏰";
-actionToEmoji["Mute"]       = "🔉";
-actionToEmoji["Kick"]       = "🦶";
-actionToEmoji["Ban"]        = "🔥";
-actionToEmoji["Warn"]       = "⚡";
-actionToEmoji["Unban"]      = "😇";
-actionToEmoji["Note"]       = "📄";
+
+const createModerationActionEmbed = (moderationAction, actedUponMember, caseId, reason, handledBy, attachmentUrl) => {
+    const banEmbed = new EmbedBuilder()
+    .setColor(moderationAction.color)
+    .setTitle(`${moderationAction.name}: Case #${caseId}`)
+    .setTimestamp();
+
+    if (attachmentUrl != null && attachmentUrl.length > 0){
+        banEmbed.setImage(attachmentUrl)
+    }
+
+    banEmbed.addFields(
+        { name: `User ${moderationAction.conjugation}:`,  value: `**${actedUponMember.displayName ?? actedUponMember.username}**\n${actedUponMember.id}`, inline: true },
+        { name: 'Handled by:',  value: `**${handledBy.displayName}**\n${handledBy.id}`, inline: true },
+        { name: `${moderationAction.name} reason:`,  value: reason, inline: false },
+    );
+
+
+    return banEmbed;
+}
+
 
 
 module.exports = {
-    getHHTPResult,
+    getHTTPResult,
     timePlayedToHours,
     getQuotedText,
     deleteTagsFromText,
@@ -281,9 +362,10 @@ module.exports = {
     hardTruncateOrComplete,
     hardTruncate,
     CyrillicOrStandard,
-    moderationActions,
     deleteCodeBlocksFromText,
-    actionToEmoji,
+    //actionToEmoji,
     groupBy,
     createRulesAndInfoEmbed,
+    moderationActions,
+    createModerationActionEmbed,
 }

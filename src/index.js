@@ -15,16 +15,17 @@ const fs 			= require('fs');
 const bloonUtils 	= require('./utils/utils.js');
 const config 		= bloonUtils.getConfig();
 const readline 		= require('readline');
-const path 			= require('path');
 const { clearInterval } = require('timers');
 const { kofi_InsertOrUpdate } = require('./utils/storedProcedures.js');
 
 // Load initial config
 
-const client 		= new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessageReactions], partials: [Partials.Channel, Partials.Reaction] }); // Create a new client instance
-client.events 		= new Collection(); // Events handler list
-client.commands 	= new Collection(); // Command handler list
-client.cooldowns 	= new Collection();
+const modalResponses 		= {};
+const client 				= new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessageReactions], partials: [Partials.Channel, Partials.Reaction] }); // Create a new client instance
+client.events 				= new Collection(); // Events handler list
+client.commands 			= new Collection(); // Command handler list
+client.contexMenuCommands	= new Collection(); // Command handler list
+client.cooldowns 			= new Collection();
 
 process.noDeprecation = true; // Stops the "ExperimentalWarning"
 
@@ -33,8 +34,8 @@ let wikieditInterval = null;
 const wikiCheckInterval = 5;
 
 //#region import interactions
-const commandsPath = 'interactions';
-const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js') || file.endsWith('.ts'));
+let commandsPath = 'interactions';
+let commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js') || file.endsWith('.ts'));
 
 for (const file of commandFiles) {
 	const folderRoute = `./${commandsPath}/${file}`;
@@ -43,6 +44,29 @@ for (const file of commandFiles) {
 	// Set a new item in the Collection with the key as the command name and the value as the exported module
 	client.commands.set(command.data.name, command);
 }
+
+commandsPath = 'contextMenu';
+commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js') || file.endsWith('.ts'));
+
+for (const file of commandFiles) {
+	const folderRoute = `./${commandsPath}/${file}`;
+	const command = require(folderRoute);
+	console.log(`Loading context menu command ${file}`);
+	// Set a new item in the Collection with the key as the command name and the value as the exported module
+	client.contexMenuCommands.set(command.data.name, command);
+}
+
+commandsPath = 'modalResponse';
+commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js') || file.endsWith('.ts'));
+
+for (const file of commandFiles) {
+	const folderRoute = `./${commandsPath}/${file}`;
+	const command = require(folderRoute);
+	console.log(`Loading context menu command ${file}`);
+	modalResponses[command.customId] = command.execute;
+}
+
+
 
 //#endregion
 
@@ -68,16 +92,51 @@ for (const eventFile of eventFiles) {
 
 //#region handle interactions
 client.on(Events.InteractionCreate, async interaction => {
-	if (!interaction.isChatInputCommand()) return;
 
-	const command = interaction.client.commands.get(interaction.commandName);
+	// Handle modal submission:
+	if (interaction.isModalSubmit()){
+		const interactionParts = interaction.customId.split('/');
+
+		const guildId = interactionParts[1];
+		const channelId = interactionParts[2];
+		const messageId = interactionParts[3];
+		const selectedUserId = interactionParts[4];
+
+		console.log(`Modal submit ${interactionParts[0]}. Guild: ${guildId}. Channel: ${channelId}. Message: ${messageId}. UserId: ${selectedUserId}`);
+
+		const modalResponse = modalResponses[interactionParts[0]];
+
+		if (!modalResponse){
+			console.log('No modal response found for that action');
+			await interaction.deferReply({ ephemeral: true });
+			await interaction.editReply({ content: 'No modal response found for that action' });
+			return;
+		}
+		
+		await modalResponse(interaction, guildId, channelId, messageId, selectedUserId);
+
+		return;
+	}
+	
+
+	if (!(interaction.isChatInputCommand() || interaction.isContextMenuCommand() || interaction.isMessageContextMenuCommand())) return;
+
+	let command = null;
+
+	if (interaction.isChatInputCommand()){
+		command = interaction.client.commands.get(interaction.commandName);
+	}else{
+		command = interaction.client.contexMenuCommands.get(interaction.commandName);
+	}
+	
 
 	if (!command) {
-		console.error(`No command matching ${interaction.commandName} was found.`);
+		interaction.reply({  content: `No command or context menu command matching ${interaction.commandName} was found.` });
+		console.error(`No command or context menu command matching ${interaction.commandName} was found.`);
 		return;
 	}
 
-	//#region Handle cooldowns
+	//#region Handle cool downs
 	const { cooldowns } = client;
 
 	if (!cooldowns.has(command.data.name)) {
@@ -130,6 +189,7 @@ client.once(Events.ClientReady, async c => {
 	}, (wikiCheckInterval * 60) * 1000);
 
 	// Giant loop to allow input
+	// eslint-disable-next-line no-constant-condition
 	while (1 == 1){
 		const command = await askQuestion("");
 		handleCommands(command, client);
@@ -182,18 +242,18 @@ async function handleCommands(command, client) {
 	
 			const guild = await client.guilds.fetch(args[1] == 0 ? config.bloonGuildId : args[1]);
 			const channel = await guild.channels.fetch(args[2] == 0 ? config.intruderGeneralChannel : args[2]);
-			console.log("sending text: " + text.replace(/\"/g, ""));
-			channel.send(text.replace(/\"/g, ""));
+			console.log("sending text: " + text.replace(/"/g, ""));
+			channel.send(text.replace(/"/g, ""));
 		}
 
 		if (command.startsWith("reload")){
-			var text  = bloonUtils.getQuotedText(command);
+			let text  = bloonUtils.getQuotedText(command);
 			if (!text){
 				console.log("Reload> No text input was found in the command")
 				return;
 			} 
 
-			text = text.replace(/\"/g, "").toLowerCase();
+			text = text.replace(/"/g, "").toLowerCase();
 
 			// Check commands
 			const loadedCommand = client.commands.get(text);
@@ -338,7 +398,7 @@ async function handleCommands(command, client) {
 				}
 
 				var phrase  = bloonUtils.getQuotedText(command);
-				await kofi_InsertOrUpdate(commands[2].toLowerCase(), phrase.replace(/\"/g, ""), false);
+				await kofi_InsertOrUpdate(commands[2].toLowerCase(), phrase.replace(/"/g, ""), false);
 				console.log(`New kofi answer created/updated for userName ${commands[2].toLowerCase()}`);
 				return;
 			}
@@ -364,9 +424,9 @@ async function handleCommands(command, client) {
 			const rulesAndInfoEmbed = bloonUtils.createRulesAndInfoEmbed();
 			const guild = await client.guilds.fetch(config.bloonGuildId);
 			const channel = await guild.channels.fetch(config.rulesAndInfoChannel);
-			if (!channel) { console.log("Couldn't find rule's channel"); return; };
+			if (!channel) { console.log("Couldn't find rule's channel"); return; }
 			const message = await channel.messages.fetch(config.rulesMessageId);
-			if (!message) { console.log("Couldn't find rule's message"); return; };
+			if (!message) { console.log("Couldn't find rule's message"); return; }
 			await message.edit({ embeds: [rulesAndInfoEmbed] });
 		}
 

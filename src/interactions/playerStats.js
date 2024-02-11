@@ -70,14 +70,14 @@ module.exports = {
             ctx.textAlign = "left";
             ctx.textBaseline = "middle";
 
-            const player = await bloonUtils.getHHTPResult(`https://api.intruderfps.com/agents/${steamId}`);
+            const player = await bloonUtils.getHTTPResult(`https://api.intruderfps.com/agents/${steamId}`);
 
             if (player == null){
                 await interaction.editReply({ content: 'No user found for that steam ID.', ephemeral: true });
                 return;
             }
 
-            const stats = await bloonUtils.getHHTPResult(`https://api.intruderfps.com/agents/${steamId}/stats`);
+            const stats = await bloonUtils.getHTTPResult(`https://api.intruderfps.com/agents/${steamId}/stats`);
 
             if (stats == null){
                 await interaction.editReply({ content: 'No stats found for that steam ID.', ephemeral: true });
