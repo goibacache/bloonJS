@@ -97,13 +97,6 @@ client.on(Events.InteractionCreate, async interaction => {
 	if (interaction.isModalSubmit()){
 		const interactionParts = interaction.customId.split('/');
 
-		const guildId = interactionParts[1];
-		const channelId = interactionParts[2];
-		const messageId = interactionParts[3];
-		const selectedUserId = interactionParts[4];
-
-		console.log(`Modal submit ${interactionParts[0]}. Guild: ${guildId}. Channel: ${channelId}. Message: ${messageId}. UserId: ${selectedUserId}`);
-
 		const modalResponse = modalResponses[interactionParts[0]];
 
 		if (!modalResponse){
@@ -113,7 +106,7 @@ client.on(Events.InteractionCreate, async interaction => {
 			return;
 		}
 		
-		await modalResponse(interaction, guildId, channelId, messageId, selectedUserId);
+		await modalResponse(interaction, interaction.customId);
 
 		return;
 	}
@@ -131,7 +124,7 @@ client.on(Events.InteractionCreate, async interaction => {
 	
 
 	if (!command) {
-		interaction.reply({  content: `No command or context menu command matching ${interaction.commandName} was found.` });
+		interaction.reply({  content: `No command or context menu command matching '${interaction.commandName}' was found.`, ephemeral: true });
 		console.error(`No command or context menu command matching ${interaction.commandName} was found.`);
 		return;
 	}

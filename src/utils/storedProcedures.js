@@ -95,7 +95,6 @@ const createConnection = async () => {
     });
 }
 
-
 module.exports = {
     moderationAction_Insert,
     moderationAction_GetNewId,

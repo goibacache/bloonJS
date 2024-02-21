@@ -1,5 +1,5 @@
-const { EmbedBuilder } = require('discord.js');
-const https         = require('https');
+const { EmbedBuilder }  = require('discord.js');
+const https             = require('https');
 
 
 
@@ -51,43 +51,51 @@ const transliterate = {"Ё":"YO","Й":"I","Ц":"TS","У":"U","К":"K","Е":"E","
 // #endregion
 
 /**
- * Gets an HTTP result from any place you want and returns the result in the JSON format
+ * Gets an HTTP result from any place you want and returns the result in the JSON format. 
+ * If "binary" is passed as the encoding and it's an image it will return the image in base64
  * @param {string} requestURL 
  * @returns 
  */
-const getHTTPResult = (requestURL) => {
+const getHTTPResult = (requestURL, encoding = "utf8") => {
     return new Promise((resolve, reject) => {
-        https.get(requestURL, (res) => {
-            var { statusCode } = res;
-            var contentType = res.headers['content-type'];
-
-            let error;
+        https.get(requestURL, {
+            'encoding': encoding
+        }, (res) => {
+            const { statusCode } = res;
+            const contentType = res.headers['content-type'];
+            res.setEncoding(encoding); // Set encoding
 
             if (statusCode !== 200) {
-            error = new Error('Request Failed.\n' +
-                `Status Code: ${statusCode}`);
-            } else if (!/^application\/json/.test(contentType)) {
-            error = new Error('Invalid content-type.\n' +
-                `Expected application/json but received ${contentType}`);
+                console.error('Request Failed.\n' + `Status Code: ${statusCode}`);
+                // consume response data to free up memory
+                res.resume();
+                reject('Request Failed.\n' + `Status Code: ${statusCode}`);
             }
 
-            if (error) {
-            console.error(error.message);
-            // consume response data to free up memory
-            res.resume();
+            const responseIsJson = /^application\/json/.test(contentType);
+            const responseIsImg = /^image\/.*/.test(contentType);
+
+            if (!responseIsJson && !responseIsImg){
+                resolve();
             }
 
-            res.setEncoding('utf8');
             let rawData = '';
 
             res.on('data', (chunk) => {
-            rawData += chunk;
-            });
+                // When it is an IMG the response are various base64buffers
+                rawData += chunk;
+            });            
 
             res.on('end', () => {
             try {
-                const parsedData = JSON.parse(rawData);
-                resolve(parsedData);
+
+                if (responseIsJson){
+                    //const parsedData = JSON.parse(rawData);
+                    resolve(JSON.parse(rawData));
+                }else{
+                    const buffer = Buffer.from(rawData, 'binary').toString('base64');
+                    resolve(`data:${contentType};base64,${buffer}`);
+                }
             } catch (e) {
                 reject(e.message);
             }

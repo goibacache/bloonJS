@@ -435,7 +435,6 @@ const command = {
 
                     // Write the moderation action in the chat to log it in the DDBB
                     channel.send({ embeds: [actionEmbed]});
-                    // TODO: upload attachment as blob.
                     await storedProcedures.moderationAction_Insert(action, target.id, reason, interaction.member.id); // Also save it on the DB :D
                 }
             });

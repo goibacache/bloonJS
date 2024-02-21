@@ -20,8 +20,17 @@ const regAttch = RegExp(/\[att:.*\]/g);
 const regSpam = /\b\+18\b|\b18\b|\bnude?3?s?5?\b|\bna?4?ke?3?d\b|\bnitro\b|\bfre?3?e?3?\b|\bnft\b|\broblox\b|\bstea?4?m\b|\bdi?l?1?sco?0?rd(?!.com\/channels\/)\b|\ba?4?dul?1?ts?\b|cry?l?i?1?pto?0?\b|\bpro?0?mo?0?\b|\bbtc\b/gi;
 const regUrl = /https?:\/\/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)?/gi;
 
+/**
+  * @typedef {import('discord.js').Message} Message
+ */
+
 const evnt = {
     name: Events.MessageCreate,
+    /**
+     * 
+     * @param {Message} message 
+     * @returns 
+     */
 	async execute(message) {
         try {
 
@@ -88,15 +97,16 @@ const evnt = {
                 });
             }
 
-            // Instantly delete if it mentions everyone && the user doesn't have the mod or aug role <- TODO!
+            // Instantly delete if it mentions everyone && the user doesn't have the mod or aug role
             if (message.mentions.everyone){
                 // Check if it's a mod or a hidden manager
                 const userWhoMentionedEveryone = await message.guild.members.fetch(message.author.id);
                 const isMod = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Mod).size > 0;
-                const isHiddenManager = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_HiddenManager).size > 0
-                if (!(isMod || isHiddenManager)){
+                const isHiddenManager = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_HiddenManager).size > 0;
+                const isAug = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Aug).size > 0;
+                if (!(isMod || isHiddenManager || isAug)){
                     console.log("SPAM FILTER: Message mentions everyone. Deleted");
-                    console.log(`SPAM FILTER: Deleted message: ${message.content}`);
+                    console.log(`SPAM FILTER: Deleted message: ${message.content} by ${message.author.tag}`);
                     await message.delete();
                     return;
                 }

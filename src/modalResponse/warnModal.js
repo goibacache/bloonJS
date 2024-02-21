@@ -6,12 +6,13 @@ const storedProcedures  = require('../utils/storedProcedures.js');
   * @typedef {import('discord.js').ModalSubmitInteraction} ModalSubmitInteraction
   * @typedef {import('discord.js').Message} Message
   * @typedef {import('discord.js').Channel} Channel
+  * @typedef {import('discord.js').User} User
  */
 
-const customId = 'noteModal';
+const customId = 'warnModal';
 
 module.exports = {
-    from: 'noteContextMenuMessage.js & noteContextMenuUser.js',
+    from: 'warnContextMenuUser.js & warnContextMenuMessage.js',
     customId: customId,
     /**
 	 * Executes the action
@@ -30,59 +31,41 @@ module.exports = {
             const   messageId           = interactionParts[3];
             const   selectedUserId      = interactionParts[4];
 
-            /**
-             * Is the action being done on a message or on an user?
-             */
-            const isMessageAction = messageId != 0;
-
             console.log(`Modal submit ${customId}.\nGuild: ${guildId}. Channel: ${channelId}. Message: ${messageId}. UserId: ${selectedUserId}\nBy user ${interaction.user.tag}`);
 
             // Get data from the text field
-            const noteText = interaction.fields.getTextInputValue('noteText');
+            const warnText = interaction.fields.getTextInputValue('warnText');
 
             // Store in database and create the embed
-            const action                    = bloonUtils.moderationActions.Note;
+            const action                    = bloonUtils.moderationActions.Warn;
+            /**
+             * The message
+             * @type {User}
+             */
             const userToBeActedUpon         = await interaction.member.guild.members.fetch(selectedUserId);
             const caseID                    = await storedProcedures.moderationAction_GetNewId(action);
             const moderationActionChannel   = await interaction.member.guild.channels.fetch(config.moderationActionsChannel);
-            const actionEmbed               = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, noteText, interaction.member, null);
+            const actionEmbed               = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, warnText, interaction.member, null);
             
             if (caseID == 0) {
                 await interaction.editReply({ content: `Couldn't save ${action.name} in database.`, components: [] });
                 return;
             }
 
+            await userToBeActedUpon.send({content: warnText})
+                .then(async () => await interaction.editReply({ content: `The warning was delivered via DM 🔥.`, components: [], embeds: [] }))
+                .catch(async () => await interaction.editReply({ content: `Couldn't send the DM 😢, sorry. This warning was saved on the database, but please consider contacting the user directly and creating a note.`, components: [], embeds: [] }));
+
             // Save it on the database
-            await storedProcedures.moderationAction_Insert(action, selectedUserId, noteText, interaction.member.id).catch(() => {
-                throw "Couldn't insert moderation action into the database";
+            await storedProcedures.moderationAction_Insert(action, selectedUserId, warnText, interaction.member.id).catch(() => {
+                throw "The warning was delivered via DM 🔥 but couldn't insert moderation action into the database.";
             }); 
 
             // Write the moderation action in the chat to log it in the database
             moderationActionChannel.send({ embeds: [actionEmbed]}).catch(() => {
-                throw "Couldn't send moderation action message into the #evidence channel";
+                throw "The warning was delivered via DM 🔥 but couldn't send moderation action message into the #evidence channel.";
             });
 
-            let replyText = "Note created successfully.";
-            if (isMessageAction){
-                /**
-                 * The message
-                 * @type {Message}
-                 */
-                const message = await interaction.client.channels.cache.get(channelId).messages.fetch(messageId);
-                await message.delete().catch(() => {
-                    throw "Couldn't delete message";
-                });
-
-                replyText = `Note created successfully and message deleted.`;
-            }
-
-            if (interaction.deferred && !interaction.replied) {
-                await interaction.editReply({ content: replyText, components: [], embeds: [] });
-            } else if (interaction.deferred && interaction.replied) {
-                await interaction.followUp({ content: replyText, components: [], embeds: [] });
-            } else {
-                await interaction.reply({ content: replyText, components: [], embeds: [] });
-            }
         } catch (error) {
             console.log(`⚠ Error in ${customId}: ${error}`);
             const answer = { content: `There was an error in ${customId}.\nError: ${error}`, components: [], embeds: [] };
