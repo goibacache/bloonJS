@@ -100,9 +100,9 @@ client.on(Events.InteractionCreate, async interaction => {
 		const modalResponse = modalResponses[interactionParts[0]];
 
 		if (!modalResponse){
-			console.log('No modal response found for that action');
+			console.log(`No modal response found for action ${interactionParts[0]}`);
 			await interaction.deferReply({ ephemeral: true });
-			await interaction.editReply({ content: 'No modal response found for that action' });
+			await interaction.editReply({ content: `No modal response found for action ${interactionParts[0]}` });
 			return;
 		}
 		

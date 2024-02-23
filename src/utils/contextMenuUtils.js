@@ -78,7 +78,7 @@ const createTimeoutModal = (interaction) => {
     // Create the text input components
     const timeoutTime = new TextInputBuilder()
     .setCustomId('timeoutText')
-    .setLabel('Timeout time (in minutes)') // The label is the prompt the user sees for this input
+    .setLabel('Timeout time in minutes [0-40320]') // The label is the prompt the user sees for this input
     .setStyle(TextInputStyle.Short) // Short means only a single line of text
     .setValue('10')
     .setMinLength(1)
@@ -139,7 +139,7 @@ const createKickModal = (interaction) => {
     const { guild, channel, messageId, selectedUserId } = getGuildChannelMessageAndTarget(interaction);
     const isMessageAction = messageId != 0;
 
-    const inputText = `You have been kicked for the follow reasons:\n${getInputText(interaction)}`;
+    const inputText = `You have been kicked for the following reasons:\n${getInputText(interaction)}`;
 
     // Create modal:
     const modal = new ModalBuilder()
@@ -159,6 +159,87 @@ const createKickModal = (interaction) => {
 
     // Add inputs to the modal
     modal.addComponents(noteActionRow);
+
+    return modal;
+}
+
+
+/**
+ * 
+ * @param {MessageContextMenuCommandInteraction | UserContextMenuCommandInteraction} interaction
+ * @returns ModalBuilder
+ */
+const createBanModal = (interaction) => {
+
+    const { guild, channel, messageId, selectedUserId } = getGuildChannelMessageAndTarget(interaction);
+    //const isMessageAction = messageId != 0;
+
+    const inputText = `You have been banned for the following reasons:\n${getInputText(interaction)}`;
+
+    // Create modal:
+    const modal = new ModalBuilder()
+        .setCustomId(`banModal/${guild}/${channel}/${messageId}/${selectedUserId}`)
+        .setTitle('Banning and deleting messages');
+
+    // Create the text input components
+    const banText = new TextInputBuilder()
+        .setCustomId('banText')
+        .setLabel('Ban message (DM & evidence)') // The label is the prompt the user sees for this input
+        .setStyle(TextInputStyle.Paragraph) // Short means only a single line of text
+        .setValue(inputText)
+        .setRequired(true)
+        .setPlaceholder('The ban/DM that will be sent to the user and saved in the evidence channel');
+
+    // Create the text input components
+    const hoursOfMessagesToDelete = new TextInputBuilder()
+        .setCustomId('hoursToDelete')
+        .setLabel('Hours of messages to delete [0-168]') // The label is the prompt the user sees for this input
+        .setStyle(TextInputStyle.Short) // Short means only a single line of text
+        .setValue("12")
+        .setRequired(true)
+        .setPlaceholder('The ban/DM that will be sent to the user and saved in the evidence channel');
+
+    const banTextActionRow                  = new ActionRowBuilder().addComponents(banText);
+    const hoursOfMessagesToDeleteActionRow  = new ActionRowBuilder().addComponents(hoursOfMessagesToDelete);
+
+    // Add inputs to the modal
+    modal.addComponents(banTextActionRow);
+    modal.addComponents(hoursOfMessagesToDeleteActionRow);
+
+    return modal;
+}
+
+
+/**
+ * 
+ * @param {MessageContextMenuCommandInteraction | UserContextMenuCommandInteraction} interaction
+ * @returns ModalBuilder
+ */
+const createUnbanModal = (interaction) => {
+
+    const { guild, channel, messageId, selectedUserId } = getGuildChannelMessageAndTarget(interaction);
+    //const isMessageAction = messageId != 0;
+
+    const inputText = `You have been unbanned from Superboss's discord server.`;
+
+    // Create modal:
+    const modal = new ModalBuilder()
+        .setCustomId(`unbanModal/${guild}/${channel}/${messageId}/${selectedUserId}`)
+        .setTitle('Unbanning user');
+
+    // Create the text input components
+    const unbanText = new TextInputBuilder()
+        .setCustomId('unbanText')
+        .setLabel('Unban message (DM & evidence)') // The label is the prompt the user sees for this input
+        .setStyle(TextInputStyle.Paragraph) // Short means only a single line of text
+        .setValue(inputText)
+        .setRequired(true)
+        .setPlaceholder('The unban direct message that will be sent to the user and saved in the evidence channel');
+
+    const unbanTextActionRow = new ActionRowBuilder().addComponents(unbanText);
+
+    // Add inputs to the modal
+    modal.addComponents(unbanTextActionRow);
 
     return modal;
 }
@@ -212,5 +293,7 @@ module.exports = {
     createNoteModal,
     createTimeoutModal,
     createWarnModal,
-    createKickModal
+    createKickModal,
+    createBanModal,
+    createUnbanModal
 };

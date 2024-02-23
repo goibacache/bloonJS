@@ -43,8 +43,8 @@ module.exports = {
             }
 
             //timeout max: 40320
-            if (parseInt(timeoutText) > 40320){
-                await interaction.editReply({ content: `Time out time can't be higher than 40320 minutes.` });
+            if (parseInt(timeoutText) > 40320 || parseInt(timeoutText) < 1){
+                await interaction.editReply({ content: `Time out time must be a number between 1 and 40320 minutes.` });
                 return;
             }
 
