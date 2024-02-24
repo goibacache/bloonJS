@@ -29,7 +29,7 @@ module.exports = {
 
             await interaction.deferReply({ ephemeral: true }); // This makes it so it can take more than 3 seconds to reply.
 
-			const { messageId, selectedUserId } = getGuildChannelMessageAndTarget(interaction);
+			const { selectedUserId } = getGuildChannelMessageAndTarget(interaction);
 
 			//#region Button configuration
 			const previousButton = new ButtonBuilder()

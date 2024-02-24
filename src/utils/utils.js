@@ -410,7 +410,7 @@ const loadModerationProfileEmbeds = async (moderationProfile) => {
             .setTitle(`Moderation profile`)
             .setTimestamp();
 
-            roomEmbed.addFields({ name: `Moderation resume`, value: resume }); // Load resume
+            roomEmbed.addFields({ name: `**Moderation resume**`, value: resume }); // Header
 
             // Create current embed
             const date = new Date(current.timeStamp);
@@ -418,7 +418,10 @@ const loadModerationProfileEmbeds = async (moderationProfile) => {
         
             const emoji = moderationActions[current.Type].emoji;
 
-            roomEmbed.addFields({ name: `Moderation action Nº ${index+1}`, value: `${emoji} ${current.Type}` });
+   
+            roomEmbed.addFields({ name: `Moderation - Moderation action Nº ${index+1}`, value: `${emoji} ${current.Type}` }); // Header
+
+            //roomEmbed.addFields({ name: `Moderation action Nº ${index+1}`, value: `${emoji} ${current.Type}` });
             roomEmbed.addFields({ name: `Reason`, value: `${deleteCodeBlocksFromText(current.reason)}` });
             roomEmbed.addFields({ name: `📅 Date`, value: `${dateText}` });
 
