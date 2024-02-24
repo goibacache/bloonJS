@@ -78,7 +78,7 @@ const createTimeoutModal = (interaction) => {
     // Create the text input components
     const timeoutTime = new TextInputBuilder()
     .setCustomId('timeoutText')
-    .setLabel('Timeout time in minutes [0-40320]') // The label is the prompt the user sees for this input
+    .setLabel('Timeout time in minutes [1-40320]') // The label is the prompt the user sees for this input
     .setStyle(TextInputStyle.Short) // Short means only a single line of text
     .setValue('10')
     .setMinLength(1)
@@ -295,5 +295,6 @@ module.exports = {
     createWarnModal,
     createKickModal,
     createBanModal,
-    createUnbanModal
+    createUnbanModal,
+    getGuildChannelMessageAndTarget
 };

@@ -14,8 +14,8 @@ const { ContextMenuCommandBuilder, ApplicationCommandType } = require('discord.j
 module.exports = {
 	contextMenuId: 'kickModal',
 	data: new ContextMenuCommandBuilder()
-		.setName('User: Kick')
-		.setType(ApplicationCommandType.User)
+		.setName('4 Message: Kick and delete')
+		.setType(ApplicationCommandType.Message)
 		.setDMPermission(false)
 		.setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 	/**
@@ -25,7 +25,7 @@ module.exports = {
 	async execute(interaction) {
 		try{
 			// Log for admin
-			console.log(`User context menu action: '${this.data.name}' by ${interaction.member.user.tag} (${interaction.member.user.id})`);
+			console.log(`Message context menu action: '${this.data.name}' by ${interaction.member.user.tag} (${interaction.member.user.id})`);
 			// Create modal
 			const modal = createKickModal(interaction);
 			// Show modal

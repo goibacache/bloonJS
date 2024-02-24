@@ -14,7 +14,7 @@ const { ContextMenuCommandBuilder, ApplicationCommandType } = require('discord.j
 module.exports = {
 	contextMenuId: 'noteModal',
 	data: new ContextMenuCommandBuilder()
-		.setName('User: Note')
+		.setName('1 User: Note')
 		.setType(ApplicationCommandType.User)
 		.setDMPermission(false)
 		.setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),

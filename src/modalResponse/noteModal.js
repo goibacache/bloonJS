@@ -20,7 +20,7 @@ module.exports = {
     async execute(interaction, interactionCustomId) {
         try {
             // Defer reply
-            interaction.deferReply({ ephemeral: true });
+            await interaction.deferReply({ ephemeral: true });
 
             // Get data from the custom id
             const   interactionParts    = interactionCustomId.split('/');
@@ -42,7 +42,14 @@ module.exports = {
 
             // Store in database and create the embed
             const action                    = bloonUtils.moderationActions.Note;
-            const userToBeActedUpon         = await interaction.member.guild.members.fetch(selectedUserId);
+            /**
+             * The user
+             * @type {User}
+             */
+            const userToBeActedUpon         = await interaction.member.guild.members.fetch(selectedUserId)
+                                                .catch(() => {
+                                                    throw `Couldn't find that user on this server.`;
+                                                });
             const caseID                    = await storedProcedures.moderationAction_GetNewId(action);
             const moderationActionChannel   = await interaction.member.guild.channels.fetch(config.moderationActionsChannel);
             const actionEmbed               = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, noteText, interaction.member, null);

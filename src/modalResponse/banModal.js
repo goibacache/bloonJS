@@ -21,7 +21,7 @@ module.exports = {
     async execute(interaction, interactionCustomId) {
         try {
             // Defer reply
-            interaction.deferReply({ ephemeral: true });
+            await interaction.deferReply({ ephemeral: true });
 
             // Get data from the custom id
             const   interactionParts    = interactionCustomId.split('/');
@@ -52,10 +52,19 @@ module.exports = {
             // Store in database and create the embed
             const action                    = bloonUtils.moderationActions.Ban;
             /**
-             * The message
+             * The user
              * @type {User}
              */
-            const userToBeActedUpon         = await interaction.member.guild.members.fetch(selectedUserId);
+            let userToBeActedUpon;
+
+            try {
+                userToBeActedUpon = await interaction.member.guild.members.fetch(selectedUserId);
+                console.log('Acting on a user that is on the server.');
+            } catch (error) {
+                userToBeActedUpon = await interaction.client.users.fetch(selectedUserId);
+                console.log('Acting on a user that is NOT on the server.');
+            }
+
             const caseID                    = await storedProcedures.moderationAction_GetNewId(action);
             const moderationActionChannel   = await interaction.member.guild.channels.fetch(config.moderationActionsChannel);
             const actionEmbed               = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, banText, interaction.member, null);
@@ -83,26 +92,26 @@ module.exports = {
                 const message = await interaction.client.channels.cache.get(channelId).messages.fetch(messageId);
                 if (message){
                     await message.delete()
-                    .then(async () => await interaction.editReply({ content: `The user was banned and the message was deleted 🔥.`, components: [], embeds: [] }))
+                    .then(async () => await interaction.editReply({ content: `The user was banned successfully and the message was deleted 🔥.`, components: [], embeds: [] }))
                     .catch(() => {
-                        throw `The user was banned but I couldn't delete the message 😢, sorry.`;
+                        throw `The user was banned successfully but I couldn't delete the message 😢, sorry.`;
                     });
                 }
             }
 
             // Save it on the database
             await storedProcedures.moderationAction_Insert(action, selectedUserId, banText, interaction.member.id).catch(() => {
-                throw "The user was banned but I couldn't insert the moderation action into the database.";
+                throw "The user was banned successfully but I couldn't insert the moderation action into the database.";
             }); 
 
             // Write the moderation action in the chat to log it in the database
-            moderationActionChannel.send({ embeds: [actionEmbed]}).catch(() => {
-                throw "The user was banned but I couldn't send the message into the #evidence channel.";
+            await moderationActionChannel.send({ embeds: [actionEmbed]}).catch(() => {
+                throw "The user was banned successfully but I couldn't send the message into the #evidence channel.";
             });
 
             await userToBeActedUpon.send({content: banText})
-                .then(async () => await interaction.editReply({ content: isMessageAction ? `The user was banned, the message deleted and the ban message was delivered via DM 🔥.` : `The user was banned and the message was delivered via DM 🔥.`, components: [], embeds: [] }))
-                .catch(async () => await interaction.editReply({ content: isMessageAction ? `The user was banned, the message deleted but I couldn't send the DM 😢, sorry.` : `The user was banned but I couldn't send the DM 😢, sorry.`, components: [], embeds: [] }));
+                .then(async () => await interaction.editReply({ content: isMessageAction ? `The user was banned successfully, the message deleted and the ban message was delivered via DM 🔥.` : `The user was banned successfully and the message was delivered via DM 🔥.`, components: [], embeds: [] }))
+                .catch(async () => await interaction.editReply({ content: isMessageAction ? `The user was banned successfully, the message deleted but I couldn't send the DM 😢, sorry.` : `The user was banned successfully but I couldn't send the DM 😢, sorry.`, components: [], embeds: [] }));
 
         } catch (error) {
             console.log(`⚠ Error in ${customId}: ${error}`);

@@ -355,6 +355,101 @@ const createModerationActionEmbed = (moderationAction, actedUponMember, caseId, 
     return banEmbed;
 }
 
+/**
+ * Loads and creates the moderation embeds
+ * @param {number} userId 
+ * @returns moderationProfileEmbeds, moderationProfile
+ */
+const loadModerationProfileEmbeds = async (moderationProfile) => {
+    let moderationProfileEmbeds = [];
+
+    let resume = ``;
+
+    if (moderationProfile.length == 0){
+        resume += `😇 This profile has **no** previous moderation actions\n`;
+    }else{
+        const groupedByType = groupBy('Type', moderationProfile);
+
+        resume += '```'; // Start quote
+
+        groupedByType.forEach((group, index) => {
+
+            if (group.items.length == 0){
+                return;
+            }
+            //console.log("group.Type: ", group.Type);
+            const emoji = moderationActions[group.Type].emoji;
+            //console.log("emoji found:", emoji);
+            if (index > 0){
+                resume += ` | `;
+            }
+            //resume += `${emoji} **${group.Type}**: ${group.items.length}`;      
+            resume += `${emoji} ${group.Type}: ${group.items.length}`;      
+        });
+
+        resume += '```'; // End quote
+    }
+
+    if (moderationProfile.length == 0){
+        const roomEmbed = new EmbedBuilder()
+        .setColor(0x0099FF)
+        .setTitle(`Moderation profile`)
+        .setTimestamp();
+    
+        roomEmbed.addFields({ name: `No moderation actions found for this user`, value: `-` });
+    
+        roomEmbed.setFooter({ text: `SuperbossGames | #moderation action` });
+    
+        moderationProfileEmbeds.push(roomEmbed);
+    }else{
+        // TODO: Do 3 mod actions in ONE embed.
+
+        moderationProfile.forEach((current, index) => {
+            const roomEmbed = new EmbedBuilder()
+            .setColor(0x0099FF)
+            .setTitle(`Moderation profile`)
+            .setTimestamp();
+
+            roomEmbed.addFields({ name: `Moderation resume`, value: resume }); // Load resume
+
+            // Create current embed
+            const date = new Date(current.timeStamp);
+            const dateText = `${date.toLocaleDateString("en-US", {day: 'numeric', month: 'long', year: 'numeric', timeZone: 'utc'})} ${date.toLocaleTimeString("en-US")}`;
+        
+            const emoji = moderationActions[current.Type].emoji;
+
+            roomEmbed.addFields({ name: `Moderation action Nº ${index+1}`, value: `${emoji} ${current.Type}` });
+            roomEmbed.addFields({ name: `Reason`, value: `${deleteCodeBlocksFromText(current.reason)}` });
+            roomEmbed.addFields({ name: `📅 Date`, value: `${dateText}` });
+
+            roomEmbed.setFooter({ text: `SuperbossGames | #moderation action` });
+        
+            moderationProfileEmbeds.push(roomEmbed);
+        });
+    }
+
+    return moderationProfileEmbeds;
+};
+
+
+const getModerationProfileEmbed = (currentActionIndex, moderationProfileEmbeds, previousButton, nextButton) => {
+    resolveButtonState(currentActionIndex, moderationProfileEmbeds.length - 1, previousButton, nextButton);
+    return moderationProfileEmbeds[currentActionIndex];
+}
+
+const resolveButtonState = (currentActionIndex, maxActionIndex, previousButton, nextButton) => {
+    if (currentActionIndex == 0){
+        previousButton.setDisabled(true);
+    }else{
+        previousButton.setDisabled(false);
+    }
+
+    if (currentActionIndex == maxActionIndex){
+        nextButton.setDisabled(true);
+    }else{
+        nextButton.setDisabled(false);
+    }
+}
 
 
 module.exports = {
@@ -376,4 +471,7 @@ module.exports = {
     createRulesAndInfoEmbed,
     moderationActions,
     createModerationActionEmbed,
+    loadModerationProfileEmbeds,
+    getModerationProfileEmbed,
+    resolveButtonState
 }

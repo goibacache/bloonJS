@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle, ComponentType } = require('discord.js')
-const bloonUtils = require('../utils/utils.js');
+const bloonUtils = require('../../utils/utils.js');
 const config = bloonUtils.getConfig();
-const { moderationAction_Profile } = require('../utils/storedProcedures.js');
+const { moderationAction_Profile } = require('../../utils/storedProcedures.js');
 
 module.exports = {
 	cooldown: 5,

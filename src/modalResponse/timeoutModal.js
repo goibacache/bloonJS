@@ -21,7 +21,7 @@ module.exports = {
     async execute(interaction, interactionCustomId) {
         try {
             // Defer reply
-            interaction.deferReply({ ephemeral: true });
+            await interaction.deferReply({ ephemeral: true });
 
             // Get data from the custom id
             const   interactionParts    = interactionCustomId.split('/');
@@ -56,10 +56,13 @@ module.exports = {
             // Store in database and create the embed
             const action                    = bloonUtils.moderationActions.Timeout;
             /**
-             * The message
+             * The user
              * @type {User}
              */
-            const userToBeActedUpon         = await interaction.member.guild.members.fetch(selectedUserId);
+            const userToBeActedUpon         = await interaction.member.guild.members.fetch(selectedUserId)
+                                                .catch(() => {
+                                                    throw `Couldn't find that user on this server.`;
+                                                });
             const caseID                    = await storedProcedures.moderationAction_GetNewId(action);
             const moderationActionChannel   = await interaction.member.guild.channels.fetch(config.moderationActionsChannel);
             const actionEmbed               = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, noteText, interaction.member, null);
@@ -69,6 +72,12 @@ module.exports = {
                 return;
             }
 
+            await userToBeActedUpon.timeout(parseInt(timeoutText) * 60 * 1000)
+            .catch((error) => {
+                console.log("Error: " + error);
+                throw "Couldn't time out the user";
+            });
+
             // Save it on the database
             await storedProcedures.moderationAction_Insert(action, selectedUserId, noteText, interaction.member.id).catch(() => {
                 throw "Couldn't insert moderation action into the database";
@@ -77,10 +86,6 @@ module.exports = {
             // Write the moderation action in the chat to log it in the database
             moderationActionChannel.send({ embeds: [actionEmbed]}).catch(() => {
                 throw "Couldn't send moderation action message into the #evidence channel";
-            });
-
-            await userToBeActedUpon.timeout(parseInt(timeoutText) * 60 * 1000).catch(() => {
-                throw "Couldn't time out the user";
             });
 
             if (isMessageAction){
@@ -95,8 +100,8 @@ module.exports = {
             }
             
             await userToBeActedUpon.send({content: `You have been timed out from Superboss' Discord server for the following reason: ${noteText}\nPlease do not reply this message as we're not able to see it and remember that continuously breaking the server rules will result in either a kick or a ban`})
-            .then(async () => await interaction.editReply({ content: `The user was timed out, the message deleted and the DM was delivered 🔥.`, components: [], embeds: [] }))
-            .catch(async () => await interaction.editReply({ content: `The user was timed out, the message deleted but I couldn't send the DM 😢, sorry.`, components: [], embeds: [] }));
+            .then(async () => await interaction.editReply({ content: isMessageAction ? `The user was timed out, the message deleted and the DM was delivered 🔥.` : `The user was timed out and the DM was delivered 🔥.` , components: [], embeds: [] }))
+            .catch(async () => await interaction.editReply({ content: isMessageAction ? `The user was timed out, the message deleted but I couldn't send the DM 😢, sorry.` : `The user was timed out but I couldn't send the DM 😢, sorry.`, components: [], embeds: [] }));
         
         } catch (error) {
             console.log(`⚠ Error in ${customId}: ${error}`);

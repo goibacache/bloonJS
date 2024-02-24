@@ -1,8 +1,8 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ButtonStyle, ButtonBuilder, ActionRowBuilder, ComponentType } = require('discord.js')
 const { EmbedBuilder } = require('@discordjs/builders');
-const bloonUtils = require('../utils/utils.js');
+const bloonUtils = require('../../utils/utils.js');
 const config = bloonUtils.getConfig();
-const storedProcedures = require('../utils/storedProcedures.js');
+const storedProcedures = require('../../utils/storedProcedures.js');
 
 /**
  * Adds the basic command action: Target, reason & evidence.
@@ -64,90 +64,6 @@ interface ModerationProfile(
 )
 */
 
-const resolveButtonState = (currentActionIndex, maxActionIndex, previousButton, nextButton) => {
-    if (currentActionIndex == 0){
-        previousButton.setDisabled(true);
-    }else{
-        previousButton.setDisabled(false);
-    }
-
-    if (currentActionIndex == maxActionIndex){
-        nextButton.setDisabled(true);
-    }else{
-        nextButton.setDisabled(false);
-    }
-}
-
-/**
- * Loads and creates the moderation embeds
- * @param {number} userId 
- * @returns moderationProfileEmbeds, moderationProfile
- */
-const loadModerationProfileEmbeds = async (moderationProfile) => {
-    let moderationProfileEmbeds = [];
-
-    let resume = ``;
-
-    if (moderationProfile.length == 0){
-        resume += `😇 This profile has **no** previous moderation actions\n`;
-    }else{
-        const groupedByType = bloonUtils.groupBy('Type', moderationProfile);
-
-        groupedByType.forEach((group, index) => {
-            console.log("group.Type: ", group.Type);
-            const emoji = bloonUtils.moderationActions[group.Type].emoji;
-            console.log("emoji found:", emoji);
-            if (index > 0){
-                resume += `\n`;
-            }
-            resume += `${emoji} **${group.Type}**: ${group.items.length}`;      
-        });          
-    }
-
-    if (moderationProfile.length == 0){
-        const roomEmbed = new EmbedBuilder()
-        .setColor(0x0099FF)
-        .setTitle(`Moderation profile`)
-        .setTimestamp();
-    
-        roomEmbed.addFields({ name: `No moderation actions found for this user`, value: `-` });
-    
-        roomEmbed.setFooter({ text: `SuperbossGames | #moderation action` });
-    
-        moderationProfileEmbeds.push(roomEmbed);
-    }else{
-        // TODO: Do 3 mod actions in ONE embed.
-
-        moderationProfile.forEach((current, index) => {
-            const roomEmbed = new EmbedBuilder()
-            .setColor(0x0099FF)
-            .setTitle(`Moderation profile`)
-            .setTimestamp();
-
-            roomEmbed.addFields({ name: `Moderation resume`, value: resume }); // Load resume
-
-            // Create current embed
-            const date = new Date(current.timeStamp);
-            const dateText = `${date.toLocaleDateString("en-US", {day: 'numeric', month: 'long', year: 'numeric', timeZone: 'utc'})} ${date.toLocaleTimeString("en-US")}`;
-        
-            const emoji = bloonUtils.moderationActions[current.Type].emoji;
-
-            roomEmbed.addFields({ name: `Moderation action Nº ${index+1}`, value: `${emoji} **${current.Type}**\n**Reason:** \`\`${current.reason}\`\` \n\`\`${dateText}\`\`` });
-
-            roomEmbed.setFooter({ text: `SuperbossGames | #moderation action` });
-        
-            moderationProfileEmbeds.push(roomEmbed);
-        });
-    }
-
-    return moderationProfileEmbeds;
-};
-
-const getModerationProfileEmbed = (currentActionIndex, moderationProfileEmbeds, previousButton, nextButton) => {
-    resolveButtonState(currentActionIndex, moderationProfileEmbeds.length - 1, previousButton, nextButton);
-    return moderationProfileEmbeds[currentActionIndex];
-}
-
 const command = {
     cooldown: 0,
     data: new SlashCommandBuilder()
@@ -155,6 +71,7 @@ const command = {
         .setDescription(`Does an admin action and creates a log in the #moderation-actions channel.`)
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers | PermissionFlagsBits.AttachFiles)
         .setDMPermission(false)
+        /*
         .addSubcommand(subcommand => {
             subcommand
                 .setName('note')
@@ -216,7 +133,7 @@ const command = {
                         .setMinValue(0)
                         .setMaxValue(168)
                     )
-        })
+        })*/
         .addSubcommand(subcommand => {
             subcommand
                 .setName('unban')
@@ -414,7 +331,12 @@ const command = {
                                 }
                                 // Removes the ban
                                 await interaction.guild.bans.remove(target.id, reason);   
-                                interaction.editReply({ content: `The user was unbanned successfully.`, components: [], embeds: [] });                         
+                                interaction.editReply({ content: `The user was unbanned successfully 😇.`, components: [], embeds: [] });
+
+                                // Send the DM
+                                await target.send({content: reason})
+                                    .then(async () => await interaction.editReply({ content: `The user was unbanned successfully and the DM delivered 😇.`, components: [], embeds: [] }))
+                                    .catch(async () => await interaction.editReply({ content: `The user was unbanned successfully 😇, but I couldn't send the DM 😢, sorry.`, components: [], embeds: [] }));
                             }catch(error){
                                 console.log(`⚠ Error in Unban: ${error}`);
                                 interaction.editReply({ content: `There was an error unbanning the user.`, components: [], embeds: [] });
