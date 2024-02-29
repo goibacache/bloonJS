@@ -98,12 +98,12 @@ const evnt = {
             }
 
             // Instantly delete if it mentions everyone && the user doesn't have the mod or aug role
-            if (message.mentions.everyone){
+            if (message.mentions.everyone || message.content.indexOf("@everyone") > -1){
                 // Check if it's a mod or a hidden manager
                 const userWhoMentionedEveryone = await message.guild.members.fetch(message.author.id);
-                const isMod = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Mod).size > 0;
-                const isHiddenManager = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_HiddenManager).size > 0;
-                const isAug = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Aug).size > 0;
+                const isMod             = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Mod).size > 0;
+                const isHiddenManager   = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_HiddenManager).size > 0;
+                const isAug             = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Aug).size > 0;
                 if (!(isMod || isHiddenManager || isAug)){
                     console.log("SPAM FILTER: Message mentions everyone. Deleted");
                     console.log(`SPAM FILTER: Deleted message: ${message.content} by ${message.author.tag}`);

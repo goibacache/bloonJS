@@ -1,10 +1,3 @@
-/**
- * @typedef {import('discord.js').ModalBuilder} ModalBuilder
- * @typedef {import('discord.js').TextInputBuilder} TextInputBuilder
- * @typedef {import('discord.js').MessageContextMenuCommandInteraction} MessageContextMenuCommandInteraction
- * * @typedef {import('discord.js').UserContextMenuCommandInteraction} UserContextMenuCommandInteraction
- */
-
 /*
  * The core of the modal actions.
  * This file exists only to stop me from duplicating code :^)
@@ -12,6 +5,14 @@
 
 const { ModalBuilder, TextInputStyle, TextInputBuilder, ActionRowBuilder } = require('discord.js');
 const bloonUtils = require('./utils.js');
+const { registerFont, createCanvas, Image } = require('canvas');
+
+/**
+ * @typedef {import('discord.js').ModalBuilder} ModalBuilder
+ * @typedef {import('discord.js').TextInputBuilder} TextInputBuilder
+ * @typedef {import('discord.js').MessageContextMenuCommandInteraction} MessageContextMenuCommandInteraction
+ * * @typedef {import('discord.js').UserContextMenuCommandInteraction} UserContextMenuCommandInteraction
+ */
 
 /**
  * 
@@ -52,7 +53,7 @@ const createNoteModal = (interaction) => {
  * @param {MessageContextMenuCommandInteraction | UserContextMenuCommandInteraction} interaction
  * @returns ModalBuilder
  */
-const createTimeoutModal = (interaction) => {
+const createTimeoutModal = (interaction, defaultTime = '10') => {
 
     const { guild, channel, messageId, selectedUserId } = getGuildChannelMessageAndTarget(interaction);
     const isMessageAction = messageId != 0;
@@ -80,7 +81,7 @@ const createTimeoutModal = (interaction) => {
     .setCustomId('timeoutText')
     .setLabel('Timeout time in minutes [1-40320]') // The label is the prompt the user sees for this input
     .setStyle(TextInputStyle.Short) // Short means only a single line of text
-    .setValue('10')
+    .setValue(defaultTime)
     .setMinLength(1)
     .setMaxLength(5)
     .setRequired(true)

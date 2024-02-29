@@ -14,7 +14,7 @@ const { getGuildChannelMessageAndTarget, createNoteModal, createTimeoutModal, cr
 module.exports = {
 	contextMenuId: 'moderationProfile',
 	data: new ContextMenuCommandBuilder()
-		.setName('Message: Delete')
+		.setName('Message: Delete & Moderate')
 		.setType(ApplicationCommandType.Message)
 		.setDMPermission(false)
 		.setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),

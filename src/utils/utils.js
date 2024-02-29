@@ -1,6 +1,5 @@
-const { EmbedBuilder }  = require('discord.js');
-const https             = require('https');
-
+const { EmbedBuilder } = require('discord.js');
+const https = require('https');
 
 
 //#region initialization
@@ -419,7 +418,7 @@ const loadModerationProfileEmbeds = async (moderationProfile) => {
             const emoji = moderationActions[current.Type].emoji;
 
    
-            roomEmbed.addFields({ name: `Moderation - Moderation action Nº ${index+1}`, value: `${emoji} ${current.Type}` }); // Header
+            roomEmbed.addFields({ name: `Moderation - Moderation action Nº ${index+1} of ${moderationProfile.length}`, value: `${emoji} ${current.Type}` }); // Header
 
             //roomEmbed.addFields({ name: `Moderation action Nº ${index+1}`, value: `${emoji} ${current.Type}` });
             roomEmbed.addFields({ name: `Reason`, value: `${deleteCodeBlocksFromText(current.reason)}` });
