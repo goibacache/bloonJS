@@ -20,16 +20,26 @@ const regAttch = RegExp(/\[att:.*\]/g);
 const regSpam = /\b\+18\b|\b18\b|\bnude?3?s?5?\b|\bna?4?ke?3?d\b|\bnitro\b|\bfre?3?e?3?\b|\bnft\b|\broblox\b|\bstea?4?m\b|\bdi?l?1?sco?0?rd(?!.com\/channels\/)\b|\ba?4?dul?1?ts?\b|cry?l?i?1?pto?0?\b|\bpro?0?mo?0?\b|\bbtc\b/gi;
 const regUrl = /https?:\/\/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)?/gi;
 
+const agentRole = config.role_Agent;
+
 const evnt = {
     name: Events.MessageCreate,
 	async execute(message) {
         try {
 
-            // Avoid replying to itself
-            if (message.author.id === config.clientId){
+            // Avoid replying to itself and bots
+            if (message.author.id === config.clientId || message.author.bot){
                 return;
             }
 
+            // On first message and no AGENT role, assign it.
+            const member = message.member; 
+
+            // Check if the user already has the "Agent" role, if it doesn't add it.
+            if (!member.roles.cache.some(role => role.id === agentRole)){
+                console.log(`${member.user.tag}'s first message! Adding agent role`);
+                await member.roles.add(agentRole);      // Add
+            }
         
             // Regex to split the question.
             const messageSplit = message.content.toLowerCase().split(regWhoIs);
