@@ -23,6 +23,7 @@ const regUrl = /https?:\/\/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([
 /**
   * @typedef {import('discord.js').Message} Message
  */
+const agentRole = config.role_Agent;
 
 const evnt = {
     name: Events.MessageCreate,
@@ -34,11 +35,19 @@ const evnt = {
 	async execute(message) {
         try {
 
-            // Avoid replying to itself
-            if (message.author.id === config.clientId){
+            // Avoid replying to itself and bots
+            if (message.author.id === config.clientId || message.author.bot){
                 return;
             }
 
+            // On first message and no AGENT role, assign it.
+            const member = message.member; 
+
+            // Check if the user already has the "Agent" role, if it doesn't add it.
+            if (!member.roles.cache.some(role => role.id === agentRole)){
+                console.log(`${member.user.tag}'s first message! Adding agent role`);
+                await member.roles.add(agentRole);      // Add
+            }
         
             // Regex to split the question.
             const messageSplit = message.content.toLowerCase().split(regWhoIs);

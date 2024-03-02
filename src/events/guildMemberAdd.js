@@ -12,10 +12,13 @@ const evnt = {
 				return;
 			}
 			
+			// 28/02/2024 removed due to security concerns. Agent role will be added on first message.
+			/*
 			console.log(`GuildMemberAdd ${member.user.id}: Adding role...`);
 			const agentRole = await member.guild.roles.fetch(config.role_Agent); // Lookup the "agent" role
 			member.roles.add(agentRole);    // Assign it
 			console.log(`GuildMemberAdd ${member.user.id}: Role added.`);
+			*/
 
 			// Welcome message
 			const avatarURL		= member.user.avatarURL();
