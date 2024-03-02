@@ -360,16 +360,6 @@ async function handleCommands(command, client) {
 			}
 		}
 
-		if (command.startsWith("rulesUpdate")){
-			const rulesAndInfoEmbed = bloonUtils.createRulesAndInfoEmbed();
-			const guild = await client.guilds.fetch(config.bloonGuildId);
-			const channel = await guild.channels.fetch(config.rulesAndInfoChannel);
-			if (!channel) { console.log("Couldn't find rule's channel"); return; };
-			const message = await channel.messages.fetch(config.rulesMessageId);
-			if (!message) { console.log("Couldn't find rule's message"); return; };
-			await message.edit({ embeds: [rulesAndInfoEmbed] });
-		}
-
 		
 	}catch(error){
 		console.error(`\nError in command: ${error}`);
