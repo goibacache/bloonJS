@@ -286,38 +286,36 @@ const groupBy = (key, array) => {
 
 const createRulesAndInfoEmbed = () => {
     // Load config from self.
-    const config 		= getConfig();
+    const config = getConfig();
 
     // Creates the embed parts
-
     const description = 
-        `**1**. Be respectful, no racism or derogatory attitude
-        **2**. No NSFW/shocking/pornographic and political nature posts
-        **3**. No trolling.
-        **4**. No spamming or text abusing.
-        **5**. Do not over message/mention staff.
-        **6**. No alternate accounts to dodge moderation action.
-        **7**. Post in the correct channels.
-        **8**. Chat in English only.
-        **9**. No advertising non-Intruder content.
-        **10**. Respect the staff and follow instructions. Mods are doing their best to make a friendly environment.
-        **11**. No discussion of moderator actions in public chats. Contact <@104389223280295936> if you feel wrongfully moderated in accordance with the rules listed above.`;
+        `**1**. Be respectful, no racism or derogatory attitude\n` +
+        `**2**. No NSFW/shocking/pornographic and political nature posts\n` +
+        `**3**. No trolling.\n` +
+        `**4**. No spamming or text abusing.\n` +
+        `**5**. Do not over message/mention staff.\n` +
+        `**6**. No alternate accounts to dodge moderation action.\n` +
+        `**7**. Post in the correct channels.\n` +
+        `**8**. Chat in English only.\n` +
+        `**9**. No advertising non-Intruder content.\n` +
+        `**10**. Respect the staff and follow instructions. Mods are doing their best to make a friendly environment.`;
 
     const roles = 
-        `<@&${config.role_Developer}> : The developers of Intruder!
-        <@&${config.role_Developer}> : Official staff partners working along with the developer for community management.
-        <@&${config.role_Mod}> : The amazing community volunteers assisting the team to keep the peace.
-        <@&${config.role_Aug}> : A group of serious players who engage the community.
-        <@&${config.role_Agent}> : All members of the community.`; // Fixed for now D:<
+        `<@&${config.role_Developer}> : The developers of Intruder!\n` +
+        `<@&${config.role_CommunityManagementTeam}> : Official staff partners working along with the developer for community management.\n` +
+        `<@&${config.role_Mod}> : The amazing community volunteers assisting the team to keep the peace.\n` +
+        `<@&${config.role_Aug}> : A group of serious players who engage the community.\n` +
+        `<@&${config.role_Agent}> : All members of the community.`;
 
     const importantLinks = 
-        `${config.youtubeEmoji} | [**Youtube**](https://www.youtube.com/superbossgames)
-        ${config.twitterEmoji} | [**Twitter**](https://twitter.com/SuperbossGames/)
-        ${config.helpraceEmoji} | [**Helprace**](https://superbossgames.helprace.com/)
-        ${config.redditEmoji} | [**Reddit**](https://www.reddit.com/r/Intruder)
-        ${config.twitchEmoji} | [**Twitch**](https://www.twitch.tv/superbossgames)
-        ${config.discordEmoji} | [**Server Invite**](https://discord.gg/superbossgames)
-        ${config.wikiEmoji} | [**Wiki**](https://wiki.superbossgames.com/)`;
+        `${config.youtubeEmoji} | [**Youtube**](https://www.youtube.com/superbossgames)\n` +
+        `${config.twitterEmoji} | [**Twitter**](https://twitter.com/SuperbossGames/)\n` +
+        `${config.helpraceEmoji} | [**Helprace**](https://superbossgames.helprace.com/)\n` +
+        `${config.redditEmoji} | [**Reddit**](https://www.reddit.com/r/Intruder)\n` +
+        `${config.twitchEmoji} | [**Twitch**](https://www.twitch.tv/superbossgames)\n` +
+        `${config.discordEmoji} | [**Server Invite**](https://discord.gg/superbossgames)\n` +
+        `${config.wikiEmoji} | [**Wiki**](https://wiki.superbossgames.com/)`;
 
     const rulesAndInfoEmbed = new EmbedBuilder()
     .setColor(0x1799b1)

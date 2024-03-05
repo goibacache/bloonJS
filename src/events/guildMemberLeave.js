@@ -45,7 +45,7 @@ const evnt = {
 			.setTitle(`🚪 User left | ${member.user.username}`)
 			.setThumbnail(avatarURL)
 			.setTimestamp()
-			.setDescription(`**ID:** ${member.user.id}\n**Tag**: <@${member.user.id}>`)
+			.setDescription(`**ID:** ${member.user.id}\n**Tag**: <@!${member.user.id}>`)
 			.setFooter({ text: `User joined: ${dateJoined}` });
 
 			// If it isn't a kick nor a ban, send the message to bloonside

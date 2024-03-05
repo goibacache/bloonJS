@@ -235,8 +235,8 @@ async function handleCommands(command, client) {
 	
 			const guild = await client.guilds.fetch(args[1] == 0 ? config.bloonGuildId : args[1]);
 			const channel = await guild.channels.fetch(args[2] == 0 ? config.intruderGeneralChannel : args[2]);
-			console.log("sending text: " + text.replace(/"/g, ""));
-			channel.send(text.replace(/"/g, ""));
+			console.log("sending text: " + text.replace(/\"/g, ""));
+			channel.send(text.replace(/\"/g, ""));
 		}
 
 		if (command.startsWith("reload")){
@@ -417,9 +417,9 @@ async function handleCommands(command, client) {
 			const rulesAndInfoEmbed = bloonUtils.createRulesAndInfoEmbed();
 			const guild = await client.guilds.fetch(config.bloonGuildId);
 			const channel = await guild.channels.fetch(config.rulesAndInfoChannel);
-			if (!channel) { console.log("Couldn't find rule's channel"); return; }
+			if (!channel) { console.log("Couldn't find rule's channel"); return; };
 			const message = await channel.messages.fetch(config.rulesMessageId);
-			if (!message) { console.log("Couldn't find rule's message"); return; }
+			if (!message) { console.log("Couldn't find rule's message"); return; };
 			await message.edit({ embeds: [rulesAndInfoEmbed] });
 		}
 

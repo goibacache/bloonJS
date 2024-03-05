@@ -289,12 +289,19 @@ const command = {
                             break;
                         case bloonUtils.moderationActions.Ban:
                             try{
-                                await interaction.guild.bans.create(target, { reason, deleteMessageSeconds: hoursofmessagestodelete * 3600 }); // 12 hours by default.
                                 if (directmessage){
                                     await target.send({content: `You have been banned from Superboss' Discord server for the following reason: ${reason}. ${attachment != null ? `\nThis ban had the following attachment: ${attachment.url}` : ''}  \nPlease do not reply this message as we're not able to see it and remember that continuously breaking the server rules will result in either a kick or a ban.`})
-                                    .then(() => interaction.editReply({ content: `The user was banned and the DM was delivered 🔥.`, components: [], embeds: [] }))
-                                    .catch(() => interaction.editReply({ content: `Couldn't DM the user.`, components: [], embeds: [] }));
+                                    .then(async () => {
+                                        await interaction.guild.bans.create(target, { reason, deleteMessageSeconds: hoursofmessagestodelete * 3600 }); // 12 hours by default.
+                                        await interaction.editReply({ content: `The user was banned and the DM was delivered 🔥.`, components: [], embeds: [] })
+                                    })
+                                    .catch(async () => {
+                                        await interaction.guild.bans.create(target, { reason, deleteMessageSeconds: hoursofmessagestodelete * 3600 }); // 12 hours by default.
+                                        await interaction.editReply({ content: `Couldn't DM the user.`, components: [], embeds: [] })
+                                    });
+                                    
                                 }else{
+                                    await interaction.guild.bans.create(target, { reason, deleteMessageSeconds: hoursofmessagestodelete * 3600 }); // 12 hours by default.
                                     interaction.editReply({ content: `${target.username} has been banned correctly. **No** DM was sent`, components: [], embeds: [] });
                                 }
                             }catch(error){
