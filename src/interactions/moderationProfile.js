@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle, ComponentType } = require('discord.js')
-const bloonUtils = require('../../utils/utils.js');
+const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
-const { moderationAction_Profile } = require('../../utils/storedProcedures.js');
+const { moderationAction_Profile } = require('../utils/storedProcedures.js');
 
 module.exports = {
 	cooldown: 5,
@@ -65,7 +65,7 @@ module.exports = {
                 for(const action of res.slice(index * 10, index*10 + 10)){
                     const date = new Date(action.timeStamp);
                     const dateText = `${date.toLocaleDateString("en-US", {day: 'numeric', month: 'long', year: 'numeric', timeZone: 'utc'})} ${date.toLocaleTimeString("en-US")}`;
-                    mpEmbed.addFields({ name: `-${actionIndex.toString().padStart(maxAmountOfChars)}-   ${bloonUtils.moderationActions[action.Type].emoji} ${action.Type}`, value: `\`${dateText}\`\n**Reason:** ${action.reason}\n` });
+                    mpEmbed.addFields({ name: `-${actionIndex.toString().padStart(maxAmountOfChars)}-   ${bloonUtils.moderationActions[action.Type].emoji} ${action.Type}`, value: `\`${dateText}\`\n**Reason:** ${action.reason.replace(/(\r\n|\n|\r)/gm, "")}\n` });
                     actionIndex++;
                 }
                 

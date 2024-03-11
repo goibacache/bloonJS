@@ -10,13 +10,18 @@
 **************************************************************************/
 
 // Imports
-const { Client, Collection, Events, GatewayIntentBits, Partials } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, Partials, ChannelType, ThreadAutoArchiveDuration, MessageFlags, Message, Guild } = require('discord.js');
 const fs 			= require('fs');
 const bloonUtils 	= require('./utils/utils.js');
 const config 		= bloonUtils.getConfig();
 const readline 		= require('readline');
 const { clearInterval } = require('timers');
 const { kofi_InsertOrUpdate } = require('./utils/storedProcedures.js');
+
+/**
+ * @typedef {import('discord.js').TextChannel} TextChannel
+ * @typedef {import('discord.js').ThreadChannel} ThreadChannel
+ */
 
 // Load initial config
 
@@ -411,6 +416,46 @@ async function handleCommands(command, client) {
 			if (channel){
 				channel.send({ content: ``, embeds: [rulesAndInfoEmbed] });
 			}
+		}
+
+		if (command.startsWith("thread")){
+			/**
+             * The guild object
+             * @type {Guild}
+             */
+			const guild = await client.guilds.fetch(config.bloonGuildId);
+            /**
+             * The text channel object
+             * @type {TextChannel}
+             */
+			const channel = await guild.channels.fetch(config.intruderHelpChannel);
+			/**
+             * The thread text channel object
+             * @type {ThreadChannel}
+             */
+			let thread = await channel.threads.cache.find(x => x.name === `This message shouldn't ping you :x`);
+
+			// If null, create a new thread.
+			if (!thread){
+				thread = await channel.threads.create({ 
+					name: `This message shouldn't ping you :x`, // Max 100 chars
+					autoArchiveDuration: ThreadAutoArchiveDuration.OneWeek,
+					invitable: true,
+					rateLimitPerUser: 15,
+					reason: 'Testing the ping maybe?',
+					type: ChannelType.PrivateThread,
+					startMessage: null
+				});
+			}
+
+			// Make the bot join
+			if (thread.joinable) await thread.join();
+			// "Loading" message
+			const firstMessage = await thread.send({ content: `Now Loading...`, flags: [ MessageFlags.SuppressNotifications ] });
+			// Edit the message and mention all of the roles that should be included.
+			await firstMessage.edit({ content: `@Silent <@&${config.role_Agent}> & <@&${config.role_Aug}> & <@&${config.role_Mod}>` })
+			// Finally send the message you want.
+			await firstMessage.edit({ content: `You did A, B and C` })
 		}
 
 		

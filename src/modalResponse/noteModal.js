@@ -83,6 +83,8 @@ module.exports = {
                 replyText = `Note created successfully and message deleted.`;
             }
 
+            
+
             if (interaction.deferred && !interaction.replied) {
                 await interaction.editReply({ content: replyText, components: [], embeds: [] });
             } else if (interaction.deferred && interaction.replied) {

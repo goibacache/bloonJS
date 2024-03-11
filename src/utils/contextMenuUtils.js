@@ -29,7 +29,7 @@ const createNoteModal = (interaction) => {
     // Create modal:
     const modal = new ModalBuilder()
         .setCustomId(`noteModal/${guild}/${channel}/${messageId}/${selectedUserId}`)
-        .setTitle(isMessageAction ? 'Creating a note and deleting message' : 'Creating a note on user');
+        .setTitle(isMessageAction ? 'Create note & delete message (No DM)' : 'Note user (No DM)');
 
     // Create the text input components
     const note = new TextInputBuilder()
@@ -63,7 +63,7 @@ const createTimeoutModal = (interaction, defaultTime = '10') => {
     // Create modal:
     const modal = new ModalBuilder()
         .setCustomId(`timeoutModal/${guild}/${channel}/${messageId}/${selectedUserId}`)
-        .setTitle(isMessageAction ? 'Timing out and deleting message' : 'Timing out user');
+        .setTitle(isMessageAction ? 'Timeout user & delete message (DM)' : 'Timeout user (DM)');
 
     // Create the text input components
     const note = new TextInputBuilder()
@@ -106,12 +106,12 @@ const createWarnModal = (interaction) => {
     const { guild, channel, messageId, selectedUserId } = getGuildChannelMessageAndTarget(interaction);
     const isMessageAction = messageId != 0;
 
-    const inputText = `You have received a warning from Superboss' Discord server for the following reason:\n-\n\nPlease do not reply this message as we're not able to see it and remember that continuously breaking the server rules will result in either a kick or a ban.`
+    const inputText = `You have been warned for the following:\n\n${getInputText(interaction)}\nRemember that continuously breaking the server rules will result in either a kick or a ban.`
 
     // Create modal:
     const modal = new ModalBuilder()
         .setCustomId(`warnModal/${guild}/${channel}/${messageId}/${selectedUserId}`)
-        .setTitle(isMessageAction ? 'Warning and deleting message' : 'Warn a user (DM)');
+        .setTitle(isMessageAction ? 'Warn user & delete message (DM)' : 'Warn user (DM)');
 
     // Create the text input components
     const note = new TextInputBuilder()
@@ -140,12 +140,12 @@ const createKickModal = (interaction) => {
     const { guild, channel, messageId, selectedUserId } = getGuildChannelMessageAndTarget(interaction);
     const isMessageAction = messageId != 0;
 
-    const inputText = `You have been kicked for the following reasons:\n${getInputText(interaction)}`;
+    const inputText = `You have been kicked for the following reasons:\n\n${getInputText(interaction)}`;
 
     // Create modal:
     const modal = new ModalBuilder()
         .setCustomId(`kickModal/${guild}/${channel}/${messageId}/${selectedUserId}`)
-        .setTitle(isMessageAction ? 'Kicking and deleting message' : 'Kick a user and send a DM with the reason');
+        .setTitle(isMessageAction ? 'Kick user & delete message (DM)' : 'Kick user (DM)');
 
     // Create the text input components
     const note = new TextInputBuilder()
@@ -173,14 +173,14 @@ const createKickModal = (interaction) => {
 const createBanModal = (interaction) => {
 
     const { guild, channel, messageId, selectedUserId } = getGuildChannelMessageAndTarget(interaction);
-    //const isMessageAction = messageId != 0;
+    const isMessageAction = messageId != 0;
 
-    const inputText = `You have been banned for the following reasons:\n${getInputText(interaction)}`;
+    const inputText = `You have been banned for the following reasons:\n\n${getInputText(interaction)}`;
 
     // Create modal:
     const modal = new ModalBuilder()
         .setCustomId(`banModal/${guild}/${channel}/${messageId}/${selectedUserId}`)
-        .setTitle('Banning and deleting messages');
+        .setTitle(isMessageAction ? 'Ban user & delete message (DM)' : 'Ban user (DM)');
 
     // Create the text input components
     const banText = new TextInputBuilder()
@@ -264,7 +264,7 @@ const getInputText = (interaction) => {
     // Attachments:
     let attachments = "";
     if (interaction.targetMessage.attachments.size > 0){
-        attachments += inputText.length > 0 ? `\nWith the following attachments:\n` : 'Posted the following attachments:\n';
+        attachments += inputText.length > 0 ? `\nWith the following attachment(s):\n` : 'Posted the following attachment(s):\n';
 
         interaction.targetMessage.attachments.forEach(async (attachment) => {
             attachments += `[${attachment.name}](<${attachment.url}>)\n`

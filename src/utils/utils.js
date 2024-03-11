@@ -1,4 +1,4 @@
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, Client, ThreadChannel, ThreadAutoArchiveDuration, ChannelType } = require('discord.js');
 const https = require('https');
 
 
@@ -20,15 +20,6 @@ regionsToEmojis["KR"]   = "<:kr:1125796028369616968>";
 regionsToEmojis["IN"]   = "<:in:1125796023147704370>";
 regionsToEmojis["RU"]   = "<:ru:1125796030777131078>";
 regionsToEmojis["CN"]   = "<:cn:1125796020090048545>"; // Unused?
-
-// const actionToEmoji = [];
-// actionToEmoji["Timeout"]    = "⏰";
-// actionToEmoji["Mute"]       = "🔉";
-// actionToEmoji["Kick"]       = "🦶";
-// actionToEmoji["Ban"]        = "🔥";
-// actionToEmoji["Warn"]       = "⚡";
-// actionToEmoji["Unban"]      = "😇";
-// actionToEmoji["Note"]       = "📄";
 
 /**
  * Definition of moderation actions
@@ -332,7 +323,7 @@ const createRulesAndInfoEmbed = () => {
 }
 
 
-const createModerationActionEmbed = (moderationAction, actedUponMember, caseId, reason, handledBy, attachmentUrl) => {
+const createModerationActionEmbed = (moderationAction, actedUponMember, caseId, reason, handledBy, attachmentUrl, DMsent = false) => {
     const banEmbed = new EmbedBuilder()
     .setColor(moderationAction.color)
     .setTitle(`${moderationAction.name}: Case #${caseId}`)
@@ -346,6 +337,7 @@ const createModerationActionEmbed = (moderationAction, actedUponMember, caseId, 
         { name: `User ${moderationAction.conjugation}:`,  value: `**${actedUponMember.displayName ?? actedUponMember.username}**\n${actedUponMember.id}`, inline: true },
         { name: 'Handled by:',  value: `**${handledBy.displayName}**\n${handledBy.id}`, inline: true },
         { name: `${moderationAction.name} reason:`,  value: reason, inline: false },
+        { name: 'Direct message:',  value: DMsent ? `Delivered.` : `Couldn't be delivered.`, inline: true },
     );
 
 
@@ -407,19 +399,19 @@ const loadModerationProfileEmbeds = async (moderationProfile) => {
             .setTitle(`Moderation profile`)
             .setTimestamp();
 
-            roomEmbed.addFields({ name: `**Moderation resume**`, value: resume }); // Header
+            roomEmbed.addFields({ name: `**Moderation resume**`, value: resume+"\n\n" }); // Header
 
             // Create current embed
             const date = new Date(current.timeStamp);
             const dateText = `${date.toLocaleDateString("en-US", {day: 'numeric', month: 'long', year: 'numeric', timeZone: 'utc'})} ${date.toLocaleTimeString("en-US")}`;
         
             const emoji = moderationActions[current.Type].emoji;
-
    
-            roomEmbed.addFields({ name: `Moderation - Moderation action Nº ${index+1} of ${moderationProfile.length}`, value: `${emoji} ${current.Type}` }); // Header
+            roomEmbed.addFields({ name: `Moderation action Nº ${index+1} of ${moderationProfile.length}`, value: `${emoji} ${current.Type}` }); // Header
 
             //roomEmbed.addFields({ name: `Moderation action Nº ${index+1}`, value: `${emoji} ${current.Type}` });
-            roomEmbed.addFields({ name: `Reason`, value: `${deleteCodeBlocksFromText(current.reason)}` });
+            //roomEmbed.addFields({ name: `Reason`, value: `${deleteCodeBlocksFromText(current.reason.replace(/(\r\n\r\n|\n\n|\r\r)/gm, ""))}` });
+            roomEmbed.addFields({ name: `Reason`, value: `${current.reason.replace(/(\r\n\r\n|\n\n|\r\r)/gm, "")}` });
             roomEmbed.addFields({ name: `📅 Date`, value: `${dateText}` });
 
             roomEmbed.setFooter({ text: `SuperbossGames | #moderation action` });
@@ -451,6 +443,59 @@ const resolveButtonState = (currentActionIndex, maxActionIndex, previousButton, 
     }
 }
 
+/**
+ * Creates a thread under Help
+ * @param {Client} client 
+ * @returns {ThreadChannel}
+ */
+const createOrFindModerationActionHelpThread = async (client, name) => {
+
+    try {
+        const config = getConfig();
+        /**
+         * The guild object
+         * @type {Guild}
+         */
+        const guild = await client.guilds.fetch(config.bloonGuildId);
+        /**
+         * The text channel object
+         * @type {TextChannel}
+         */
+        const channel = await guild.channels.fetch(config.intruderHelpChannel);
+        /**
+         * The thread text channel object
+         * @type {ThreadChannel}
+         */
+        let thread = await channel.threads.cache.find(x => x.name === name);
+
+        // If null, create a new thread.
+        if (!thread){
+            thread = await channel.threads.create({ 
+                name: name, // Max 100 chars
+                autoArchiveDuration: ThreadAutoArchiveDuration.OneWeek,
+                invitable: true,
+                rateLimitPerUser: 15,
+                reason: 'Moderation action',
+                type: ChannelType.PublicThread,
+                startMessage: null
+            });
+
+            // Delete creation message
+            const creationMessage = await channel.messages.fetch(thread.id);
+            await creationMessage.delete();
+        }
+
+        // Make the bot join
+        if (thread.joinable) await thread.join();
+
+        // Return the thread
+        return thread;
+    } catch (error) {
+        console.log(`There was an error creating the thread `, error);
+        return null;
+    }
+}
+
 
 module.exports = {
     getHTTPResult,
@@ -466,12 +511,12 @@ module.exports = {
     hardTruncate,
     CyrillicOrStandard,
     deleteCodeBlocksFromText,
-    //actionToEmoji,
     groupBy,
     createRulesAndInfoEmbed,
     moderationActions,
     createModerationActionEmbed,
     loadModerationProfileEmbeds,
     getModerationProfileEmbed,
-    resolveButtonState
+    resolveButtonState,
+    createOrFindModerationActionHelpThread
 }

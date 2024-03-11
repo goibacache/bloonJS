@@ -1,6 +1,7 @@
 const bloonUtils        = require('../utils/utils.js');
 const config            = bloonUtils.getConfig();
 const storedProcedures  = require('../utils/storedProcedures.js');
+const { MessageFlags }  = require('discord.js');
 
 /**
   * @typedef {import('discord.js').ModalSubmitInteraction} ModalSubmitInteraction
@@ -31,6 +32,14 @@ module.exports = {
             const   messageId           = interactionParts[3];
             const   selectedUserId      = interactionParts[4];
 
+            // Various returns
+            let DMsent = false;
+            let messageDeleted = false;
+            let sentInEvidence = false;
+            let threadCreated = false;
+
+            const isMessageAction = messageId != 0;
+
             console.log(`Modal submit ${customId}.\nGuild: ${guildId}. Channel: ${channelId}. Message: ${messageId}. UserId: ${selectedUserId}\nBy user ${interaction.user.tag}`);
 
             // Get data from the text field
@@ -48,16 +57,49 @@ module.exports = {
                                                 });
             const caseID                    = await storedProcedures.moderationAction_GetNewId(action);
             const moderationActionChannel   = await interaction.member.guild.channels.fetch(config.moderationActionsChannel);
-            const actionEmbed               = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, warnText, interaction.member, null);
             
             if (caseID == 0) {
                 await interaction.editReply({ content: `Couldn't save ${action.name} in database.`, components: [] });
                 return;
             }
 
-            await userToBeActedUpon.send({content: warnText})
-                .then(async () => await interaction.editReply({ content: `The warning was delivered via DM 🔥.`, components: [], embeds: [] }))
-                .catch(async () => await interaction.editReply({ content: `Couldn't send the DM 😢, sorry. This warning was saved on the database, but please consider contacting the user directly and creating a note.`, components: [], embeds: [] }));
+            DMsent = await userToBeActedUpon.send({content: warnText})
+                .then(async () => {
+                    return true;
+                })
+                .catch(async () => {
+                    return false;
+                });
+
+            const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, warnText, interaction.member, null, DMsent);
+
+            // Create thread
+            const thread = await bloonUtils.createOrFindModerationActionHelpThread(interaction.client, `Moderation for ${selectedUserId}`);
+
+            if (thread){
+                threadCreated = true;
+            }
+
+            // "Loading" message
+            const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}>\n...` });
+            // Edit the message and mention all of the roles that should be included.
+            await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n<@&${config.role_Agent}> & <@&${config.role_Aug}> & <@&${config.role_Mod}>...` })
+            // Finally send the message we really want to send...
+            await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n${warnText}`, embeds: [] });
+
+            //if for some reason the message persists, delete it
+            if (isMessageAction){
+                /**
+                 * The message
+                 * @type {Message}
+                 */
+                const message = await interaction.client.channels.cache.get(channelId).messages.fetch(messageId);
+                if (message){
+                    messageDeleted = await message.delete()
+                    .then(() => true)
+                    .catch(() => false);
+                }
+            }
 
             // Save it on the database
             await storedProcedures.moderationAction_Insert(action, selectedUserId, warnText, interaction.member.id).catch(() => {
@@ -65,9 +107,18 @@ module.exports = {
             }); 
 
             // Write the moderation action in the chat to log it in the database
-            moderationActionChannel.send({ embeds: [actionEmbed]}).catch(() => {
-                throw "The warning was delivered via DM 🔥 but couldn't send moderation action message into the #evidence channel.";
-            });
+            sentInEvidence = moderationActionChannel.send({ embeds: [actionEmbed]})
+            .then(() => true)
+            .catch(() => false);
+
+            const line1 = DMsent ? `✅ DM was delivered` : `❌ DM couldn't be delivered`;
+            const line2 = isMessageAction ? messageDeleted ? `\n✅ Message deleted` : `\n❌ Message couldn't be deleted` : '';
+            const line3 = sentInEvidence ? `\n✅ Evidence sent` : `\n❌ Couldn't send the evidence`;
+            const line4 = threadCreated ? `\n✅ Thread created` : ` \n❌ Thread couldn't created`;
+
+            await interaction.editReply({
+                content: line1 + line2 + line3 + line4
+            })
 
         } catch (error) {
             console.log(`⚠ Error in ${customId}: ${error}`);
