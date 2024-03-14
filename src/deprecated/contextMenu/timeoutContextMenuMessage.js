@@ -1,5 +1,5 @@
 const { PermissionFlagsBits } 	= require('discord.js');
-const { createBanModal } 	= require('../utils/contextMenuUtils.js');
+const { createTimeoutModal } 	= require('../../utils/contextMenuUtils.js');
 /**
  * @typedef {import('discord.js').ModalBuilder} ModalBuilder
  * @typedef {import('discord.js').TextInputBuilder} TextInputBuilder
@@ -12,9 +12,9 @@ const { ContextMenuCommandBuilder, ApplicationCommandType } = require('discord.j
  * Creates a modal with the custom id "noteModal"
  */
 module.exports = {
-	contextMenuId: 'banModal',
+	contextMenuId: 'timeoutModal',
 	data: new ContextMenuCommandBuilder()
-		.setName('5 Message: Ban and delete')
+		.setName('2 Message: Timeout and delete')
 		.setType(ApplicationCommandType.Message)
 		.setDMPermission(false)
 		.setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
@@ -27,7 +27,7 @@ module.exports = {
 			// Log for admin
 			console.log(`Message context menu action: '${this.data.name}' by ${interaction.member.user.tag} (${interaction.member.user.id})`);
 			// Create modal
-			const modal = createBanModal(interaction);
+			const modal = createTimeoutModal(interaction);
 			// Show modal
 			await interaction.showModal(modal);
 		}catch(error){

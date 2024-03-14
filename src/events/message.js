@@ -34,7 +34,7 @@ const evnt = {
      */
 	async execute(message) {
         try {
-
+            if (message.guildId != config.bloonGuildId) return;
             // Avoid replying to itself and bots
             if (message.author.id === config.clientId || message.author.bot){
                 return;

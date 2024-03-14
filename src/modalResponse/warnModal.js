@@ -37,6 +37,7 @@ module.exports = {
             let messageDeleted = false;
             let sentInEvidence = false;
             let threadCreated = false;
+            let savedInDatabase = false;
 
             const isMessageAction = messageId != 0;
 
@@ -71,21 +72,19 @@ module.exports = {
                     return false;
                 });
 
-            const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, warnText, interaction.member, null, DMsent);
-
             // Create thread
             const thread = await bloonUtils.createOrFindModerationActionHelpThread(interaction.client, `Moderation for ${selectedUserId}`);
 
             if (thread){
                 threadCreated = true;
-            }
 
-            // "Loading" message
-            const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}>\n...` });
-            // Edit the message and mention all of the roles that should be included.
-            await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n<@&${config.role_Agent}> & <@&${config.role_Aug}> & <@&${config.role_Mod}>...` })
-            // Finally send the message we really want to send...
-            await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n${warnText}`, embeds: [] });
+                // "Loading" message
+                const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}>\n...` });
+                // Edit the message and mention all of the roles that should be included.
+                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n<@&${config.role_Agent}> & <@&${config.role_Aug}> & <@&${config.role_Mod}>...` })
+                // Finally send the message we really want to send...
+                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n${warnText}`, embeds: [] });
+            }
 
             //if for some reason the message persists, delete it
             if (isMessageAction){
@@ -102,11 +101,13 @@ module.exports = {
             }
 
             // Save it on the database
-            await storedProcedures.moderationAction_Insert(action, selectedUserId, warnText, interaction.member.id).catch(() => {
-                throw "The warning was delivered via DM 🔥 but couldn't insert moderation action into the database.";
-            }); 
+            savedInDatabase = await storedProcedures.moderationAction_Insert(action, selectedUserId, warnText, interaction.member.id)
+            .then(() => true)
+            .catch(() => false); 
 
-            // Write the moderation action in the chat to log it in the database
+            // Write the moderation action in the chat
+            const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, warnText, interaction.member, null, DMsent);
+
             sentInEvidence = moderationActionChannel.send({ embeds: [actionEmbed]})
             .then(() => true)
             .catch(() => false);
@@ -115,10 +116,11 @@ module.exports = {
             const line2 = isMessageAction ? messageDeleted ? `\n✅ Message deleted` : `\n❌ Message couldn't be deleted` : '';
             const line3 = sentInEvidence ? `\n✅ Evidence sent` : `\n❌ Couldn't send the evidence`;
             const line4 = threadCreated ? `\n✅ Thread created` : ` \n❌ Thread couldn't created`;
+            const line5 = savedInDatabase ? `\n✅ Saved in database` : ` \n❌ Couldn't be saved in database`;
 
             await interaction.editReply({
-                content: line1 + line2 + line3 + line4
-            })
+                content: line1 + line2 + line3 + line4 + line5
+            });
 
         } catch (error) {
             console.log(`⚠ Error in ${customId}: ${error}`);

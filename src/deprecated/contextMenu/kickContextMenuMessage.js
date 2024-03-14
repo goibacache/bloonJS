@@ -1,5 +1,5 @@
 const { PermissionFlagsBits } 	= require('discord.js');
-const { createNoteModal } 		= require('../utils/contextMenuUtils.js');
+const { createKickModal } 	= require('../../utils/contextMenuUtils.js');
 /**
  * @typedef {import('discord.js').ModalBuilder} ModalBuilder
  * @typedef {import('discord.js').TextInputBuilder} TextInputBuilder
@@ -12,10 +12,10 @@ const { ContextMenuCommandBuilder, ApplicationCommandType } = require('discord.j
  * Creates a modal with the custom id "noteModal"
  */
 module.exports = {
-	contextMenuId: 'noteModal',
+	contextMenuId: 'kickModal',
 	data: new ContextMenuCommandBuilder()
-		.setName('1 User: Note')
-		.setType(ApplicationCommandType.User)
+		.setName('4 Message: Kick and delete')
+		.setType(ApplicationCommandType.Message)
 		.setDMPermission(false)
 		.setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 	/**
@@ -25,9 +25,9 @@ module.exports = {
 	async execute(interaction) {
 		try{
 			// Log for admin
-			console.log(`User context menu action: '${this.data.name}' by ${interaction.member.user.tag} (${interaction.member.user.id})`);
+			console.log(`Message context menu action: '${this.data.name}' by ${interaction.member.user.tag} (${interaction.member.user.id})`);
 			// Create modal
-			const modal = createNoteModal(interaction);	
+			const modal = createKickModal(interaction);
 			// Show modal
 			await interaction.showModal(modal);
 		}catch(error){

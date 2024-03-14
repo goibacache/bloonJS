@@ -31,6 +31,14 @@ module.exports = {
             const   messageId           = interactionParts[3];
             const   selectedUserId      = interactionParts[4];
 
+            // Various returns
+            let DMsent = false;
+            let userTimedOut = false;
+            let messageDeleted = false;
+            let sentInEvidence = false;
+            let threadCreated = false;
+            let savedInDatabase = false;
+
             console.log(`Modal submit ${customId}.\nGuild: ${guildId}. Channel: ${channelId}. Message: ${messageId}. UserId: ${selectedUserId}\nBy user ${interaction.user.tag}`);
 
             // Get data from the text field
@@ -65,28 +73,47 @@ module.exports = {
                                                 });
             const caseID                    = await storedProcedures.moderationAction_GetNewId(action);
             const moderationActionChannel   = await interaction.member.guild.channels.fetch(config.moderationActionsChannel);
-            const actionEmbed               = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, noteText, interaction.member, null);
             
             if (caseID == 0) {
                 await interaction.editReply({ content: `Couldn't save ${action.name} in database.`, components: [] });
                 return;
             }
 
-            await userToBeActedUpon.timeout(parseInt(timeoutText) * 60 * 1000)
-            .catch((error) => {
-                console.log("Error: " + error);
-                throw "Couldn't time out the user";
-            });
+            // Action
+            userTimedOut = await userToBeActedUpon.timeout(parseInt(timeoutText) * 60 * 1000)
+            .then(() => true)
+            .catch(() => false);
+
+            // DM
+            DMsent = await userToBeActedUpon.send({content: `You have been timed out from Superboss' Discord server for the following reason: ${noteText}\nPlease do not reply this message as we're not able to see it and remember that continuously breaking the server rules will result in either a kick or a ban`})
+            .then(() => true)
+            .catch(() => false);
+
+            // Thread
+            const thread = await bloonUtils.createOrFindModerationActionHelpThread(interaction.client, `Moderation for ${selectedUserId}`);
+
+            if (thread){
+                threadCreated = true;
+
+                // "Loading" message
+                const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}>\n...` });
+                // Edit the message and mention all of the roles that should be included.
+                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n<@&${config.role_Agent}> & <@&${config.role_Aug}> & <@&${config.role_Mod}>...` })
+                // Finally send the message we really want to send...
+                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n${noteText}`, embeds: [] });
+            }
 
             // Save it on the database
-            await storedProcedures.moderationAction_Insert(action, selectedUserId, noteText, interaction.member.id).catch(() => {
-                throw "Couldn't insert moderation action into the database";
-            }); 
+            savedInDatabase = await storedProcedures.moderationAction_Insert(action, selectedUserId, noteText, interaction.member.id)
+            .then(() => true)
+            .catch(() => false); 
 
-            // Write the moderation action in the chat to log it in the database
-            moderationActionChannel.send({ embeds: [actionEmbed]}).catch(() => {
-                throw "Couldn't send moderation action message into the #evidence channel";
-            });
+            // Write the moderation action in the chat to log it
+            const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, noteText, interaction.member, null, DMsent);
+
+            sentInEvidence = moderationActionChannel.send({ embeds: [actionEmbed]})
+            .then(() => false)
+            .catch(() => false);
 
             if (isMessageAction){
                 /**
@@ -94,14 +121,21 @@ module.exports = {
                  * @type {Message}
                  */
                 const message = await interaction.client.channels.cache.get(channelId).messages.fetch(messageId);
-                await message.delete().catch(() => {
-                    throw "The user was timed out but I couldn't delete message 😢, sorry.";
-                });
+                messageDeleted = await message.delete()
+                .then(() => true)
+                .catch(() => false);
             }
-            
-            await userToBeActedUpon.send({content: `You have been timed out from Superboss' Discord server for the following reason: ${noteText}\nPlease do not reply this message as we're not able to see it and remember that continuously breaking the server rules will result in either a kick or a ban`})
-            .then(async () => await interaction.editReply({ content: isMessageAction ? `The user was timed out, the message deleted and the DM was delivered 🔥.` : `The user was timed out and the DM was delivered 🔥.` , components: [], embeds: [] }))
-            .catch(async () => await interaction.editReply({ content: isMessageAction ? `The user was timed out, the message deleted but I couldn't send the DM 😢, sorry.` : `The user was timed out but I couldn't send the DM 😢, sorry.`, components: [], embeds: [] }));
+
+            const line1 = userTimedOut ? `✅ User was timed out` : `❌ Couldn't time out user`;
+            const line2 = DMsent ? `✅ DM was delivered` : `❌ DM couldn't be delivered`;
+            const line3 = isMessageAction ? messageDeleted ? `\n✅ Message deleted` : `\n❌ Message couldn't be deleted` : '';
+            const line4 = sentInEvidence ? `\n✅ Evidence sent` : `\n❌ Couldn't send the evidence`;
+            const line5 = threadCreated ? `\n✅ Thread created` : ` \n❌ Thread couldn't created`;
+            const line6 = savedInDatabase ? `\n✅ Moderation action saved in the database` : ` \n❌ Moderation action couldn't be saved in the database`;
+
+            await interaction.editReply({
+                content: line1 + line2 + line3 + line4 + line5 + line6
+            });
         
         } catch (error) {
             console.log(`⚠ Error in ${customId}: ${error}`);

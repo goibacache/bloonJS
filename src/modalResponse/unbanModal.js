@@ -31,6 +31,13 @@ module.exports = {
             const   messageId           = interactionParts[3];
             const   selectedUserId      = interactionParts[4];
 
+            // Various returns
+            let userUnbanned = false;
+            let DMsent = false;
+            let sentInEvidence = false;
+            let threadCreated = false;
+            let savedInDatabase = false;
+
             console.log(`Modal submit ${customId}.\nGuild: ${guildId}. Channel: ${channelId}. Message: ${messageId}. UserId: ${selectedUserId}\nBy user ${interaction.user.tag}`);
 
             // Get data from the text field
@@ -65,9 +72,15 @@ module.exports = {
                 interaction.editReply({ content: `The user ID provided is not banned from this server.`, components: [], embeds: [] });
                 return;
             }
+
             // Removes the ban
-            await interaction.guild.bans.remove(selectedUserId, unbanText);   
-            interaction.editReply({ content: `The user was unbanned successfully 😇.`, components: [], embeds: [] });                         
+            userUnbanned = await interaction.guild.bans.remove(selectedUserId, unbanText)
+                .then(() => true)
+                .catch(() => false);
+
+            DMsent = await userToBeActedUpon.send({content: unbanText})
+                .then(() => true)
+                .catch(() => false);
             
 
             // Save it on the database
@@ -76,13 +89,34 @@ module.exports = {
             }); 
 
             // Write the moderation action in the chat to log it in the database
-            moderationActionChannel.send({ embeds: [actionEmbed]}).catch(() => {
-                throw "The user was unbanned successfully but I couldn't send the message into the #evidence channel.";
-            });
+            sentInEvidence = moderationActionChannel.send({ embeds: [actionEmbed]})
+                .then(() => true)
+                .catch(() => false);
 
-            await userToBeActedUpon.send({content: unbanText})
-                .then(async () => await interaction.editReply({ content: `The user was unbanned successfully and the DM delivered 😇.`, components: [], embeds: [] }))
-                .catch(async () => await interaction.editReply({ content: `The user was unbanned successfully 😇, but I couldn't send the DM 😢, sorry.`, components: [], embeds: [] }));
+            
+            // Thread
+            const thread = await bloonUtils.createOrFindModerationActionHelpThread(interaction.client, `Moderation for ${selectedUserId}`);
+
+            if (thread){
+                threadCreated = true;
+
+                // "Loading" message
+                const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}>\n...` });
+                // Edit the message and mention all of the roles that should be included.
+                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n<@&${config.role_Agent}> & <@&${config.role_Aug}> & <@&${config.role_Mod}>...` })
+                // Finally send the message we really want to send...
+                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n${noteText}`, embeds: [] });
+            }
+
+            const line1 = userUnbanned ? `✅ User was unbanned` : `❌ Couldn't unban the user`;
+            const line2 = DMsent ? `✅ DM was delivered` : `❌ DM couldn't be delivered`;
+            const line3 = sentInEvidence ? `\n✅ Evidence sent` : `\n❌ Couldn't send the evidence`;
+            const line4 = threadCreated ? `\n✅ Thread created` : ` \n❌ Thread couldn't created`;
+            const line5 = savedInDatabase ? `\n✅ Moderation action saved in the database` : ` \n❌ Moderation action couldn't be saved in the database`;
+
+            await interaction.editReply({
+                content: line1 + line2 + line3 + line4 + line5
+            });
 
         } catch (error) {
             console.log(`⚠ Error in ${customId}: ${error}`);

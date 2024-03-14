@@ -31,6 +31,14 @@ module.exports = {
             const   messageId           = interactionParts[3];
             const   selectedUserId      = interactionParts[4];
 
+            // Various returns
+            let userBanned = false;
+            let DMsent = false;
+            let messageDeleted = false;
+            let sentInEvidence = false;
+            let threadCreated = false;
+            let savedInDatabase = false;
+
             console.log(`Modal submit ${customId}.\nGuild: ${guildId}. Channel: ${channelId}. Message: ${messageId}. UserId: ${selectedUserId}\nBy user ${interaction.user.tag}`);
 
             // Get data from the text field
@@ -67,7 +75,6 @@ module.exports = {
 
             const caseID                    = await storedProcedures.moderationAction_GetNewId(action);
             const moderationActionChannel   = await interaction.member.guild.channels.fetch(config.moderationActionsChannel);
-            const actionEmbed               = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, banText, interaction.member, null);
 
             const isMessageAction = messageId != 0;
             
@@ -76,12 +83,15 @@ module.exports = {
                 return;
             }
 
+            // Message the user
+            DMsent = await userToBeActedUpon.send({content: banText})
+                .then(() => true)
+                .catch(() => false);
+
             // Ban the user
-            await interaction.guild.bans.create(selectedUserId, { banText, deleteMessageSeconds: parseInt(hoursToDelete) * 3600 })
-                .then(async () => await interaction.editReply({ content: `The user was banned successfully 🔥.`, components: [], embeds: [] }))
-                .catch(() => {
-                    throw `I couldn't ban the user 😢, sorry.`;
-                });
+            userBanned = await interaction.guild.bans.create(selectedUserId, { banText, deleteMessageSeconds: parseInt(hoursToDelete) * 3600 })
+                .then(() => true)
+                .catch(() => false);
 
             //if for some reason the message persists, delete it
             if (isMessageAction){
@@ -91,27 +101,48 @@ module.exports = {
                  */
                 const message = await interaction.client.channels.cache.get(channelId).messages.fetch(messageId);
                 if (message){
-                    await message.delete()
-                    .then(async () => await interaction.editReply({ content: `The user was banned successfully and the message was deleted 🔥.`, components: [], embeds: [] }))
-                    .catch(() => {
-                        throw `The user was banned successfully but I couldn't delete the message 😢, sorry.`;
-                    });
+                    messageDeleted = await message.delete()
+                        .then(() => true)
+                        .catch(() => false);
                 }
             }
 
             // Save it on the database
-            await storedProcedures.moderationAction_Insert(action, selectedUserId, banText, interaction.member.id).catch(() => {
-                throw "The user was banned successfully but I couldn't insert the moderation action into the database.";
-            }); 
+            savedInDatabase = await storedProcedures.moderationAction_Insert(action, selectedUserId, banText, interaction.member.id)
+                .then(() => true)
+                .catch(() => false);
+
+            const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, banText, interaction.member, null, DMsent);
 
             // Write the moderation action in the chat to log it in the database
-            await moderationActionChannel.send({ embeds: [actionEmbed]}).catch(() => {
-                throw "The user was banned successfully but I couldn't send the message into the #evidence channel.";
-            });
+            sentInEvidence = await moderationActionChannel.send({ embeds: [actionEmbed]})
+                .then(() => true)
+                .catch(() => false);
 
-            await userToBeActedUpon.send({content: banText})
-                .then(async () => await interaction.editReply({ content: isMessageAction ? `The user was banned successfully, the message deleted and the ban message was delivered via DM 🔥.` : `The user was banned successfully and the message was delivered via DM 🔥.`, components: [], embeds: [] }))
-                .catch(async () => await interaction.editReply({ content: isMessageAction ? `The user was banned successfully, the message deleted but I couldn't send the DM 😢, sorry.` : `The user was banned successfully but I couldn't send the DM 😢, sorry.`, components: [], embeds: [] }));
+            // Thread
+            const thread = await bloonUtils.createOrFindModerationActionHelpThread(interaction.client, `Moderation for ${selectedUserId}`);
+
+            if (thread){
+                threadCreated = true;
+
+                // "Loading" message
+                const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}>\n...` });
+                // Edit the message and mention all of the roles that should be included.
+                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n<@&${config.role_Agent}> & <@&${config.role_Aug}> & <@&${config.role_Mod}>...` })
+                // Finally send the message we really want to send...
+                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n${noteText}`, embeds: [] });
+            }
+
+            const line1 = userBanned ? `✅ User was banned` : `❌ Couldn't ban the user`;
+            const line2 = DMsent ? `✅ DM was delivered` : `❌ DM couldn't be delivered`;
+            const line3 = isMessageAction ? messageDeleted ? `\n✅ Message deleted` : `\n❌ Message couldn't be deleted` : '';
+            const line4 = sentInEvidence ? `\n✅ Evidence sent` : `\n❌ Couldn't send the evidence`;
+            const line5 = threadCreated ? `\n✅ Thread created` : ` \n❌ Thread couldn't created`;
+            const line6 = savedInDatabase ? `\n✅ Moderation action saved in the database` : ` \n❌ Moderation action couldn't be saved in the database`;
+            
+            await interaction.editReply({
+                content: line1 + line2 + line3 + line4 + line5 + line6
+            });
 
         } catch (error) {
             console.log(`⚠ Error in ${customId}: ${error}`);

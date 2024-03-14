@@ -30,6 +30,11 @@ module.exports = {
             const   messageId           = interactionParts[3];
             const   selectedUserId      = interactionParts[4];
 
+            // Various returns
+            let messageDeleted = false;
+            let sentInEvidence = false;
+            let savedInDatabase = false;
+
             /**
              * Is the action being done on a message or on an user?
              */
@@ -52,7 +57,7 @@ module.exports = {
                                                 });
             const caseID                    = await storedProcedures.moderationAction_GetNewId(action);
             const moderationActionChannel   = await interaction.member.guild.channels.fetch(config.moderationActionsChannel);
-            const actionEmbed               = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, noteText, interaction.member, null);
+            const actionEmbed               = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, noteText, interaction.member, null, DMsent);
             
             if (caseID == 0) {
                 await interaction.editReply({ content: `Couldn't save ${action.name} in database.`, components: [] });
@@ -60,38 +65,34 @@ module.exports = {
             }
 
             // Save it on the database
-            await storedProcedures.moderationAction_Insert(action, selectedUserId, noteText, interaction.member.id).catch(() => {
-                throw "Couldn't insert moderation action into the database";
-            }); 
+            savedInDatabase = await storedProcedures.moderationAction_Insert(action, selectedUserId, noteText, interaction.member.id)
+            .then(() => true)
+            .catch(() => false); 
 
             // Write the moderation action in the chat to log it in the database
-            moderationActionChannel.send({ embeds: [actionEmbed]}).catch(() => {
-                throw "Couldn't send moderation action message into the #evidence channel";
-            });
+            sentInEvidence = await moderationActionChannel.send({ embeds: [actionEmbed]})
+            .then(() => true)
+            .catch(() => false);
 
-            let replyText = "Note created successfully.";
             if (isMessageAction){
                 /**
                  * The message
                  * @type {Message}
                  */
                 const message = await interaction.client.channels.cache.get(channelId).messages.fetch(messageId);
-                await message.delete().catch(() => {
-                    throw "Couldn't delete message";
-                });
-
-                replyText = `Note created successfully and message deleted.`;
+                messageDeleted = await message.delete()
+                .then(() => true)
+                .catch(() => false);
             }
 
+            const line1 = isMessageAction ? messageDeleted ? `\n✅ Message deleted` : `\n❌ Message couldn't be deleted` : '';
+            const line2 = sentInEvidence ? `\n✅ Evidence sent` : `\n❌ Couldn't send the evidence`;
+            const line3 = savedInDatabase ? `\n✅ Saved in database` : ` \n❌ Couldn't be saved in database`;
+
+            await interaction.editReply({
+                content: line1 + line2 + line3
+            });
             
-
-            if (interaction.deferred && !interaction.replied) {
-                await interaction.editReply({ content: replyText, components: [], embeds: [] });
-            } else if (interaction.deferred && interaction.replied) {
-                await interaction.followUp({ content: replyText, components: [], embeds: [] });
-            } else {
-                await interaction.reply({ content: replyText, components: [], embeds: [] });
-            }
         } catch (error) {
             console.log(`⚠ Error in ${customId}: ${error}`);
             const answer = { content: `There was an error in ${customId}.\nError: ${error}`, components: [], embeds: [] };

@@ -31,6 +31,14 @@ module.exports = {
             const   messageId           = interactionParts[3];
             const   selectedUserId      = interactionParts[4];
 
+            // Various returns
+            let DMsent = false;
+            let userKicked = false;
+            let messageDeleted = false;
+            let sentInEvidence = false;
+            let threadCreated = false;
+            let savedInDatabase = false;
+
             console.log(`Modal submit ${customId}.\nGuild: ${guildId}. Channel: ${channelId}. Message: ${messageId}. UserId: ${selectedUserId}\nBy user ${interaction.user.tag}`);
 
             // Get data from the text field
@@ -48,7 +56,6 @@ module.exports = {
                                                 });
             const caseID                    = await storedProcedures.moderationAction_GetNewId(action);
             const moderationActionChannel   = await interaction.member.guild.channels.fetch(config.moderationActionsChannel);
-            const actionEmbed               = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, kickText, interaction.member, null);
 
             const isMessageAction = messageId != 0;
             
@@ -57,21 +64,25 @@ module.exports = {
                 return;
             }
 
-            await interaction.guild.members.kick(userToBeActedUpon, kickText)
-                .then(async () => await interaction.editReply({ content: `The user was kicked.`, components: [], embeds: [] }))
-                .catch(() => {
-                    throw "I couldn't kick that user 😢, sorry";
-                });
+            DMsent = await userToBeActedUpon.send({content: kickText})
+            .then(() => true)
+            .catch(() => false);
+
+            userKicked = await interaction.guild.members.kick(userToBeActedUpon, kickText)
+                .then(() => true)
+                .catch(() => false);
 
             // Save it on the database
-            await storedProcedures.moderationAction_Insert(action, selectedUserId, kickText, interaction.member.id).catch(() => {
-                throw "The user was kicked but I couldn't insert the moderation action into the database.";
-            }); 
+            savedInDatabase = await storedProcedures.moderationAction_Insert(action, selectedUserId, kickText, interaction.member.id)
+            .then(() => true)
+            .catch(() => false); 
+
+            const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, kickText, interaction.member, null, DMsent);
 
             // Write the moderation action in the chat to log it in the database
-            moderationActionChannel.send({ embeds: [actionEmbed]}).catch(() => {
-                throw "The user was kicked but I couldn't send the message into the #evidence channel.";
-            });
+            sentInEvidence = moderationActionChannel.send({ embeds: [actionEmbed]})
+            .then(() => true)
+            .catch(() => false);
 
             if (isMessageAction){
                 /**
@@ -79,16 +90,35 @@ module.exports = {
                  * @type {Message}
                  */
                 const message = await interaction.client.channels.cache.get(channelId).messages.fetch(messageId);
-                await message.delete()
-                    .then(async () => await interaction.editReply({ content: `The user was kicked and the message was deleted.`, components: [], embeds: [] }))
-                    .catch(() => {
-                        throw `The user was kicked but I couldn't delete the message.`;
-                    });
+                messageDeleted = await message.delete()
+                    .then(() => true)
+                    .catch(() => false);
             }
 
-            await userToBeActedUpon.send({content: kickText})
-                .then(async () => await interaction.editReply({ content: isMessageAction ? `The user was kicked, the message deleted and the kick message was delivered via DM 🔥.` : `The user was kicked and the kick message was delivered via DM 🔥.`, components: [], embeds: [] }))
-                .catch(async () => await interaction.editReply({ content: isMessageAction ? `The user was kicked, the message deleted but I couldn't send the DM 😢, sorry.` : `The user was kicked but I couldn't send the DM 😢, sorry.`, components: [], embeds: [] }));
+            // Thread
+            const thread = await bloonUtils.createOrFindModerationActionHelpThread(interaction.client, `Moderation for ${selectedUserId}`);
+
+            if (thread){
+                threadCreated = true;
+
+                // "Loading" message
+                const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}>\n...` });
+                // Edit the message and mention all of the roles that should be included.
+                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n<@&${config.role_Agent}> & <@&${config.role_Aug}> & <@&${config.role_Mod}>...` })
+                // Finally send the message we really want to send...
+                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n${noteText}`, embeds: [] });
+            }
+
+            const line1 = userKicked ? `✅ User was kicked` : `❌ Couldn't kick user`;
+            const line2 = DMsent ? `✅ DM was delivered` : `❌ DM couldn't be delivered`;
+            const line3 = isMessageAction ? messageDeleted ? `\n✅ Message deleted` : `\n❌ Message couldn't be deleted` : '';
+            const line4 = sentInEvidence ? `\n✅ Evidence sent` : `\n❌ Couldn't send the evidence`;
+            const line5 = threadCreated ? `\n✅ Thread created` : ` \n❌ Thread couldn't created`;
+            const line6 = savedInDatabase ? `\n✅ Moderation action saved in the database` : ` \n❌ Moderation action couldn't be saved in the database`;
+
+            await interaction.editReply({
+                content: line1 + line2 + line3 + line4 + line5 + line6
+            });
 
         } catch (error) {
             console.log(`⚠ Error in ${customId}: ${error}`);
