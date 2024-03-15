@@ -1,4 +1,4 @@
-const { EmbedBuilder, Client, ThreadChannel, ThreadAutoArchiveDuration, ChannelType } = require('discord.js');
+const { EmbedBuilder, ThreadAutoArchiveDuration, ChannelType } = require('discord.js');
 const https = require('https');
 
 
@@ -167,7 +167,7 @@ const truncateOrComplete = (text, maxLength = 28, padRight = false) => {
         text = text.padEnd(maxLength); // Max is 28, fixed.    
     }
     if (text.length > maxLength){
-        text = text.substr(0, maxLength-3) + "...";
+        text = text.substring(0, maxLength-3) + "...";
     }
 
     return text;
@@ -472,7 +472,7 @@ const createOrFindModerationActionHelpThread = async (client, name) => {
         if (!thread){
             thread = await channel.threads.create({ 
                 name: name, // Max 100 chars
-                autoArchiveDuration: ThreadAutoArchiveDuration.OneWeek,
+                autoArchiveDuration: ThreadAutoArchiveDuration.ThreeDays, // Three days for now
                 invitable: true,
                 rateLimitPerUser: 15,
                 reason: 'Moderation action',
