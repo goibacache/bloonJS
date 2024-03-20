@@ -1,4 +1,4 @@
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, Message } = require('discord.js');
 const https         = require('https');
 
 
@@ -256,6 +256,27 @@ const createRulesAndInfoEmbed = () => {
     return rulesAndInfoEmbed;
 }
 
+/**
+ * 
+ * @param {Message} message 
+ */
+const getTextAndAttachmentsFromMessage = (message) => {
+    let messageResume = '';
+
+    if (message.content.length > 0){
+        messageResume += `\`\`\`${deleteCodeBlocksFromText(message.content)}\`\`\``;
+    }
+
+    if (message.attachments.size > 0){
+        messageResume += `_Attachments_:\n`;
+    }
+    message.attachments.forEach((attachment) => {
+        messageResume += `[${attachment.name}](<${attachment.url}>)	`
+    });
+
+    return messageResume;
+}
+
 const actionToEmoji = [];
 actionToEmoji["Timeout"]    = "⏰";
 actionToEmoji["Mute"]       = "🔉";
@@ -284,4 +305,5 @@ module.exports = {
     actionToEmoji,
     groupBy,
     createRulesAndInfoEmbed,
+    getTextAndAttachmentsFromMessage,
 }

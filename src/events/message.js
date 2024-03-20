@@ -3,7 +3,7 @@ const config            = bloonUtils.getConfig();
 
 const regexs            = require('../messageRegexs.js');
 const storedProcedures  = require('../utils/storedProcedures.js');
-const { Events }        = require('discord.js');
+const { Events, GuildMember, Message, TextChannel }        = require('discord.js');
 
 
 const   commands            = [".rule34"];
@@ -24,6 +24,11 @@ const agentRole = config.role_Agent;
 
 const evnt = {
     name: Events.MessageCreate,
+    /**
+     * 
+     * @param {Message} message 
+     * @returns 
+     */
 	async execute(message) {
         try {
 
@@ -35,7 +40,7 @@ const evnt = {
             // All messages should be lower case to be processed
             message.content = message.content.toLowerCase();
 
-            // Instantly delete if it mentions everyone && the user doesn't have the mod or aug role <- TODO!
+            // Instantly delete if it mentions everyone && the user doesn't have the mod role
             if (message.mentions.everyone){
                 // Check if it's a mod or a hidden manager
                 const userWhoMentionedEveryone = await message.guild.members.fetch(message.author.id);
@@ -57,14 +62,37 @@ const evnt = {
                     console.log("SPAM FILTER: Message contains URL");
 
                     // Check if it's a mod or a hidden manager
+                    /**
+                     * The guild object
+                     * @type {GuildMember}
+                     */
                     const userWhoMentionedEveryone = await message.guild.members.fetch(message.author.id);
                     const isMod = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Mod).size > 0;
                     const isHiddenManager = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_HiddenManager).size > 0
                     const isAug = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Aug).size > 0
                     if (!(isMod || isHiddenManager || isAug)){
+                        // Get mods channel
                         console.log("SPAM FILTER: Message from random (not that one) user, deleting.");
                         console.log(`SPAM FILTER: Deleted message: ${message.content}`);
+
+                        let messageResume = bloonUtils.getTextAndAttachmentsFromMessage(message);
+
                         await message.delete();
+                        await userWhoMentionedEveryone.timeout(1 * 60 * 1000); // 1 minute.
+                        
+
+                        /**
+                         * @type { TextChannel }
+                         */
+                        const modChatChannel = await message.guild.channels.fetch(config.alertsChannel);
+                        /**
+                         * @type { Message }
+                         */
+                        const text = await modChatChannel.send({
+                            content: `🧐 It seems to me that the user <@${userWhoMentionedEveryone.id}> is a compromised account. The account was timed out for 1 minute 🔥 for posting the following: ${messageResume}`,
+                            embeds: []
+                        });
+
                         return;
                     }else{
                         console.log(`SPAM FILTER: Message was sent by trusted user.\nMessage: ${message.content}`)

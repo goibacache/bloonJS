@@ -1,4 +1,4 @@
-const { Events, AuditLogEvent } = require('discord.js');
+const { Events, AuditLogEvent, Message } = require('discord.js');
 const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 
@@ -49,7 +49,12 @@ const evnt = {
 			});
 
 			const channel = message.guild.channels.cache.get(config.bloonServerLogs);
-			await channel.send({ content: `🧹 New deletion ${wasItAMod}of message by <@${message.author.id}> (${message.author.username}) in <#${message.channelId}> \n\n_Deleted message_:\n${msg}${attachments}`, allowedMentions: { parse: [] }});
+			await channel.send({ 
+				content: `🧹 New deletion ${wasItAMod}of message by <@${message.author.id}> (${message.author.username}) in <#${message.channelId}> \n\n_Deleted message_:\n${msg}${attachments}`, 
+				allowedMentions: { parse: [] },
+				embeds: []
+			});
+
 		}catch(error){
 			console.error("Error in messageDelete.js: " + error);
 		}
