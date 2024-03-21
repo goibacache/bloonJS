@@ -15,6 +15,7 @@ module.exports = {
 	bloonsideChannel:				"your-bloonside-channel",
 	bloonServerLogs:				"your-bloon-server-log",
 	modChatChannel:					"your-mod-chat-channel",
+	alertsChannel:					"your-alerts-channel",
 
 	rulesMessageId:					"your-rules-message-id",
 	newsSubscribeMessageId:			"your-subscribe-to-news-message-id",

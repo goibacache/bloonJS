@@ -3,7 +3,7 @@ const config            = bloonUtils.getConfig();
 
 const regexs            = require('../messageRegexs.js');
 const storedProcedures  = require('../utils/storedProcedures.js');
-const { Events }        = require('discord.js');
+const { Events, GuildMember, Message, TextChannel }        = require('discord.js');
 
 
 const   commands            = [".rule34"];
@@ -40,6 +40,71 @@ const evnt = {
                 return;
             }
 
+            // All messages should be lower case to be processed
+            message.content = message.content.toLowerCase();
+
+            // Instantly delete if it mentions everyone && the user doesn't have the mod role
+            if (message.mentions.everyone){
+                // Check if it's a mod or a hidden manager
+                const userWhoMentionedEveryone = await message.guild.members.fetch(message.author.id);
+                const isMod = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Mod).size > 0;
+                const isHiddenManager = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_HiddenManager).size > 0
+                if (!(isMod || isHiddenManager)){
+                    console.log("SPAM FILTER: Message mentions everyone. Deleted");
+                    console.log(`SPAM FILTER: Deleted message: ${message.content}`);
+                    await message.delete();
+                    return;
+                }
+            }
+
+            // Check if it's spam or +18
+            if (message.content.match(regSpam)?.length > 1){
+                console.log("SPAM FILTER: Message appears to be spam");
+                // and if it has an URL then kill it
+                if (message.content.match(regUrl)?.length > 0){
+                    console.log("SPAM FILTER: Message contains URL");
+
+                    // Check if it's a mod or a hidden manager
+                    /**
+                     * The guild object
+                     * @type {GuildMember}
+                     */
+                    const userWhoMentionedEveryone = await message.guild.members.fetch(message.author.id);
+                    const isMod = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Mod).size > 0;
+                    const isHiddenManager = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_HiddenManager).size > 0
+                    const isAug = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Aug).size > 0
+                    if (!(isMod || isHiddenManager || isAug)){
+                        // Get mods channel
+                        console.log("SPAM FILTER: Message from random (not that one) user, deleting.");
+                        console.log(`SPAM FILTER: Deleted message: ${message.content}`);
+
+                        let messageResume = bloonUtils.getTextAndAttachmentsFromMessage(message);
+
+                        await message.delete();
+                        await userWhoMentionedEveryone.timeout(1 * 60 * 1000); // 1 minute.
+                        
+
+                        /**
+                         * @type { TextChannel }
+                         */
+                        const modChatChannel = await message.guild.channels.fetch(config.alertsChannel);
+                        /**
+                         * @type { Message }
+                         */
+                        await modChatChannel.send({
+                            content: `🧐 It seems to me that the user <@${userWhoMentionedEveryone.id}> is a compromised account. The account was timed out for 1 minute 🔥 for posting the following: ${messageResume}`,
+                            embeds: []
+                        });
+
+                        return;
+                    }else{
+                        console.log(`SPAM FILTER: Message was sent by trusted user.\nMessage: ${message.content}`)
+                    }
+                }
+            }
+
+            // After SPAM check:
+            
             // On first message and no AGENT role, assign it.
             const member = message.member; 
 
@@ -48,7 +113,7 @@ const evnt = {
                 console.log(`${member.user.tag}'s first message! Adding agent role`);
                 await member.roles.add(agentRole);      // Add
             }
-        
+
             // Regex to split the question.
             const messageSplit = message.content.toLowerCase().split(regWhoIs);
 
@@ -89,12 +154,9 @@ const evnt = {
                 await message.reply({ content: response[0].phrase, files: [{
                     attachment: attachmentLocalDir,
                     name: attachmentName
-                 }] });
-                 return; // Kill process
+                    }] });
+                return; // Kill process
             }
-
-            // All messages should be lower case to be processed
-            message.content = message.content.toLowerCase();
 
             // Handle regexs replies in the general / help & map making channels
             if (isInChannel(message, config.intruderGeneralChannel) || isInChannel(message, config.intruderHelpChannel) || isInChannel(message, config.intruderMapmakingChannel) || isInChannel(message, config.pugChannel) ) {
@@ -104,42 +166,6 @@ const evnt = {
                     }
                     return; // Stop the foreach
                 });
-            }
-
-            // Instantly delete if it mentions everyone && the user doesn't have the mod or aug role
-            if (message.mentions.everyone || message.content.indexOf("@everyone") > -1){
-                // Check if it's a mod or a hidden manager
-                const userWhoMentionedEveryone = await message.guild.members.fetch(message.author.id);
-                const isMod             = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Mod).size > 0;
-                const isHiddenManager   = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_HiddenManager).size > 0;
-                const isAug             = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Aug).size > 0;
-                if (!(isMod || isHiddenManager || isAug)){
-                    console.log("SPAM FILTER: Message mentions everyone. Deleted");
-                    console.log(`SPAM FILTER: Deleted message: ${message.content} by ${message.author.tag}`);
-                    await message.delete();
-                    return;
-                }
-            }
-
-            // Check if it's spam or +18
-            if (message.content.match(regSpam)?.length > 1){
-                console.log("SPAM FILTER: Message appears to be spam");
-                // and if it has an URL then kill it
-                if (message.content.match(regUrl)?.length > 0){
-                    console.log("SPAM FILTER: Message contains URL");
-
-                    // Check if it's a mod or a hidden manager
-                    const userWhoMentionedEveryone = await message.guild.members.fetch(message.author.id);
-                    const isMod = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Mod).size > 0;
-                    const isHiddenManager = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_HiddenManager).size > 0
-                    const isAug = userWhoMentionedEveryone.roles.cache.filter(x => x.config.role_Aug).size > 0
-                    if (!(isMod || isHiddenManager || isAug)){
-                        console.log("SPAM FILTER: Message from random (not that one) user, deleting.");
-                        console.log(`SPAM FILTER: Deleted message: ${message.content}`);
-                        await message.delete();
-                        return;
-                    }
-                }
             }
 
             // Includes a command but not in the right channel.

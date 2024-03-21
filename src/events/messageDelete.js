@@ -1,4 +1,4 @@
-const { Events, AuditLogEvent } = require('discord.js');
+const { Events, AuditLogEvent, Message } = require('discord.js');
 const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 
@@ -33,8 +33,6 @@ const evnt = {
 			}
 
 			const wasItAMod = modUser != null ? `by third-party <@${modUser.id}> (${modUser.username}) ` : "";
-
-			const textDecorator = "```";
 
 			const msg = bloonUtils.deleteCodeBlocksFromText(message.content);
 
