@@ -322,14 +322,200 @@ const createRulesAndInfoEmbed = () => {
     return rulesAndInfoEmbed;
 }
 
-const actionToEmoji = [];
-actionToEmoji["Timeout"]    = "⏰";
-actionToEmoji["Mute"]       = "🔉";
-actionToEmoji["Kick"]       = "🦶";
-actionToEmoji["Ban"]        = "🔥";
-actionToEmoji["Warn"]       = "⚡";
-actionToEmoji["Unban"]      = "😇";
-actionToEmoji["Note"]       = "📄";
+const createModerationActionEmbed = (moderationAction, actedUponMember, caseId, reason, handledBy, attachmentUrl, DMsent = false) => {
+    const banEmbed = new EmbedBuilder()
+    .setColor(moderationAction.color)
+    .setTitle(`${moderationAction.name}: Case #${caseId}`)
+    .setTimestamp();
+
+    if (attachmentUrl != null && attachmentUrl.length > 0){
+        banEmbed.setImage(attachmentUrl)
+    }
+
+    banEmbed.addFields(
+        { name: `User ${moderationAction.conjugation}:`,  value: `**${actedUponMember.displayName ?? actedUponMember.username}**\n${actedUponMember.id}`, inline: true },
+        { name: 'Handled by:',  value: `**${handledBy.displayName}**\n${handledBy.id}`, inline: true },
+        { name: `${moderationAction.name} reason:`,  value: reason, inline: false },
+        { name: 'Direct message:',  value: DMsent ? `Delivered.` : `Couldn't be delivered.`, inline: true },
+    );
+
+
+    return banEmbed;
+}
+
+/**
+ * Loads and creates the moderation embeds
+ * @param {number} userId 
+ * @returns moderationProfileEmbeds, moderationProfile
+ */
+const loadModerationProfileEmbeds = async (moderationProfile) => {
+    let moderationProfileEmbeds = [];
+
+    let resume = ``;
+
+    if (moderationProfile.length == 0){
+        resume += `😇 This profile has **no** previous moderation actions\n`;
+    }else{
+        const groupedByType = groupBy('Type', moderationProfile);
+
+        resume += '```'; // Start quote
+
+        groupedByType.forEach((group, index) => {
+
+            if (group.items.length == 0){
+                return;
+            }
+            //console.log("group.Type: ", group.Type);
+            const emoji = moderationActions[group.Type].emoji;
+            //console.log("emoji found:", emoji);
+            if (index > 0){
+                resume += ` | `;
+            }
+            //resume += `${emoji} **${group.Type}**: ${group.items.length}`;      
+            resume += `${emoji} ${group.Type}: ${group.items.length}`;      
+        });
+
+        resume += '```'; // End quote
+    }
+
+    if (moderationProfile.length == 0){
+        const roomEmbed = new EmbedBuilder()
+        .setColor(0x0099FF)
+        .setTitle(`Moderation profile`)
+        .setTimestamp();
+    
+        roomEmbed.addFields({ name: `No moderation actions found for this user`, value: `-` });
+    
+        roomEmbed.setFooter({ text: `SuperbossGames | #moderation action` });
+    
+        moderationProfileEmbeds.push(roomEmbed);
+    }else{
+        // TODO: Do 3 mod actions in ONE embed.
+
+        moderationProfile.forEach((current, index) => {
+            const roomEmbed = new EmbedBuilder()
+            .setColor(0x0099FF)
+            .setTitle(`Moderation profile`)
+            .setTimestamp();
+
+            roomEmbed.addFields({ name: `**Moderation resume**`, value: resume+"\n\n" }); // Header
+
+            // Create current embed
+            const date = new Date(current.timeStamp);
+            const dateText = `${date.toLocaleDateString("en-US", {day: 'numeric', month: 'long', year: 'numeric', timeZone: 'utc'})} ${date.toLocaleTimeString("en-US")}`;
+        
+            const emoji = moderationActions[current.Type].emoji;
+   
+            roomEmbed.addFields({ name: `Moderation action Nº ${index+1} of ${moderationProfile.length}`, value: `${emoji} ${current.Type}` }); // Header
+
+            //roomEmbed.addFields({ name: `Moderation action Nº ${index+1}`, value: `${emoji} ${current.Type}` });
+            //roomEmbed.addFields({ name: `Reason`, value: `${deleteCodeBlocksFromText(current.reason.replace(/(\r\n\r\n|\n\n|\r\r)/gm, ""))}` });
+            roomEmbed.addFields({ name: `Reason`, value: `${current.reason.replace(/(\r\n\r\n|\n\n|\r\r)/gm, "")}` });
+            roomEmbed.addFields({ name: `📅 Date`, value: `${dateText}` });
+
+            roomEmbed.setFooter({ text: `SuperbossGames | #moderation action` });
+        
+            moderationProfileEmbeds.push(roomEmbed);
+        });
+    }
+
+    return moderationProfileEmbeds;
+};
+
+
+const getModerationProfileEmbed = (currentActionIndex, moderationProfileEmbeds, previousButton, nextButton) => {
+    resolveButtonState(currentActionIndex, moderationProfileEmbeds.length - 1, previousButton, nextButton);
+    return moderationProfileEmbeds[currentActionIndex];
+}
+
+const resolveButtonState = (currentActionIndex, maxActionIndex, previousButton, nextButton) => {
+    if (currentActionIndex == 0){
+        previousButton.setDisabled(true);
+    }else{
+        previousButton.setDisabled(false);
+    }
+
+    if (currentActionIndex == maxActionIndex){
+        nextButton.setDisabled(true);
+    }else{
+        nextButton.setDisabled(false);
+    }
+}
+
+/**
+ * Creates a thread under Help
+ * @param {Client} client 
+ * @returns {ThreadChannel}
+ */
+const createOrFindModerationActionHelpThread = async (client, name) => {
+
+    try {
+        const config = getConfig();
+        /**
+         * The guild object
+         * @type {Guild}
+         */
+        const guild = await client.guilds.fetch(config.bloonGuildId);
+        /**
+         * The text channel object
+         * @type {TextChannel}
+         */
+        const channel = await guild.channels.fetch(config.intruderHelpChannel);
+        /**
+         * The thread text channel object
+         * @type {ThreadChannel}
+         */
+        let thread = await channel.threads.cache.find(x => x.name === name);
+
+        // If null, create a new thread.
+        if (!thread){
+            thread = await channel.threads.create({ 
+                name: name, // Max 100 chars
+                autoArchiveDuration: ThreadAutoArchiveDuration.ThreeDays, // Three days for now
+                invitable: true,
+                rateLimitPerUser: 15,
+                reason: 'Moderation action',
+                type: ChannelType.PublicThread,
+                startMessage: null
+            });
+
+            // Delete creation message
+            const creationMessage = await channel.messages.fetch(thread.id);
+            await creationMessage.delete();
+        }
+
+        // Make the bot join
+        if (thread.joinable) await thread.join();
+
+        // Return the thread
+        return thread;
+    } catch (error) {
+        console.log(`There was an error creating the thread `, error);
+        return null;
+    }
+}
+
+/**
+ * 
+ * @param {Message} message 
+ */
+const getTextAndAttachmentsFromMessage = (message) => {
+    let messageResume = '';
+    const textDecorator = "```";
+
+    if (message.content.length > 0){
+        messageResume += `${textDecorator}${deleteCodeBlocksFromText(message.content)}${textDecorator}`;
+    }
+
+    if (message.attachments.size > 0){
+        messageResume += `_Attachments_:\n`;
+    }
+    message.attachments.forEach((attachment) => {
+        messageResume += `[${attachment.name}](<${attachment.url}>)	`
+    });
+
+    return messageResume;
+}
 
 
 module.exports = {

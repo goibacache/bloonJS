@@ -31,6 +31,7 @@ module.exports = {
             const   selectedUserId      = interactionParts[4];
 
             // Various returns
+            let DMsent = false; // No DM on notes.
             let messageDeleted = false;
             let sentInEvidence = false;
             let savedInDatabase = false;

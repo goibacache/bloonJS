@@ -106,7 +106,7 @@ module.exports = {
                 // Edit the message and mention all of the roles that should be included.
                 await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n<@&${config.role_Agent}> & <@&${config.role_Aug}> & <@&${config.role_Mod}>...` })
                 // Finally send the message we really want to send...
-                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n${noteText}`, embeds: [] });
+                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n${kickText}`, embeds: [] });
             }
 
             const line1 = userKicked ? `✅ User was kicked` : `❌ Couldn't kick user`;

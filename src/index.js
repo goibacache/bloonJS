@@ -10,7 +10,7 @@
 **************************************************************************/
 
 // Imports
-const { Client, Collection, Events, GatewayIntentBits, Partials, ChannelType, ThreadAutoArchiveDuration, MessageFlags, Message, Guild } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, Partials, ChannelType, ThreadAutoArchiveDuration, MessageFlags } = require('discord.js');
 const fs 			= require('fs');
 const bloonUtils 	= require('./utils/utils.js');
 const config 		= bloonUtils.getConfig();
@@ -240,8 +240,8 @@ async function handleCommands(command, client) {
 	
 			const guild = await client.guilds.fetch(args[1] == 0 ? config.bloonGuildId : args[1]);
 			const channel = await guild.channels.fetch(args[2] == 0 ? config.intruderGeneralChannel : args[2]);
-			console.log("sending text: " + text.replace(/\"/g, ""));
-			channel.send(text.replace(/\"/g, ""));
+			console.log("sending text: " + text.replace(/"/g, ""));
+			channel.send(text.replace(/"/g, ""));
 		}
 
 		if (command.startsWith("reload")){

@@ -5,7 +5,6 @@
 
 const { ModalBuilder, TextInputStyle, TextInputBuilder, ActionRowBuilder } = require('discord.js');
 const bloonUtils = require('./utils.js');
-const { registerFont, createCanvas, Image } = require('canvas');
 
 /**
  * @typedef {import('discord.js').ModalBuilder} ModalBuilder

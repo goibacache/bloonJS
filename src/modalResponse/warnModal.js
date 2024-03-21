@@ -1,7 +1,6 @@
 const bloonUtils        = require('../utils/utils.js');
 const config            = bloonUtils.getConfig();
 const storedProcedures  = require('../utils/storedProcedures.js');
-const { MessageFlags }  = require('discord.js');
 
 /**
   * @typedef {import('discord.js').ModalSubmitInteraction} ModalSubmitInteraction

@@ -4,9 +4,13 @@
   "description": "A Discord Bot replacement for our fallen comrade.\r Uses DiscordJS to handle the discord interactions and events.",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "eslint": "eslint src/. --ext js"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  }
 }

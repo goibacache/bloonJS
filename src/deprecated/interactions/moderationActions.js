@@ -185,8 +185,8 @@ const command = {
             // Get log of actions of a user
             let     currentActionIndex      = 0;
             const   moderationProfile       = await storedProcedures.moderationAction_Profile(target.id);
-            const   moderationProfileEmbeds = await loadModerationProfileEmbeds(moderationProfile);
-            let     moderationHistoryEmbed  = getModerationProfileEmbed(0, moderationProfileEmbeds, previousButton, nextButton);
+            const   moderationProfileEmbeds = await bloonUtils.loadModerationProfileEmbeds(moderationProfile);
+            let     moderationHistoryEmbed  = bloonUtils.getModerationProfileEmbed(0, moderationProfileEmbeds, previousButton, nextButton);
 
             // Initial response:
             await interaction.editReply({
@@ -218,7 +218,7 @@ const command = {
                         currentActionIndex++;
                     }
     
-                    let moderationHistoryEmbed = getModerationProfileEmbed(currentActionIndex, moderationProfileEmbeds, previousButton, nextButton);
+                    let moderationHistoryEmbed = bloonUtils.getModerationProfileEmbed(currentActionIndex, moderationProfileEmbeds, previousButton, nextButton);
     
                     m.update({ embeds: [moderationHistoryEmbed], files: [], components: [acceptDenyButtons] });
                 }

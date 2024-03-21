@@ -1,5 +1,4 @@
-const { SlashCommandBuilder, AttachmentBuilder } = require('discord.js')
-const { EmbedBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 const { registerFont, createCanvas } = require('canvas');
@@ -253,7 +252,7 @@ module.exports = {
 
             // Reply
             const attachment = canvas.toBuffer('image/png', { compressionLevel: 3, filters: canvas.PNG_FILTER_NONE })
-	        await interaction.editReply({ files: [attachment] });
+            await interaction.editReply({ files: [attachment] });
 		}catch(error){
             const answer = { content: `There was an error in the /stats command, sorry.`};
             

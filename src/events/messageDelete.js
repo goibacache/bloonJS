@@ -1,4 +1,4 @@
-const { Events, AuditLogEvent, Message } = require('discord.js');
+const { Events, AuditLogEvent } = require('discord.js');
 const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 
@@ -47,6 +47,8 @@ const evnt = {
 
 			const channel = message.guild.channels.cache.get(config.bloonServerLogs);
 			const deletedMessageTextLength = `${msg}${attachments}`.length;
+
+			const textDecorator = '```';
 
 			const maxSize = 1500;
 			// Check for total content length. If its length is over ~1700 split message into various ones.
