@@ -102,7 +102,7 @@ module.exports = {
 
             // triggers when the times runs out, removes buttons
             collector.on('end', () => {
-                interaction.editReply({ components: [] });
+                interaction.editReply({ content: '', components: [] });
             });
                         
             // triggers when the buttons are pressed

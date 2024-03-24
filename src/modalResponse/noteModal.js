@@ -35,6 +35,7 @@ module.exports = {
             let messageDeleted = false;
             let sentInEvidence = false;
             let savedInDatabase = false;
+            let fullMessage = '';
 
             /**
              * Is the action being done on a message or on an user?
@@ -65,26 +66,36 @@ module.exports = {
                 return;
             }
 
-            // Save it on the database
-            savedInDatabase = await storedProcedures.moderationAction_Insert(action, selectedUserId, noteText, interaction.member.id)
-            .then(() => true)
-            .catch(() => false); 
-
-            // Write the moderation action in the chat to log it in the database
-            sentInEvidence = await moderationActionChannel.send({ embeds: [actionEmbed]})
-            .then(() => true)
-            .catch(() => false);
-
             if (isMessageAction){
                 /**
                  * The message
                  * @type {Message}
                  */
                 const message = await interaction.client.channels.cache.get(channelId).messages.fetch(messageId);
+                fullMessage = bloonUtils.getTextAndAttachmentsFromMessage(message);
                 messageDeleted = await message.delete()
                 .then(() => true)
-                .catch(() => false);
+                .catch((error) => {
+                    console.log(`Error while deleting message: ${error}`);
+                    return false;
+                });
             }
+
+            // Save it on the database
+            savedInDatabase = await storedProcedures.moderationAction_Insert(action, selectedUserId, noteText, interaction.member.id, fullMessage)
+                .then(() => true)
+                .catch((error) => {
+                    console.log(`Error while saving in database: ${error}`);
+                    return false;
+                });
+
+            // Write the moderation action in the chat to log it in the database
+            sentInEvidence = await moderationActionChannel.send({ embeds: [actionEmbed]})
+                .then(() => true)
+                .catch((error) => {
+                    console.log(`Error while sending to the evidence channel: ${error}`);
+                    return false;
+                });
 
             const line1 = isMessageAction ? messageDeleted ? `\n✅ Message deleted` : `\n❌ Message couldn't be deleted` : '';
             const line2 = sentInEvidence ? `\n✅ Evidence sent` : `\n❌ Couldn't send the evidence`;

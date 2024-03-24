@@ -257,7 +257,7 @@ const getInputText = (interaction) => {
     let inputText = "";
 
     if (interaction.targetMessage.content.length > 0){
-        inputText = `Posted the following message:\n\`\`\`${bloonUtils.truncateOrComplete(bloonUtils.deleteCodeBlocksFromText(interaction.targetMessage.content), 700, false)}\`\`\``;
+        inputText = `Posted the following message:\n\`\`\`${bloonUtils.hardTruncate(bloonUtils.deleteCodeBlocksFromText(interaction.targetMessage.content), 700)}\`\`\``;
     }
 
     // Attachments:

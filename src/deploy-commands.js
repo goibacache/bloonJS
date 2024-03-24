@@ -32,7 +32,7 @@ for (const file of commandFiles) {
 	const folderRoute = `./${commandsPath}/${file}`;
 	console.log(`Loading context menu command ${file}`);
 	const command = require(folderRoute);
-	console.log(`Loading context menu command ${file}!`);
+	console.log(`Loaded context menu command ${file}!`);
 	// Set a new item in the Collection with the key as the command name and the value as the exported module
 	commands.push(command.data.toJSON());
 }

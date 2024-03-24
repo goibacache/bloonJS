@@ -281,16 +281,23 @@ const createRulesAndInfoEmbed = () => {
 
     // Creates the embed parts
     const description = 
-        `**1**. Be respectful, no racism or derogatory attitude\n` +
-        `**2**. No NSFW/shocking/pornographic and political nature posts\n` +
-        `**3**. No trolling.\n` +
-        `**4**. No spamming or text abusing.\n` +
-        `**5**. Do not over message/mention staff.\n` +
-        `**6**. No alternate accounts to dodge moderation action.\n` +
-        `**7**. Post in the correct channels.\n` +
-        `**8**. Chat in English only.\n` +
-        `**9**. No advertising non-Intruder content.\n` +
-        `**10**. Respect the staff and follow instructions. Mods are doing their best to make a friendly environment.`;
+        `**Server Rules**\n` +
+        `⚠️ **Minor offenses (Warnings/Timeouts/Kicks)**:\n` +
+        `1. Being disrespectful/having a derogatory attitude.\n` +
+        `2. Trolling, agitating or encouraging others to break rules.\n` +
+        `3. Spamming or text abusing.\n` +
+        `4. Over messaging/mentioning staff.\n` +
+        `5. Posting in the incorrect channels.\n` +
+        `6. Chatting in languages other than English.\n` +
+        `7. Advertising non-Intruder content.\n` +
+        `8. Disrespecting the staff and not following instructions. Mods are doing their best to make a friendly environment, spamming memes or trolling is not an acceptable form of rebuttal to any mod actions.\n` +
+        `9. Discussing moderation actions in public channels. Whenever there's one a public forum post will be assigned to the user under the help channel, use that channel to discuss it.\n\n` +
+        `🧨 **Serious Offenses (Bans)**:\n` +
+        `1. Posting or having a profile picture that includes NSFW/shocking/pornographic/graphic content or that has a political nature.\n` +
+        `2. Using alternate accounts to dodge moderation actions.\n` +
+        `3. Racism, other bigotry, or attacks on identity of any kind.\n` +
+        `4. Bots or admin impersonations.\n\n` +
+        `**Nevertheless, moderation actions are discretionary and based on severity.**`;
 
     const roles = 
         `<@&${config.role_Developer}> : The developers of Intruder!\n` +
@@ -336,6 +343,11 @@ const createModerationActionEmbed = (moderationAction, actedUponMember, caseId, 
         { name: `User ${moderationAction.conjugation}:`,  value: `**${actedUponMember.displayName ?? actedUponMember.username}**\n${actedUponMember.id}`, inline: true },
         { name: 'Handled by:',  value: `**${handledBy.displayName}**\n${handledBy.id}`, inline: true },
         { name: `${moderationAction.name} reason:`,  value: reason, inline: false },
+    );
+
+    // Add attachments one by one.
+    
+    banEmbed.addFields(
         { name: 'Direct message:',  value: DMsent ? `Delivered.` : `Couldn't be delivered.`, inline: true },
     );
 
@@ -407,9 +419,6 @@ const loadModerationProfileEmbeds = async (moderationProfile) => {
             const emoji = moderationActions[current.Type].emoji;
    
             roomEmbed.addFields({ name: `Moderation action Nº ${index+1} of ${moderationProfile.length}`, value: `${emoji} ${current.Type}` }); // Header
-
-            //roomEmbed.addFields({ name: `Moderation action Nº ${index+1}`, value: `${emoji} ${current.Type}` });
-            //roomEmbed.addFields({ name: `Reason`, value: `${deleteCodeBlocksFromText(current.reason.replace(/(\r\n\r\n|\n\n|\r\r)/gm, ""))}` });
             roomEmbed.addFields({ name: `Reason`, value: `${current.reason.replace(/(\r\n\r\n|\n\n|\r\r)/gm, "")}` });
             roomEmbed.addFields({ name: `📅 Date`, value: `${dateText}` });
 

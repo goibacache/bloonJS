@@ -38,6 +38,7 @@ module.exports = {
             let sentInEvidence = false;
             let threadCreated = false;
             let savedInDatabase = false;
+            let fullMessage = '';
 
             console.log(`Modal submit ${customId}.\nGuild: ${guildId}. Channel: ${channelId}. Message: ${messageId}. UserId: ${selectedUserId}\nBy user ${interaction.user.tag}`);
 
@@ -81,13 +82,19 @@ module.exports = {
 
             // Action
             userTimedOut = await userToBeActedUpon.timeout(parseInt(timeoutText) * 60 * 1000)
-            .then(() => true)
-            .catch(() => false);
+                .then(() => true)
+                .catch((error) => {
+                    console.log(`Error while timing out user: ${error}`);
+                    return false;
+                });
 
             // DM
             DMsent = await userToBeActedUpon.send({content: `You have been timed out from Superboss' Discord server for the following reason: ${noteText}\nPlease do not reply this message as we're not able to see it and remember that continuously breaking the server rules will result in either a kick or a ban`})
-            .then(() => true)
-            .catch(() => false);
+                .then(() => true)
+                .catch((error) => {
+                    console.log(`Error while sending DM: ${error}`);
+                    return false;
+                });
 
             // Thread
             const thread = await bloonUtils.createOrFindModerationActionHelpThread(interaction.client, `Moderation for ${selectedUserId}`);
@@ -103,31 +110,41 @@ module.exports = {
                 await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n${noteText}`, embeds: [] });
             }
 
-            // Save it on the database
-            savedInDatabase = await storedProcedures.moderationAction_Insert(action, selectedUserId, noteText, interaction.member.id)
-            .then(() => true)
-            .catch(() => false); 
-
-            // Write the moderation action in the chat to log it
-            const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, noteText, interaction.member, null, DMsent);
-
-            sentInEvidence = moderationActionChannel.send({ embeds: [actionEmbed]})
-            .then(() => false)
-            .catch(() => false);
-
             if (isMessageAction){
                 /**
                  * The message
                  * @type {Message}
                  */
                 const message = await interaction.client.channels.cache.get(channelId).messages.fetch(messageId);
+                fullMessage = bloonUtils.getTextAndAttachmentsFromMessage(message);
                 messageDeleted = await message.delete()
-                .then(() => true)
-                .catch(() => false);
+                    .then(() => true)
+                    .catch((error) => {
+                        console.log(`Error while deleting message: ${error}`);
+                        return false;
+                    });
             }
 
+            // Save it on the database
+            savedInDatabase = await storedProcedures.moderationAction_Insert(action, selectedUserId, noteText, interaction.member.id, fullMessage)
+                .then(() => true)
+                .catch((error) => {
+                    console.log(`Error while saving in database: ${error}`);
+                    return false;
+                });
+
+            // Write the moderation action in the chat to log it
+            const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, noteText, interaction.member, null, DMsent);
+
+            sentInEvidence = moderationActionChannel.send({ embeds: [actionEmbed]})
+                .then(() => false)
+                .catch((error) => {
+                    console.log(`Error while sending to the evidence channel: ${error}`);
+                    return false;
+                });
+
             const line1 = userTimedOut ? `✅ User was timed out` : `❌ Couldn't time out user`;
-            const line2 = DMsent ? `✅ DM was delivered` : `❌ DM couldn't be delivered`;
+            const line2 = DMsent ? `\n✅ DM was delivered` : `\n❌ DM couldn't be delivered`;
             const line3 = isMessageAction ? messageDeleted ? `\n✅ Message deleted` : `\n❌ Message couldn't be deleted` : '';
             const line4 = sentInEvidence ? `\n✅ Evidence sent` : `\n❌ Couldn't send the evidence`;
             const line5 = threadCreated ? `\n✅ Thread created` : ` \n❌ Thread couldn't created`;

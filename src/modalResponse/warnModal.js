@@ -37,6 +37,7 @@ module.exports = {
             let sentInEvidence = false;
             let threadCreated = false;
             let savedInDatabase = false;
+            let fullMessage = '';
 
             const isMessageAction = messageId != 0;
 
@@ -64,10 +65,9 @@ module.exports = {
             }
 
             DMsent = await userToBeActedUpon.send({content: warnText})
-                .then(async () => {
-                    return true;
-                })
-                .catch(async () => {
+                .then(() => true)
+                .catch((error) => {
+                    console.log(`Error while sending DM: ${error}`);
                     return false;
                 });
 
@@ -92,24 +92,34 @@ module.exports = {
                  * @type {Message}
                  */
                 const message = await interaction.client.channels.cache.get(channelId).messages.fetch(messageId);
+                fullMessage = bloonUtils.getTextAndAttachmentsFromMessage(message);
                 if (message){
                     messageDeleted = await message.delete()
                     .then(() => true)
-                    .catch(() => false);
+                    .catch((error) => {
+                        console.log(`Error while deleting message: ${error}`);
+                        return false;
+                    });
                 }
             }
 
             // Save it on the database
-            savedInDatabase = await storedProcedures.moderationAction_Insert(action, selectedUserId, warnText, interaction.member.id)
-            .then(() => true)
-            .catch(() => false); 
+            savedInDatabase = await storedProcedures.moderationAction_Insert(action, selectedUserId, warnText, interaction.member.id, fullMessage)
+                .then(() => true)
+                .catch((error) => {
+                    console.log(`Error while saving in database: ${error}`);
+                    return false;
+                });
 
             // Write the moderation action in the chat
             const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, warnText, interaction.member, null, DMsent);
 
             sentInEvidence = moderationActionChannel.send({ embeds: [actionEmbed]})
-            .then(() => true)
-            .catch(() => false);
+                .then(() => true)
+                .catch((error) => {
+                    console.log(`Error while sending to the evidence channel: ${error}`);
+                    return false;
+                });
 
             const line1 = DMsent ? `✅ DM was delivered` : `❌ DM couldn't be delivered`;
             const line2 = isMessageAction ? messageDeleted ? `\n✅ Message deleted` : `\n❌ Message couldn't be deleted` : '';

@@ -76,22 +76,33 @@ module.exports = {
             // Removes the ban
             userUnbanned = await interaction.guild.bans.remove(selectedUserId, unbanText)
                 .then(() => true)
-                .catch(() => false);
+                .catch((error) => {
+                    console.log(`Error while unbanning user: ${error}`);
+                    return false;
+                });
 
             DMsent = await userToBeActedUpon.send({content: unbanText})
                 .then(() => true)
-                .catch(() => false);
+                .catch((error) => {
+                    console.log(`Error while sending DM: ${error}`);
+                    return false;
+                });
             
-
             // Save it on the database
-            await storedProcedures.moderationAction_Insert(action, selectedUserId, unbanText, interaction.member.id).catch(() => {
-                throw "The user was unbanned successfully but I couldn't insert the moderation action into the database.";
-            }); 
+            savedInDatabase = await storedProcedures.moderationAction_Insert(action, selectedUserId, unbanText, interaction.member.id)
+                .then(() => true)
+                .catch((error) => {
+                    console.log(`Error while saving in database: ${error}`);
+                    return false;
+                });
 
             // Write the moderation action in the chat to log it in the database
             sentInEvidence = moderationActionChannel.send({ embeds: [actionEmbed]})
                 .then(() => true)
-                .catch(() => false);
+                .catch((error) => {
+                    console.log(`Error while sending to the evidence channel: ${error}`);
+                    return false;
+                });
 
             
             // Thread
@@ -109,7 +120,7 @@ module.exports = {
             }
 
             const line1 = userUnbanned ? `✅ User was unbanned` : `❌ Couldn't unban the user`;
-            const line2 = DMsent ? `✅ DM was delivered` : `❌ DM couldn't be delivered`;
+            const line2 = DMsent ? `\n✅ DM was delivered` : `\n❌ DM couldn't be delivered`;
             const line3 = sentInEvidence ? `\n✅ Evidence sent` : `\n❌ Couldn't send the evidence`;
             const line4 = threadCreated ? `\n✅ Thread created` : ` \n❌ Thread couldn't created`;
             const line5 = savedInDatabase ? `\n✅ Moderation action saved in the database` : ` \n❌ Moderation action couldn't be saved in the database`;

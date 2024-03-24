@@ -38,6 +38,7 @@ module.exports = {
             let sentInEvidence = false;
             let threadCreated = false;
             let savedInDatabase = false;
+            let fullMessage = '';
 
             console.log(`Modal submit ${customId}.\nGuild: ${guildId}. Channel: ${channelId}. Message: ${messageId}. UserId: ${selectedUserId}\nBy user ${interaction.user.tag}`);
 
@@ -65,24 +66,18 @@ module.exports = {
             }
 
             DMsent = await userToBeActedUpon.send({content: kickText})
-            .then(() => true)
-            .catch(() => false);
+                .then(() => true)
+                .catch((error) => {
+                    console.log(`Error while sending DM: ${error}`);
+                    return false;
+                });
 
             userKicked = await interaction.guild.members.kick(userToBeActedUpon, kickText)
                 .then(() => true)
-                .catch(() => false);
-
-            // Save it on the database
-            savedInDatabase = await storedProcedures.moderationAction_Insert(action, selectedUserId, kickText, interaction.member.id)
-            .then(() => true)
-            .catch(() => false); 
-
-            const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, kickText, interaction.member, null, DMsent);
-
-            // Write the moderation action in the chat to log it in the database
-            sentInEvidence = moderationActionChannel.send({ embeds: [actionEmbed]})
-            .then(() => true)
-            .catch(() => false);
+                .catch((error) => {
+                    console.log(`Error while kicking user: ${error}`);
+                    return false;
+                });
 
             if (isMessageAction){
                 /**
@@ -90,10 +85,32 @@ module.exports = {
                  * @type {Message}
                  */
                 const message = await interaction.client.channels.cache.get(channelId).messages.fetch(messageId);
+                fullMessage = bloonUtils.getTextAndAttachmentsFromMessage(message);
                 messageDeleted = await message.delete()
                     .then(() => true)
-                    .catch(() => false);
+                    .catch((error) => {
+                        console.log(`Error while deleting message: ${error}`);
+                        return false;
+                    });
             }
+
+            // Save it on the database
+            savedInDatabase = await storedProcedures.moderationAction_Insert(action, selectedUserId, kickText, interaction.member.id, fullMessage)
+                .then(() => true)
+                .catch((error) => {
+                    console.log(`Error while saving in database: ${error}`);
+                    return false;
+                });
+
+            const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, kickText, interaction.member, null, DMsent);
+
+            // Write the moderation action in the chat to log it in the database
+            sentInEvidence = moderationActionChannel.send({ embeds: [actionEmbed]})
+                .then(() => true)
+                .catch((error) => {
+                    console.log(`Error while sending to the evidence channel: ${error}`);
+                    return false;
+                });
 
             // Thread
             const thread = await bloonUtils.createOrFindModerationActionHelpThread(interaction.client, `Moderation for ${selectedUserId}`);
@@ -110,7 +127,7 @@ module.exports = {
             }
 
             const line1 = userKicked ? `✅ User was kicked` : `❌ Couldn't kick user`;
-            const line2 = DMsent ? `✅ DM was delivered` : `❌ DM couldn't be delivered`;
+            const line2 = DMsent ? `\n✅ DM was delivered` : `\n❌ DM couldn't be delivered`;
             const line3 = isMessageAction ? messageDeleted ? `\n✅ Message deleted` : `\n❌ Message couldn't be deleted` : '';
             const line4 = sentInEvidence ? `\n✅ Evidence sent` : `\n❌ Couldn't send the evidence`;
             const line5 = threadCreated ? `\n✅ Thread created` : ` \n❌ Thread couldn't created`;

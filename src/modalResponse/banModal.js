@@ -38,6 +38,7 @@ module.exports = {
             let sentInEvidence = false;
             let threadCreated = false;
             let savedInDatabase = false;
+            let fullMessage = '';
 
             console.log(`Modal submit ${customId}.\nGuild: ${guildId}. Channel: ${channelId}. Message: ${messageId}. UserId: ${selectedUserId}\nBy user ${interaction.user.tag}`);
 
@@ -86,12 +87,18 @@ module.exports = {
             // Message the user
             DMsent = await userToBeActedUpon.send({content: banText})
                 .then(() => true)
-                .catch(() => false);
+                .catch((error) => {
+                    console.log(`Error while sending DM: ${error}`);
+                    return false;
+                });
 
             // Ban the user
             userBanned = await interaction.guild.bans.create(selectedUserId, { banText, deleteMessageSeconds: parseInt(hoursToDelete) * 3600 })
                 .then(() => true)
-                .catch(() => false);
+                .catch((error) => {
+                    console.log(`Error while banning user: ${error}`);
+                    return false;
+                });
 
             //if for some reason the message persists, delete it
             if (isMessageAction){
@@ -100,24 +107,34 @@ module.exports = {
                  * @type {Message}
                  */
                 const message = await interaction.client.channels.cache.get(channelId).messages.fetch(messageId);
+                fullMessage = bloonUtils.getTextAndAttachmentsFromMessage(message);
                 if (message){
                     messageDeleted = await message.delete()
                         .then(() => true)
-                        .catch(() => false);
+                        .catch((error) => {
+                            console.log(`Error while deleting message: ${error}`);
+                            return false;
+                        });
                 }
             }
 
             // Save it on the database
-            savedInDatabase = await storedProcedures.moderationAction_Insert(action, selectedUserId, banText, interaction.member.id)
+            savedInDatabase = await storedProcedures.moderationAction_Insert(action, selectedUserId, banText, interaction.member.id, fullMessage)
                 .then(() => true)
-                .catch(() => false);
+                .catch((error) => {
+                    console.log(`Error while saving in database: ${error}`);
+                    return false;
+                });
 
             const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, banText, interaction.member, null, DMsent);
 
             // Write the moderation action in the chat to log it in the database
             sentInEvidence = await moderationActionChannel.send({ embeds: [actionEmbed]})
                 .then(() => true)
-                .catch(() => false);
+                .catch((error) => {
+                    console.log(`Error while sending to the evidence channel: ${error}`);
+                    return false;
+                });
 
             // Thread
             const thread = await bloonUtils.createOrFindModerationActionHelpThread(interaction.client, `Moderation for ${selectedUserId}`);
@@ -134,7 +151,7 @@ module.exports = {
             }
 
             const line1 = userBanned ? `✅ User was banned` : `❌ Couldn't ban the user`;
-            const line2 = DMsent ? `✅ DM was delivered` : `❌ DM couldn't be delivered`;
+            const line2 = DMsent ? `\n✅ DM was delivered` : `\n❌ DM couldn't be delivered`;
             const line3 = isMessageAction ? messageDeleted ? `\n✅ Message deleted` : `\n❌ Message couldn't be deleted` : '';
             const line4 = sentInEvidence ? `\n✅ Evidence sent` : `\n❌ Couldn't send the evidence`;
             const line5 = threadCreated ? `\n✅ Thread created` : ` \n❌ Thread couldn't created`;
