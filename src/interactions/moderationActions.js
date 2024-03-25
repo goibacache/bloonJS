@@ -1,8 +1,8 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ButtonStyle, ButtonBuilder, ActionRowBuilder, ComponentType } = require('discord.js')
 const { EmbedBuilder } = require('@discordjs/builders');
-const bloonUtils = require('../../utils/utils.js');
+const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
-const storedProcedures = require('../../utils/storedProcedures.js');
+const storedProcedures = require('../utils/storedProcedures.js');
 
 /**
  * Adds the basic command action: Target, reason & evidence.
@@ -71,7 +71,6 @@ const command = {
         .setDescription(`Does an admin action and creates a log in the #moderation-actions channel.`)
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers | PermissionFlagsBits.AttachFiles)
         .setDMPermission(false)
-        /*
         .addSubcommand(subcommand => {
             subcommand
                 .setName('note')
@@ -94,14 +93,14 @@ const command = {
             return  addBasicInteractionOptions(subcommand)
                     .addBooleanOption(option =>
                         option.setName('directmessage')
-                        .setRequired(false)
+                        .setRequired(true)
                         .setDescription('[Default: False] Whether or not a DM will be sent towards the user')
                     )
                     .addNumberOption(option => 
                         option
                             .setName('timeouttime')
                             .setDescription('[Default: 10] Time in minutes to timeout a person')
-                            .setRequired(false)
+                            .setRequired(true)
                     );
         })
         .addSubcommand(subcommand => {
@@ -112,7 +111,7 @@ const command = {
             return  addBasicInteractionOptions(subcommand)
                     .addBooleanOption(option =>
                         option.setName('directmessage')
-                        .setRequired(false)
+                        .setRequired(true)
                         .setDescription('[Default: False] Whether or not a DM will be sent towards the user')
                     )
         })
@@ -123,17 +122,17 @@ const command = {
             return  addBasicInteractionOptions(subcommand)
                     .addBooleanOption(option =>
                         option.setName('directmessage')
-                        .setRequired(false)
+                        .setRequired(true)
                         .setDescription('[Default: False] Whether or not a DM will be sent towards the user')
                     )
                     .addNumberOption(option => 
                         option.setName('hoursofmessagestodelete')
-                        .setRequired(false)
+                        .setRequired(true)
                         .setDescription('[Default: 12] Number of hours of messages to delete, must be between 0 and 168 (7 days), inclusive')
                         .setMinValue(0)
                         .setMaxValue(168)
                     )
-        })*/
+        })
         .addSubcommand(subcommand => {
             subcommand
                 .setName('unban')

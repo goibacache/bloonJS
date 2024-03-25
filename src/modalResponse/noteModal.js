@@ -38,7 +38,7 @@ module.exports = {
             let fullMessage = '';
 
             /**
-             * Is the action being done on a message or on an user?
+             * Is the action being done on a message or on a user?
              */
             const isMessageAction = messageId != 0;
 
@@ -90,7 +90,7 @@ module.exports = {
                 });
 
             // Write the moderation action in the chat to log it in the database
-            sentInEvidence = await moderationActionChannel.send({ embeds: [actionEmbed]})
+            sentInEvidence = await moderationActionChannel.send({ content: `Note for <@!${selectedUserId}>`, embeds: [actionEmbed]})
                 .then(() => true)
                 .catch((error) => {
                     console.log(`Error while sending to the evidence channel: ${error}`);

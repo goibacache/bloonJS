@@ -57,7 +57,7 @@ const createTimeoutModal = (interaction, defaultTime = '10') => {
     const { guild, channel, messageId, selectedUserId } = getGuildChannelMessageAndTarget(interaction);
     const isMessageAction = messageId != 0;
 
-    const inputText = getInputText(interaction);
+    const inputText = `You have been timed out for the following:\n\n${getInputText(interaction)}\nRemember that continuously breaking the server rules will result in either a kick or a ban.`
 
     // Create modal:
     const modal = new ModalBuilder()
@@ -220,7 +220,7 @@ const createUnbanModal = (interaction) => {
     const { guild, channel, messageId, selectedUserId } = getGuildChannelMessageAndTarget(interaction);
     //const isMessageAction = messageId != 0;
 
-    const inputText = `You have been unbanned from Superboss's discord server.`;
+    const inputText = `You have been unbanned from Superboss's discord server!`;
 
     // Create modal:
     const modal = new ModalBuilder()

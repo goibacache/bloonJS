@@ -340,8 +340,8 @@ const createModerationActionEmbed = (moderationAction, actedUponMember, caseId, 
     }
 
     banEmbed.addFields(
-        { name: `User ${moderationAction.conjugation}:`,  value: `**${actedUponMember.displayName ?? actedUponMember.username}**\n${actedUponMember.id}`, inline: true },
-        { name: 'Handled by:',  value: `**${handledBy.displayName}**\n${handledBy.id}`, inline: true },
+        { name: `User ${moderationAction.conjugation}:`,  value: `<@!${actedUponMember.id}>\n${actedUponMember.id}`, inline: true },
+        { name: 'Handled by:',  value: `<@!${handledBy.id}>\n${handledBy.id}`, inline: true },
         { name: `${moderationAction.name} reason:`,  value: reason, inline: false },
     );
 

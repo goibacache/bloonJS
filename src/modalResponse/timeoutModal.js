@@ -58,7 +58,7 @@ module.exports = {
             }
 
             /**
-             * Is the action being done on a message or on an user?
+             * Is the action being done on a message or on a user?
              */
             const isMessageAction = messageId != 0;
 
@@ -136,7 +136,7 @@ module.exports = {
             // Write the moderation action in the chat to log it
             const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, noteText, interaction.member, null, DMsent);
 
-            sentInEvidence = moderationActionChannel.send({ embeds: [actionEmbed]})
+            sentInEvidence = moderationActionChannel.send({ content: `Timeout for <@!${selectedUserId}>`, embeds: [actionEmbed]})
                 .then(() => false)
                 .catch((error) => {
                     console.log(`Error while sending to the evidence channel: ${error}`);

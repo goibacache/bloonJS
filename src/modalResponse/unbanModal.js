@@ -97,7 +97,7 @@ module.exports = {
                 });
 
             // Write the moderation action in the chat to log it in the database
-            sentInEvidence = moderationActionChannel.send({ embeds: [actionEmbed]})
+            sentInEvidence = moderationActionChannel.send({ content: `Unban for <@!${selectedUserId}>`, embeds: [actionEmbed]})
                 .then(() => true)
                 .catch((error) => {
                     console.log(`Error while sending to the evidence channel: ${error}`);
