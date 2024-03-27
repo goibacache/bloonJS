@@ -19,7 +19,7 @@ const addBasicInteractionOptions = (command) => {
     .addStringOption(option =>
         option
             .setName('reason')
-            .setDescription('Reason for action')
+            .setDescription('Reason for action, text for DM and reason for action in the thread')
             .setRequired(true)
             .setMaxLength(1700)
             .setMinLength(1)
@@ -27,8 +27,8 @@ const addBasicInteractionOptions = (command) => {
     .addAttachmentOption(option => 
         option
             .setName('evidence')
-            .setDescription('[Default: empty] Optional evidence for the action')
-            .setRequired(false)
+            .setDescription('[Required] Evidence for the action')
+            .setRequired(true)
     )
 }
 
@@ -351,9 +351,21 @@ const command = {
                             break;
                     }
 
+                    // Thread
+                    const thread = await bloonUtils.createOrFindModerationActionHelpThread(interaction.client, `Moderation for ${target.id}`);
+
+                    if (thread){
+                        // "Loading" message
+                        const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}>\n...` });
+                        // Edit the message and mention all of the roles that should be included.
+                        await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n<@&${config.role_Agent}> & <@&${config.role_Aug}> & <@&${config.role_Mod}>...` })
+                        // Finally send the message we really want to send...
+                        await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n${reason}`, embeds: [] });
+                    }
+
                     const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, reason, interaction.member, attachment?.url, DMSent);
                     // Write the moderation action in the chat to log it in the DB
-                    channel.send({ embeds: [actionEmbed]});
+                    channel.send({ content: `${action.name} for <@!${target.id}>`, embeds: [actionEmbed]});
                     await storedProcedures.moderationAction_Insert(action, target.id, reason, interaction.member.id); // Also save it on the DB :D
                 }
             });

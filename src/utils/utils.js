@@ -293,10 +293,10 @@ const createRulesAndInfoEmbed = () => {
         `8. Disrespecting the staff and not following instructions. Mods are doing their best to make a friendly environment, spamming memes or trolling is not an acceptable form of rebuttal to any mod actions.\n` +
         `9. Discussing moderation actions in public channels. Whenever there's one a public forum post will be assigned to the user under the help channel, use that channel to discuss it.\n\n` +
         `🧨 **Serious Offenses (Bans)**:\n` +
-        `1. Posting or having a profile picture that includes NSFW/shocking/pornographic/graphic content or that has a political nature.\n` +
-        `2. Using alternate accounts to dodge moderation actions.\n` +
-        `3. Racism, other bigotry, or attacks on identity of any kind.\n` +
-        `4. Bots or admin impersonations.\n\n` +
+        `10. Posting or having a profile that includes NSFW/shocking/pornographic/graphic content or that has a political nature.\n` +
+        `11. Using alternate accounts to dodge moderation actions.\n` +
+        `12. Racism, other bigotry, or attacks on identity of any kind.\n` +
+        `13. Impersonating members of the community.\n\n` +
         `**Nevertheless, moderation actions are discretionary and based on severity.**`;
 
     const roles = 
