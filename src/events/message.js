@@ -61,14 +61,14 @@ const evnt = {
                     if (isMod || isHiddenManager || isAug) {
                         console.log(`SPAM FILTER: Message was sent by trusted user.\nMessage: ${message.content}`)
                     }else{
-                        // Delete, send message to mod channel and timeout user for 1 minute
+                        // Delete, send message to mod channel and timeout user for 10 minutes
                         console.log("SPAM FILTER: Message from random (not that one) user, deleting.");
                         console.log(`SPAM FILTER: Deleted message: ${message.content}`);
 
                         const messageResume = bloonUtils.getTextAndAttachmentsFromMessage(message);
 
                         await message.delete();
-                        await userWhoMentionedEveryone.timeout(1 * 60 * 1000); // 1 minute.
+                        await userWhoMentionedEveryone.timeout(10 * 60 * 1000); // 10 minutes.
                         
 
                         /**
