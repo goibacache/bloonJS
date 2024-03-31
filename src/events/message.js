@@ -14,7 +14,7 @@ const   spamMessages = [
     `Want to support Bloon's development?\nWant to also have your custom answer when people ask bloon about you?\nYou can do both by clicking [here](https://ko-fi.com/bloon/commissions)`,
     `You can join the "looking to play" role using the \`/ltp\` command. That way you'll get alerted when people create a server and want you to join!`,
     `You can check all of the available commands using the \`/help\` command.`,
-    `The developer of this bot really likes rum. You can help him buy one if you also really enjoy rum, [here](<https://ko-fi.com/bloon>)`
+    `The developer of this bot really likes pizza. You can help him buy one if you also really enjoy pizza, [here](<https://ko-fi.com/bloon>).`
 ];
 const regWhoIs = new RegExp(/who('s|.is|.are).(.*)\?/g);
 const regAttch = RegExp(/\[att:.*\]/g);
