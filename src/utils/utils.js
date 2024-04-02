@@ -308,12 +308,13 @@ const createRulesAndInfoEmbed = () => {
 
     const importantLinks = 
         `${config.youtubeEmoji} | [**Youtube**](https://www.youtube.com/superbossgames)\n` +
+        `${config.tiktokEmoji} | [**TikTok**](https://www.tiktok.com/@superbossgames)\n` +
         `${config.twitterEmoji} | [**Twitter**](https://twitter.com/SuperbossGames/)\n` +
         `${config.helpraceEmoji} | [**Helprace**](https://superbossgames.helprace.com/)\n` +
         `${config.redditEmoji} | [**Reddit**](https://www.reddit.com/r/Intruder)\n` +
         `${config.twitchEmoji} | [**Twitch**](https://www.twitch.tv/superbossgames)\n` +
-        `${config.discordEmoji} | [**Server Invite**](https://discord.gg/superbossgames)\n` +
-        `${config.wikiEmoji} | [**Wiki**](https://wiki.superbossgames.com/)`;
+        `${config.wikiEmoji} | [**Wiki**](https://wiki.superbossgames.com/)\n` +
+        `${config.discordEmoji} | [**Server Invite**](https://discord.gg/superbossgames)`;
 
     const rulesAndInfoEmbed = new EmbedBuilder()
     .setColor(0x1799b1)

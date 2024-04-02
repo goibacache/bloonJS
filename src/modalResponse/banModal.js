@@ -161,6 +161,8 @@ module.exports = {
                 content: line1 + line2 + line3 + line4 + line5 + line6
             });
 
+            console.log(line1 + line2 + line3 + line4 + line5 + line6);
+
         } catch (error) {
             console.log(`⚠ Error in ${customId}: ${error}`);
             const answer = { content: `There was an error in ${customId}.\nError: ${error}`, components: [], embeds: [] };

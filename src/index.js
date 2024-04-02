@@ -10,7 +10,7 @@
 **************************************************************************/
 
 // Imports
-const { Client, Collection, Events, GatewayIntentBits, Partials, ChannelType, ThreadAutoArchiveDuration, MessageFlags } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, Partials } = require('discord.js');
 const fs 			= require('fs');
 const bloonUtils 	= require('./utils/utils.js');
 const config 		= bloonUtils.getConfig();

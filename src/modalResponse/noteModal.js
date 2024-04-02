@@ -104,6 +104,8 @@ module.exports = {
             await interaction.editReply({
                 content: line1 + line2 + line3
             });
+
+            console.log(line1 + line2 + line3);
             
         } catch (error) {
             console.log(`⚠ Error in ${customId}: ${error}`);

@@ -45,6 +45,7 @@ module.exports = {
 	twitchEmoji:					"<:your-twch-emoji:0000000000>",
 	discordEmoji:					"<:your-discord-emoji:0000000000>",
 	wikiEmoji:						"<:your-wiki-emoji:0000000000>",
+	tiktokEmoji:					"<:your-tiktok-emoji:0000000000>",
 
 	mysqlHost:						"your-sql-host",
 	mysqlDDBB:						"your-ddbb-name",
