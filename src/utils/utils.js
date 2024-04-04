@@ -291,7 +291,7 @@ const createRulesAndInfoEmbed = () => {
         `6. Chatting in languages other than English.\n` +
         `7. Advertising non-Intruder content.\n` +
         `8. Disrespecting the staff and not following instructions. Mods are doing their best to make a friendly environment, spamming memes or trolling is not an acceptable form of rebuttal to any mod actions.\n` +
-        `9. Discussing moderation actions in public channels. Whenever there's one a public forum post will be assigned to the user under the help channel, use that channel to discuss it.\n\n` +
+        `9. Discussing moderation actions in game-related channels. The public [community-moderation](https://discord.com/channels/103933666417217536/1225148786532290580) forum has been made for these discussions so you can go there for transparency and clarity.\n\n` +
         `🧨 **Serious Offenses (Bans)**:\n` +
         `10. Posting or having a profile that includes NSFW/shocking/pornographic/graphic content or that has a political nature.\n` +
         `11. Using alternate accounts to dodge moderation actions.\n` +
@@ -453,11 +453,11 @@ const resolveButtonState = (currentActionIndex, maxActionIndex, previousButton, 
 }
 
 /**
- * Creates a thread under Help
+ * Creates a thread in the moderation action forum
  * @param {Client} client 
- * @returns {ThreadChannel}
+ * @returns {GuildForum}
  */
-const createOrFindModerationActionHelpThread = async (client, name) => {
+const createOrFindModerationActionThread = async (client, name) => {
 
     try {
         const config = getConfig();
@@ -468,9 +468,9 @@ const createOrFindModerationActionHelpThread = async (client, name) => {
         const guild = await client.guilds.fetch(config.bloonGuildId);
         /**
          * The text channel object
-         * @type {TextChannel}
+         * @type {ForumChannel}
          */
-        const channel = await guild.channels.fetch(config.intruderHelpChannel);
+        const channel = await guild.channels.fetch(config.moderationActionForumChannel);
         /**
          * The thread text channel object
          * @type {ThreadChannel}
@@ -486,12 +486,10 @@ const createOrFindModerationActionHelpThread = async (client, name) => {
                 rateLimitPerUser: 15,
                 reason: 'Moderation action',
                 type: ChannelType.PublicThread,
-                startMessage: null
+                message: { 
+                    content: name
+                }
             });
-
-            // Delete creation message
-            const creationMessage = await channel.messages.fetch(thread.id);
-            await creationMessage.delete();
         }
 
         // Make the bot join
@@ -549,6 +547,6 @@ module.exports = {
     loadModerationProfileEmbeds,
     getModerationProfileEmbed,
     resolveButtonState,
-    createOrFindModerationActionHelpThread,
+    createOrFindModerationActionThread,
     getTextAndAttachmentsFromMessage,
 }

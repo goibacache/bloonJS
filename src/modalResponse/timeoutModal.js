@@ -97,15 +97,14 @@ module.exports = {
                 });
 
             // Thread
-            const thread = await bloonUtils.createOrFindModerationActionHelpThread(interaction.client, `Moderation for ${selectedUserId}`);
+            const thread = await bloonUtils.createOrFindModerationActionThread(interaction.client, `Moderation for User ID: ${selectedUserId}`);
 
             if (thread){
                 threadCreated = true;
-
                 // "Loading" message
                 const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}>\n...` });
                 // Edit the message and mention all of the roles that should be included.
-                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n<@&${config.role_Agent}> & <@&${config.role_Aug}> & <@&${config.role_Mod}>...` })
+                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\nSummoning: <@&${config.role_Aug}> and <@&${config.role_Mod}>...` })
                 // Finally send the message we really want to send...
                 await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n${noteText}`, embeds: [] });
             }
@@ -147,7 +146,7 @@ module.exports = {
             const line2 = DMsent ? `\n✅ DM was delivered` : `\n❌ DM couldn't be delivered`;
             const line3 = isMessageAction ? messageDeleted ? `\n✅ Message deleted` : `\n❌ Message couldn't be deleted` : '';
             const line4 = sentInEvidence ? `\n✅ Evidence sent` : `\n❌ Couldn't send the evidence`;
-            const line5 = threadCreated ? `\n✅ Thread created` : ` \n❌ Thread couldn't created`;
+            const line5 = threadCreated ? `\n✅ Evidence sent in Thread` : ` \n❌ Couldn't send evidence to Thread`;
             const line6 = savedInDatabase ? `\n✅ Moderation action saved in the database` : ` \n❌ Moderation action couldn't be saved in the database`;
 
             await interaction.editReply({

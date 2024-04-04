@@ -16,6 +16,7 @@ module.exports = {
 	bloonServerLogs:				"your-bloon-server-log",
 	modChatChannel:					"your-mod-chat-channel",
 	alertsChannel:					"your-alerts-channel",
+	moderationActionForumChannel:	"your-moderation-action-forum",
 
 	rulesMessageId:					"your-rules-message-id",
 	newsSubscribeMessageId:			"your-subscribe-to-news-message-id",

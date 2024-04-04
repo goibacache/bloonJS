@@ -36,6 +36,7 @@ module.exports = {
             let sentInEvidence = false;
             let savedInDatabase = false;
             let fullMessage = '';
+            let threadCreated = false;
 
             /**
              * Is the action being done on a message or on a user?
@@ -97,15 +98,29 @@ module.exports = {
                     return false;
                 });
 
+            // Thread
+            const thread = await bloonUtils.createOrFindModerationActionThread(interaction.client, `Moderation for User ID: ${selectedUserId}`);
+
+            if (thread){
+                threadCreated = true;
+                // "Loading" message
+                const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}>\n...` });
+                // Edit the message and mention all of the roles that should be included.
+                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\nSummoning: <@&${config.role_Aug}> and <@&${config.role_Mod}>...` })
+                // Finally send the message we really want to send...
+                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n${noteText}`, embeds: [] });
+            }
+
             const line1 = isMessageAction ? messageDeleted ? `\n✅ Message deleted` : `\n❌ Message couldn't be deleted` : '';
             const line2 = sentInEvidence ? `\n✅ Evidence sent` : `\n❌ Couldn't send the evidence`;
-            const line3 = savedInDatabase ? `\n✅ Saved in database` : ` \n❌ Couldn't be saved in database`;
+            const line3 = threadCreated ? `\n✅ Evidence sent in Thread` : ` \n❌ Couldn't send evidence to Thread`;
+            const line4 = savedInDatabase ? `\n✅ Saved in database` : ` \n❌ Couldn't be saved in database`;
 
             await interaction.editReply({
-                content: line1 + line2 + line3
+                content: line1 + line2 + line3 + line4
             });
 
-            console.log(line1 + line2 + line3);
+            console.log(line1 + line2 + line3 + line4);
             
         } catch (error) {
             console.log(`⚠ Error in ${customId}: ${error}`);
