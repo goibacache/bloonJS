@@ -17,13 +17,13 @@ const evnt = {
 				type: AuditLogEvent.MemberKick,
 				limit: 1
 			});
-		  	const kickLog = kickedLog.entries.first();
+			const kickLog = kickedLog.entries.first();
 
 			const bannedLog = await member.guild.fetchAuditLogs({
 				type: AuditLogEvent.MemberBanAdd,
 				limit: 1
 			});
-		  	const banLog = bannedLog.entries.first();
+			const banLog = bannedLog.entries.first();
 
 			// Was the user kicked?
 			if (kickLog?.targetId === member.id){

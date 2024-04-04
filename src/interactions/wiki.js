@@ -23,7 +23,7 @@ module.exports = {
 			const searchTerm = interaction.options.getString('searchterm');
 			const parameters = `?action=opensearch&format=json&formatversion=2&search=${searchTerm}&namespace=0&limit=1`
 			const queryUrl = `${config.wikiAPI}${parameters}`;
-			const result = await bloonUtils.getHHTPResult(queryUrl);
+			const result = await bloonUtils.getHTTPResult(queryUrl);
 
 			const wikiDoc = result[3][0]; // Oh,god.
 

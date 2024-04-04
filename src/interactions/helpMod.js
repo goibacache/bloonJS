@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits, ButtonStyle, ButtonBuilder, ActionRowBuilder } = require('discord.js')
+const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js')
 const { EmbedBuilder } = require('@discordjs/builders');
 
 
@@ -21,14 +21,9 @@ module.exports = {
             .setTimestamp();
         
             helpEmbed.addFields(
-                { name: '📝 /moderationaction note ',                           value: `Creates a note/log in the evidence channel. This can be either positive or negative feedback on any user.` },
-                { name: '⏰ /moderationaction timeout ',                        value: `Timeouts a user and creates a log in the evidence channel. The amount of time a user is timed out can be set as an optional parameter, if not set manually, the time out will last 10 minutes.` },
-                { name: '🙈 /moderationaction warn ',                            value: `Warns a user with a DM from bloon and creates a log in the evidence channel. If you don't want to send a DM from bloon, consider making a note and warning the user yourself.` },
-                { name: '🦶 /moderationaction kick ',                           value: `Kicks a user and creates a log in the evidence channel. If the offending user receives a DM from bloon explaining the kick reason can be set as  an optional parameter, by default it's set to off.` },
-                { name: '🔨 /moderationaction ban ',                            value: `Bans a user and creates a log in the evidence channel. If the offending user receives a DM from bloon explaining the ban reason can be set as  an optional parameter, by default it's set to off.` },
-                { name: '🛠 /moderationaction unban ',                           value: `Lifts a ban from a user and leaves a record in the evidence channel` },
-                { name: '🔍 /moderationprofile',                                value: `Shows a list of actions taken on a user. Will only be displayed in #mod-chat` },
-                { name: '❓ Still lost? Please check this video:',              value: `https://www.youtube.com/watch?v=DppjWmeFWH0` },
+                { name: '🧑 Right click on a user', value: `**User: Moderate**\nWill let you decide what action you want to take on a user.` },
+                { name: '💬 Right click on a message', value: `**Message: Delete & Moderate**\nWill let you decide what action you want to take on a user adding the message text and attachments as the reason for the action and will also delete the selected message.\n**Message: Fast Timeout**\nWill timeout a user using the text and attachments as the reason for the action and delete the message.\n**Message: Fast Warn**\nWill warn a user using the text and attachments as the reason for the action and delete the message.` },
+                { name: '❓ Looking for the old way to user the bot? Please check this video:', value: `https://www.youtube.com/watch?v=DppjWmeFWH0` },
             );
 
             await interaction.editReply({ embeds: [helpEmbed], ephemeral: true});

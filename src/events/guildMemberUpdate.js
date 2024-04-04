@@ -1,4 +1,4 @@
-const { Events, GuildMember, AuditLogEvent, Message } = require('discord.js');
+const { Events, AuditLogEvent } = require('discord.js');
 const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 

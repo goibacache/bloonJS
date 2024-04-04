@@ -3,6 +3,7 @@ const config            = bloonUtils.getConfig();
 
 const regexs            = require('../messageRegexs.js');
 const storedProcedures  = require('../utils/storedProcedures.js');
+// eslint-disable-next-line no-unused-vars
 const { Events, GuildMember, Message, TextChannel }        = require('discord.js');
 
 
@@ -13,12 +14,12 @@ const   spamMessages = [
     `Want to support Bloon's development?\nWant to also have your custom answer when people ask bloon about you?\nYou can do both by clicking [here](https://ko-fi.com/bloon/commissions)`,
     `You can join the "looking to play" role using the \`/ltp\` command. That way you'll get alerted when people create a server and want you to join!`,
     `You can check all of the available commands using the \`/help\` command.`,
-    `The developer of this bot really likes rum. You can help him buy one if you also really enjoy rum, [here](<https://ko-fi.com/bloon>)`
+    `The developer of this bot really likes pizza. You can help him buy one if you also really enjoy pizza, [here](<https://ko-fi.com/bloon>).`
 ];
 const regWhoIs = new RegExp(/who('s|.is|.are).(.*)\?/g);
 const regAttch = RegExp(/\[att:.*\]/g);
 const regSpam = /\+?18\+?|\b18\b|\bnude?3?s?5?\b|\bna?4?ke?3?d\b|\bnitro\b|\bfre?3?e?3?\b|\bnft\b|\broblox\b|\bstea?4?m\b|\bdi?l?1?sco?0?rd(?!.com\/channels\/)\b|\ba?4?dul?1?ts?\b|cry?l?i?1?pto?0?\b|\bpro?0?mo?0?\b|\bbtc\b|\bo?0?nly ?fa?4?ns\b|@everyone\b|\bte?3?e?3?ns?\b|\ble?3?a?4?ks?\b/gi;
-const regUrl = /(https?:\/\/)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)?/gi;
+const regUrl = /(https?:\/\/)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)?/gi;
 
 const agentRole = config.role_Agent;
 
@@ -31,7 +32,7 @@ const evnt = {
      */
 	async execute(message) {
         try {
-
+            if (message.guildId != config.bloonGuildId) return;
             // Avoid replying to itself and bots
             if (message.author.id === config.clientId || message.author.bot){
                 return;
@@ -40,26 +41,12 @@ const evnt = {
             // All messages should be lower case to be processed
             message.content = message.content.toLowerCase();
 
-            // Instantly delete if it mentions everyone && the user doesn't have the mod role
-            if (message.mentions.everyone){
-                // Check if it's a mod or a hidden manager
-                const userWhoMentionedEveryone = await message.guild.members.fetch(message.author.id);
-                const isMod = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Mod).size > 0;
-                const isHiddenManager = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_HiddenManager).size > 0
-                if (!(isMod || isHiddenManager)){
-                    console.log("SPAM FILTER: Message mentions everyone. Deleted");
-                    console.log(`SPAM FILTER: Deleted message: ${message.content}`);
-                    await message.delete();
-                    return;
-                }
-            }
-
-            // Check if it's spam or +18
-            if (message.content.match(regSpam)?.length > 1){
+            // Check if it's spam or +18 - Instantly delete if it mentions everyone && the user doesn't have the mod/hiddenManager/aug role
+            if (message.content.match(regSpam)?.length > 1 || message.mentions.everyone){
                 console.log("SPAM FILTER: Message appears to be spam");
                 // and if it has an URL then kill it
-                if (message.content.match(regUrl)?.length > 0){
-                    console.log("SPAM FILTER: Message contains URL");
+                if (message.content.match(regUrl)?.length > 0 || message.mentions.everyone){
+                    console.log("SPAM FILTER: Message contains URL or mentions everyone");
 
                     // Check if it's a mod or a hidden manager
                     /**
@@ -70,15 +57,18 @@ const evnt = {
                     const isMod = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Mod).size > 0;
                     const isHiddenManager = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_HiddenManager).size > 0
                     const isAug = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Aug).size > 0
-                    if (!(isMod || isHiddenManager || isAug)){
-                        // Get mods channel
+                    //if (!(isMod || isHiddenManager || isAug)){
+                    if (isMod || isHiddenManager || isAug) {
+                        console.log(`SPAM FILTER: Message was sent by trusted user.\nMessage: ${message.content}`)
+                    }else{
+                        // Delete, send message to mod channel and timeout user for 10 minutes
                         console.log("SPAM FILTER: Message from random (not that one) user, deleting.");
                         console.log(`SPAM FILTER: Deleted message: ${message.content}`);
 
-                        let messageResume = bloonUtils.getTextAndAttachmentsFromMessage(message);
+                        const messageResume = bloonUtils.getTextAndAttachmentsFromMessage(message);
 
                         await message.delete();
-                        await userWhoMentionedEveryone.timeout(1 * 60 * 1000); // 1 minute.
+                        await userWhoMentionedEveryone.timeout(10 * 60 * 1000); // 10 minutes.
                         
 
                         /**
@@ -88,14 +78,12 @@ const evnt = {
                         /**
                          * @type { Message }
                          */
-                        const text = await modChatChannel.send({
+                        await modChatChannel.send({
                             content: `🧐 It seems to me that the user <@${userWhoMentionedEveryone.id}> is a compromised account. The account was timed out for 1 minute 🔥 for posting the following: ${messageResume}`,
                             embeds: []
                         });
 
                         return;
-                    }else{
-                        console.log(`SPAM FILTER: Message was sent by trusted user.\nMessage: ${message.content}`)
                     }
                 }
             }
@@ -103,7 +91,7 @@ const evnt = {
             // After SPAM check:
             
             // On first message and no AGENT role, assign it.
-            const member = message.member; 
+            const member = message.member;
 
             // Check if the user already has the "Agent" role, if it doesn't add it.
             if (!member.roles.cache.some(role => role.id === agentRole)){

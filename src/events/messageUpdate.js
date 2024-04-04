@@ -1,4 +1,4 @@
-const { Events, messageLink } = require('discord.js');
+const { Events } = require('discord.js');
 const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 
@@ -47,22 +47,23 @@ const evnt = {
 				newAttachments += "\n";
 			}
 
-			// Check for total content length. If its length is over ~1700 split message into various ones.
+			const maxSize = 1500;
+			// Check for total content length. If its length is over ~1500 split message into various ones.
 			const channel = newMessage.guild.channels.cache.get(config.bloonServerLogs);
-			if (oldMessageText.length > 1500 || newMessageText.length > 1500 || ((oldMessageText.length + newMessageText.length) > 1700)){
+			if (oldMessageText.length > maxSize || newMessageText.length > maxSize || ((oldMessageText.length + newMessageText.length) > maxSize)){
 				const messages = [];
 				messages.push(`📝 New edit by <@${newMessage.author.id}> (${newMessage.author.username}) in ${messageLink}`);
 
-				if (oldMessageText.length > 1700){
-					messages.push(`_Old message:_${textDecorator}${oldMessageText.substring(0, 1700)}${textDecorator}$`);
-					messages.push(`_Old message (cont):_${textDecorator}${oldMessageText.substring(1700, oldMessageText.length)}${textDecorator}${oldAttachments}`);
+				if (oldMessageText.length + oldAttachments.length > maxSize){
+					messages.push(`_Old message:_${textDecorator}${oldMessageText.substring(0, maxSize)}${textDecorator}`);
+					messages.push(`_Old message (cont):_${textDecorator}${oldMessageText.substring(maxSize, oldMessageText.length)}${textDecorator}${oldAttachments}`);
 				}else{
 					messages.push(`_Old message:_${textDecorator}${oldMessageText}${textDecorator}${oldAttachments}`);
 				}
 
-				if (newMessageText.length > 1700){
-					messages.push(`_New message:_${textDecorator}${newMessageText.substring(0, 1700)}${textDecorator}`);
-					messages.push(`_New message (cont):_${textDecorator}${newMessageText.substring(1700, newMessageText.length)}${textDecorator}${newAttachments}`);
+				if (newMessageText.length + newAttachments.length > maxSize){
+					messages.push(`_New message:_${textDecorator}${newMessageText.substring(0, maxSize)}${textDecorator}`);
+					messages.push(`_New message (cont):_${textDecorator}${newMessageText.substring(maxSize, newMessageText.length)}${textDecorator}${newAttachments}`);
 				}else{
 					messages.push(`_New message:_${textDecorator}${newMessageText}${textDecorator}${newAttachments}`);
 				}

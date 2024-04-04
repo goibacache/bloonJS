@@ -1,4 +1,4 @@
-const { Events, AuditLogEvent, Message } = require('discord.js');
+const { Events, AuditLogEvent } = require('discord.js');
 const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 
@@ -34,10 +34,7 @@ const evnt = {
 
 			const wasItAMod = modUser != null ? `by third-party <@${modUser.id}> (${modUser.username}) ` : "";
 
-			const textDecorator = "```";
-
-			// TODO: FIX IF MESSAGE IS TOO LONG D:<
-			const msg = `${textDecorator}${message.content.length > 0 ? bloonUtils.deleteCodeBlocksFromText(message.content) : " "}${textDecorator}`;
+			const msg = bloonUtils.deleteCodeBlocksFromText(message.content);
 
 			// Attached files:
 			let attachments = "";
@@ -49,12 +46,25 @@ const evnt = {
 			});
 
 			const channel = message.guild.channels.cache.get(config.bloonServerLogs);
-			await channel.send({ 
-				content: `🧹 New deletion ${wasItAMod}of message by <@${message.author.id}> (${message.author.username}) in <#${message.channelId}> \n\n_Deleted message_:\n${msg}${attachments}`, 
-				allowedMentions: { parse: [] },
-				embeds: []
-			});
+			const deletedMessageTextLength = `${msg}${attachments}`.length;
 
+			const textDecorator = '```';
+
+			const maxSize = 1500;
+			// Check for total content length. If its length is over ~1700 split message into various ones.
+			if (deletedMessageTextLength > maxSize) {
+				const messages = [];
+				messages.push(`🧹 New deletion ${wasItAMod}of message by <@${message.author.id}> (${message.author.username}) in <#${message.channelId}>`);
+				messages.push(`_Deleted message_:${textDecorator}${msg.substring(0, maxSize)}${textDecorator}`);
+				messages.push(`_Deleted message (cont):_${textDecorator}${msg.substring(maxSize, msg.length)}${textDecorator}${attachments}`);
+			
+				messages.forEach(async message => {
+					await channel.send({ content: message, allowedMentions: { parse: [] }});
+				});
+			}else{
+				// Send normal message with no splits
+				await channel.send({ content: `🧹 New deletion ${wasItAMod}of message by <@${message.author.id}> (${message.author.username}) in <#${message.channelId}> \n\n_Deleted message_:\n${textDecorator}${msg}${attachments}${textDecorator}`, allowedMentions: { parse: [] }});
+			}
 		}catch(error){
 			console.error("Error in messageDelete.js: " + error);
 		}
