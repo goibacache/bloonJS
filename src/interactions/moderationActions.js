@@ -355,7 +355,7 @@ const command = {
                     const thread = await bloonUtils.createOrFindModerationActionThread(interaction.client, `Moderation for User ID: ${target.id}`);
 
                     if (thread){
-                        await thread.send({ content: `Hey <@${userToBeActedUpon.id}>\n${reason}`, embeds: [] });
+                        await thread.send({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag ?? userToBeActedUpon.tag})\n${reason}`, embeds: [] });
                     }
 
                     const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, reason, interaction.member, attachment?.url, DMSent);

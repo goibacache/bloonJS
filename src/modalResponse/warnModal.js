@@ -77,11 +77,11 @@ module.exports = {
             if (thread){
                 threadCreated = true;
                 // "Loading" message
-                const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}>\n...` });
+                const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\n...` });
                 // Edit the message and mention all of the roles that should be included.
-                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\nSummoning: <@&${config.role_Aug}> and <@&${config.role_Mod}>...` })
+                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\nSummoning: <@&${config.role_Aug}> and <@&${config.role_Mod}>...` })
                 // Finally send the message we really want to send...
-                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}>\n${warnText}`, embeds: [] });
+                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\n${warnText}`, embeds: [] });
             }
 
             //if for some reason the message persists, delete it

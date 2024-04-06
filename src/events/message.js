@@ -68,7 +68,7 @@ const evnt = {
                         const messageResume = bloonUtils.getTextAndAttachmentsFromMessage(message);
 
                         await message.delete();
-                        await userWhoMentionedEveryone.timeout(10 * 60 * 1000); // 10 minutes.
+                        await userWhoMentionedEveryone.timeout(5 * 60 * 1000); // 5 minutes.
                         
 
                         /**
@@ -79,7 +79,7 @@ const evnt = {
                          * @type { Message }
                          */
                         await modChatChannel.send({
-                            content: `🧐 It seems to me that the user <@${userWhoMentionedEveryone.id}> is a compromised account. The account was timed out for 1 minute 🔥 for posting the following: ${messageResume}`,
+                            content: `🧐 It seems to me that the user <@${userWhoMentionedEveryone.id}> (${userWhoMentionedEveryone.user.tag}) is a compromised account. The account was timed out for 5 minutes 🔥 for posting the following: ${messageResume}`,
                             embeds: []
                         });
 
