@@ -355,7 +355,12 @@ const command = {
                     const thread = await bloonUtils.createOrFindModerationActionThread(interaction.client, `Moderation for User ID: ${target.id}`);
 
                     if (thread){
-                        await thread.send({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag ?? userToBeActedUpon.tag})\n${reason}`, embeds: [] });
+                        // "Loading" message
+                        const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\n...` });
+                        // Edit the message and mention all of the roles that should be included.
+                        await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\nSummoning: <@&${config.role_Mod}>...` })
+                        // Finally send the message we really want to send...
+                        await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\n${reason}`, embeds: [] });
                     }
 
                     const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, reason, interaction.member, attachment?.url, DMSent);

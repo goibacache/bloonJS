@@ -26,7 +26,7 @@ const { kofi_InsertOrUpdate } = require('./utils/storedProcedures.js');
 // Load initial config
 
 const modalResponses 		= {};
-const client 				= new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessageReactions], partials: [Partials.Channel, Partials.Reaction] }); // Create a new client instance
+const client 				= new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessageReactions], partials: [Partials.Channel, Partials.Reaction, Partials.Message] }); // Create a new client instance
 client.events 				= new Collection(); // Events handler list
 client.commands 			= new Collection(); // Command handler list
 client.contexMenuCommands	= new Collection(); // Command handler list
