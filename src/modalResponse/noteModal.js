@@ -91,7 +91,7 @@ module.exports = {
                 });
 
             // Write the moderation action in the chat to log it in the database
-            sentInEvidence = await moderationActionChannel.send({ content: `Note for <@!${selectedUserId}>`, embeds: [actionEmbed]})
+            sentInEvidence = await moderationActionChannel.send({ content: `Note for <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})`, embeds: [actionEmbed]})
                 .then(() => true)
                 .catch((error) => {
                     console.log(`Error while sending to the evidence channel: ${error}`);

@@ -105,7 +105,7 @@ module.exports = {
             const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, kickText, interaction.member, null, DMsent);
 
             // Write the moderation action in the chat to log it in the database
-            sentInEvidence = moderationActionChannel.send({ content: `Kick for <@!${selectedUserId}>`, embeds: [actionEmbed]})
+            sentInEvidence = moderationActionChannel.send({ content: `Kick for <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})`, embeds: [actionEmbed]})
                 .then(() => true)
                 .catch((error) => {
                     console.log(`Error while sending to the evidence channel: ${error}`);

@@ -365,7 +365,7 @@ const command = {
 
                     const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, reason, interaction.member, attachment?.url, DMSent);
                     // Write the moderation action in the chat to log it in the DB
-                    channel.send({ content: `${action.name} for <@!${target.id}>`, embeds: [actionEmbed]});
+                    channel.send({ content: `${action.name} for <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})`, embeds: [actionEmbed]});
                     await storedProcedures.moderationAction_Insert(action, target.id, reason, interaction.member.id); // Also save it on the DB :D
                 }
             });
