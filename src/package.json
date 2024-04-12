@@ -12,7 +12,7 @@
     "canvas": "^2.11.2",
     "discord.js": "^14.11.0",
     "dotenv": "^16.3.1",
-    "mysql2": "^3.4.4"
+    "mysql2": ">=3.9.4"
   },
   "keywords": [],
   "author": "",
