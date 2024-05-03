@@ -296,7 +296,7 @@ const createRulesAndInfoEmbed = () => {
         `10. Posting or having a profile that includes NSFW/shocking/pornographic/graphic content or that has a political nature.\n` +
         `11. Using alternate accounts to dodge moderation actions.\n` +
         `12. Racism, other bigotry, or attacks on identity of any kind.\n` +
-        `13. Impersonating members of the community.\n\n` +
+        `13. Impersonating or mimicking another user's identity (name, image, bio, etc).\n\n` +
         `**Nevertheless, moderation actions are discretionary and based on severity.**`;
 
     const roles = 

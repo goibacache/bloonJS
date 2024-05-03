@@ -42,7 +42,7 @@ const evnt = {
             message.content = message.content.toLowerCase();
 
             // Check if it's spam or +18 - Instantly delete if it mentions everyone && the user doesn't have the mod/hiddenManager/aug role
-            if (message.content.match(regSpam)?.length > 1 || message.mentions.everyone){
+            if (message.content.match(regSpam)?.length > 1 && !message.content.includes('tenor.com') || message.mentions.everyone){ // exclude tenor.com to avoid false positives, maybe.
                 console.log("SPAM FILTER: Message appears to be spam");
                 // and if it has an URL then kill it
                 if (message.content.match(regUrl)?.length > 0 || message.mentions.everyone){
