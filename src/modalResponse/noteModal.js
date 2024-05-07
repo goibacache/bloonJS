@@ -36,7 +36,7 @@ module.exports = {
             let sentInEvidence = false;
             let savedInDatabase = false;
             let fullMessage = '';
-            let threadCreated = false;
+            //let threadCreated = false;
 
             /**
              * Is the action being done on a message or on a user?
@@ -99,6 +99,7 @@ module.exports = {
                 });
 
             // Thread
+            /*
             const thread = await bloonUtils.createOrFindModerationActionThread(interaction.client, `Moderation for User ID: ${selectedUserId}`);
 
             if (thread){
@@ -110,10 +111,12 @@ module.exports = {
                 // Finally send the message we really want to send...
                 await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\n${noteText}`, embeds: [] });
             }
+            */
 
             const line1 = isMessageAction ? messageDeleted ? `\n✅ Message deleted` : `\n❌ Message couldn't be deleted` : '';
             const line2 = sentInEvidence ? `\n✅ Evidence sent` : `\n❌ Couldn't send the evidence`;
-            const line3 = threadCreated ? `\n✅ Evidence sent in Thread` : ` \n❌ Couldn't send evidence to Thread`;
+            //const line3 = threadCreated ? `\n✅ Evidence sent in Thread` : ` \n❌ Couldn't send evidence to Thread`;
+            const line3 = `\n✅ No thread is created/updated for notes`;
             const line4 = savedInDatabase ? `\n✅ Saved in database` : ` \n❌ Couldn't be saved in database`;
 
             await interaction.editReply({

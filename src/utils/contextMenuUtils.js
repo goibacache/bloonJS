@@ -28,7 +28,7 @@ const createNoteModal = (interaction) => {
     // Create modal:
     const modal = new ModalBuilder()
         .setCustomId(`noteModal/${guild}/${channel}/${messageId}/${selectedUserId}`)
-        .setTitle(isMessageAction ? 'Create note & delete message (No DM)' : 'Note user (No DM)');
+        .setTitle(isMessageAction ? 'Create note & delete message (No DM & no thread)' : 'Note user (No DM & no thread)');
 
     // Create the text input components
     const note = new TextInputBuilder()

@@ -44,32 +44,32 @@ module.exports = {
 
             const note = new ButtonBuilder()
             .setCustomId('note')
-            .setLabel(`📄 Note (No DM)`)
+            .setLabel(`📄 Note (No DM or 🧵)`)
             .setStyle(ButtonStyle.Primary);
 
 			const timeout = new ButtonBuilder()
             .setCustomId('timeout')
-            .setLabel(`⏰ Timeout (DM)`)
+            .setLabel(`⏰ Timeout (DM/🧵)`)
             .setStyle(ButtonStyle.Primary);
 
 			const warn = new ButtonBuilder()
             .setCustomId('warn')
-            .setLabel(`⚡ Warn (DM)`)
+            .setLabel(`⚡ Warn (DM/🧵)`)
             .setStyle(ButtonStyle.Primary);
 
 			const kick = new ButtonBuilder()
             .setCustomId('kick')
-            .setLabel(`🦶 Kick (DM)`)
+            .setLabel(`🦶 Kick (DM/🧵)`)
             .setStyle(ButtonStyle.Primary);
 
 			const ban = new ButtonBuilder()
             .setCustomId('ban')
-            .setLabel(`🔥 Ban (DM)`)
+            .setLabel(`🔥 Ban (DM/🧵)`)
             .setStyle(ButtonStyle.Danger);
 
 			const unban = new ButtonBuilder()
             .setCustomId('unban')
-            .setLabel(`😇 Unban (DM)`)
+            .setLabel(`😇 Unban (DM/🧵)`)
             .setStyle(ButtonStyle.Success);
 
             const cancel = new ButtonBuilder()

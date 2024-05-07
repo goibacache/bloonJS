@@ -70,7 +70,7 @@ module.exports = {
                 userToBeActedUpon = await interaction.member.guild.members.fetch(selectedUserId);
                 console.log('Acting on a user that is on the server.');
             } catch (error) {
-                userToBeActedUpon = await interaction.client.users.fetch(selectedUserId);
+                userToBeActedUpon = await interaction.client.users.fetch(selectedUserId); //outside of guild
                 console.log('Acting on a user that is NOT on the server.');
             }
 
@@ -129,7 +129,7 @@ module.exports = {
             const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, banText, interaction.member, null, DMsent);
 
             // Write the moderation action in the chat to log it in the database
-            sentInEvidence = await moderationActionChannel.send({ content: `Ban for <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})`, embeds: [actionEmbed]})
+            sentInEvidence = await moderationActionChannel.send({ content: `Ban for <@${userToBeActedUpon.id}> (${userToBeActedUpon.user ? userToBeActedUpon.user.tag : userToBeActedUpon.tag})`, embeds: [actionEmbed]})
                 .then(() => true)
                 .catch((error) => {
                     console.log(`Error while sending to the evidence channel: ${error}`);
@@ -143,11 +143,11 @@ module.exports = {
                 threadCreated = true;
 
                 // "Loading" message
-                const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\n...` });
+                const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}> (${ userToBeActedUpon.user ? userToBeActedUpon.user.tag : userToBeActedUpon.tag })\n...` });
                 // Edit the message and mention all of the roles that should be included.
-                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\nSummoning: <@&${config.role_Mod}>...` })
+                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${ userToBeActedUpon.user ? userToBeActedUpon.user.tag : userToBeActedUpon.tag })\nSummoning: <@&${config.role_Mod}>...` })
                 // Finally send the message we really want to send...
-                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\n${banText}`, embeds: [] });
+                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${ userToBeActedUpon.user ? userToBeActedUpon.user.tag : userToBeActedUpon.tag })\n${banText}`, embeds: [] });
             }
 
             const line1 = userBanned ? `✅ User was banned` : `❌ Couldn't ban the user`;
