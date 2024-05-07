@@ -28,7 +28,7 @@ const createNoteModal = (interaction) => {
     // Create modal:
     const modal = new ModalBuilder()
         .setCustomId(`noteModal/${guild}/${channel}/${messageId}/${selectedUserId}`)
-        .setTitle(isMessageAction ? 'Create note & delete message (No DM & no thread)' : 'Note user (No DM & no thread)');
+        .setTitle(isMessageAction ? 'Create note & delete message (No DM/No 🧵)' : 'Note user (No DM/No 🧵)');
 
     // Create the text input components
     const note = new TextInputBuilder()
@@ -37,7 +37,7 @@ const createNoteModal = (interaction) => {
         .setStyle(TextInputStyle.Paragraph) // Short means only a single line of text
         .setValue(inputText)
         .setRequired(true)
-        .setPlaceholder('The note text that will be saved in the evidence channel');
+        .setPlaceholder('The note DM text, only saved in the evidence channel');
 
     const noteActionRow = new ActionRowBuilder().addComponents(note);
 
@@ -62,7 +62,7 @@ const createTimeoutModal = (interaction, defaultTime = '10') => {
     // Create modal:
     const modal = new ModalBuilder()
         .setCustomId(`timeoutModal/${guild}/${channel}/${messageId}/${selectedUserId}`)
-        .setTitle(isMessageAction ? 'Timeout user & delete message (DM)' : 'Timeout user (DM)');
+        .setTitle(isMessageAction ? 'Timeout user & delete message (DM/🧵)' : 'Timeout user (DM/🧵)');
 
     // Create the text input components
     const note = new TextInputBuilder()
@@ -71,7 +71,7 @@ const createTimeoutModal = (interaction, defaultTime = '10') => {
         .setStyle(TextInputStyle.Paragraph) // Short means only a single line of text
         .setValue(inputText)
         .setRequired(true)
-        .setPlaceholder('The note text that will be saved in the evidence channel');
+        .setPlaceholder('The timeout DM text, saved in the evidence channel and posted in the moderation thread.');
 
     const noteActionRow = new ActionRowBuilder().addComponents(note);
 
@@ -110,7 +110,7 @@ const createWarnModal = (interaction) => {
     // Create modal:
     const modal = new ModalBuilder()
         .setCustomId(`warnModal/${guild}/${channel}/${messageId}/${selectedUserId}`)
-        .setTitle(isMessageAction ? 'Warn user & delete message (DM)' : 'Warn user (DM)');
+        .setTitle(isMessageAction ? 'Warn user & delete message (DM/🧵)' : 'Warn user (DM/🧵)');
 
     // Create the text input components
     const note = new TextInputBuilder()
@@ -119,7 +119,7 @@ const createWarnModal = (interaction) => {
         .setStyle(TextInputStyle.Paragraph) // Short means only a single line of text
         .setValue(inputText)
         .setRequired(true)
-        .setPlaceholder('The warning/DM that will be sent to the user and saved in the evidence channel');
+        .setPlaceholder('The warning DM text, saved in the evidence channel and posted in the moderation thread.');
 
     const noteActionRow = new ActionRowBuilder().addComponents(note);
 
@@ -144,7 +144,7 @@ const createKickModal = (interaction) => {
     // Create modal:
     const modal = new ModalBuilder()
         .setCustomId(`kickModal/${guild}/${channel}/${messageId}/${selectedUserId}`)
-        .setTitle(isMessageAction ? 'Kick user & delete message (DM)' : 'Kick user (DM)');
+        .setTitle(isMessageAction ? 'Kick user & delete message (DM/🧵)' : 'Kick user (DM/🧵)');
 
     // Create the text input components
     const note = new TextInputBuilder()
@@ -153,7 +153,7 @@ const createKickModal = (interaction) => {
         .setStyle(TextInputStyle.Paragraph) // Short means only a single line of text
         .setValue(inputText)
         .setRequired(true)
-        .setPlaceholder('The kick/DM that will be sent to the user and saved in the evidence channel');
+        .setPlaceholder('The kick DM text, saved in the evidence channel and posted in the moderation thread.');
 
     const noteActionRow = new ActionRowBuilder().addComponents(note);
 
@@ -179,7 +179,7 @@ const createBanModal = (interaction) => {
     // Create modal:
     const modal = new ModalBuilder()
         .setCustomId(`banModal/${guild}/${channel}/${messageId}/${selectedUserId}`)
-        .setTitle(isMessageAction ? 'Ban user & delete message (DM)' : 'Ban user (DM)');
+        .setTitle(isMessageAction ? 'Ban user & delete message (DM/🧵)' : 'Ban user (DM/🧵)');
 
     // Create the text input components
     const banText = new TextInputBuilder()
@@ -188,7 +188,7 @@ const createBanModal = (interaction) => {
         .setStyle(TextInputStyle.Paragraph) // Short means only a single line of text
         .setValue(inputText)
         .setRequired(true)
-        .setPlaceholder('The ban/DM that will be sent to the user and saved in the evidence channel');
+        .setPlaceholder('The ban DM text, saved in the evidence channel and posted in the moderation thread.');
 
     // Create the text input components
     const hoursOfMessagesToDelete = new TextInputBuilder()
@@ -197,7 +197,7 @@ const createBanModal = (interaction) => {
         .setStyle(TextInputStyle.Short) // Short means only a single line of text
         .setValue("12")
         .setRequired(true)
-        .setPlaceholder('The ban/DM that will be sent to the user and saved in the evidence channel');
+        .setPlaceholder('The amount of hours of messages to delete');
 
     const banTextActionRow                  = new ActionRowBuilder().addComponents(banText);
     const hoursOfMessagesToDeleteActionRow  = new ActionRowBuilder().addComponents(hoursOfMessagesToDelete);
@@ -225,7 +225,7 @@ const createUnbanModal = (interaction) => {
     // Create modal:
     const modal = new ModalBuilder()
         .setCustomId(`unbanModal/${guild}/${channel}/${messageId}/${selectedUserId}`)
-        .setTitle('Unbanning user');
+        .setTitle('Unban user (DM/🧵)');
 
     // Create the text input components
     const unbanText = new TextInputBuilder()
@@ -234,7 +234,7 @@ const createUnbanModal = (interaction) => {
         .setStyle(TextInputStyle.Paragraph) // Short means only a single line of text
         .setValue(inputText)
         .setRequired(true)
-        .setPlaceholder('The unban direct message that will be sent to the user and saved in the evidence channel');
+        .setPlaceholder('The unban DM text, saved in the evidence channel and posted in the moderation thread.');
 
     const unbanTextActionRow = new ActionRowBuilder().addComponents(unbanText);
 
