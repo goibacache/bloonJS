@@ -52,11 +52,13 @@ module.exports = {
             const action                    = bloonUtils.moderationActions.Note;
             /**
              * The user
-             * @type {GuildMember}
+             * @type {GuildMember || User}
              */
             const userToBeActedUpon         = await interaction.member.guild.members.fetch(selectedUserId)
-                                                .catch(() => {
-                                                    throw `Couldn't find that user on this server.`;
+                                                .catch(async () => {
+                                                    return await interaction.client.users.fetch(selectedUserId).catch(() => {
+                                                        throw `Couldn't find that user on this server or on discord.`;
+                                                    })
                                                 });
             const caseID                    = await storedProcedures.moderationAction_GetNewId(action);
             const moderationActionChannel   = await interaction.member.guild.channels.fetch(config.moderationActionsChannel);
@@ -91,7 +93,7 @@ module.exports = {
                 });
 
             // Write the moderation action in the chat to log it in the database
-            sentInEvidence = await moderationActionChannel.send({ content: `Note for <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})`, embeds: [actionEmbed]})
+            sentInEvidence = await moderationActionChannel.send({ content: `Note for <@${userToBeActedUpon.id}> (${userToBeActedUpon.user ? userToBeActedUpon.user.tag : userToBeActedUpon.tag})`, embeds: [actionEmbed]})
                 .then(() => true)
                 .catch((error) => {
                     console.log(`Error while sending to the evidence channel: ${error}`);

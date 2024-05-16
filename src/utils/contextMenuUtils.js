@@ -220,7 +220,7 @@ const createUnbanModal = (interaction) => {
     const { guild, channel, messageId, selectedUserId } = getGuildChannelMessageAndTarget(interaction);
     //const isMessageAction = messageId != 0;
 
-    const inputText = `You have been unbanned from Superboss's discord server!`;
+    const inputText = `You have been unbanned from Superboss' discord server!`;
 
     // Create modal:
     const modal = new ModalBuilder()
