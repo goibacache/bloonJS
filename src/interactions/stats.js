@@ -7,7 +7,7 @@ const { registerFont, createCanvas } = require('canvas');
  * This actually translates the options into something useful.
  */
 const optionDictionary = {
-    tlevels:            { name: 'Top levels',               query: `OrderBy=stats.totalXp:desc`,          lastColumnTitle: 'Playtime',      key: null},
+    tlevels:            { name: 'Top levels',               query: `OrderBy=stats.level:desc`,            lastColumnTitle: 'Playtime',      key: null},
     tkills:             { name: 'Top kills',                query: `OrderBy=stats.kills:desc`,            lastColumnTitle: 'Kills',         key: 'kills'},
 
     tarrests:           { name: 'Top arrests',              query: `OrderBy=stats.Arrests:desc`,          lastColumnTitle: 'Arrests',       key: 'arrests'},
