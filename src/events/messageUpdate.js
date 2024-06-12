@@ -1,23 +1,28 @@
-const { Events } = require('discord.js');
+// eslint-disable-next-line no-unused-vars
+const { Events, Message } = require('discord.js');
 const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 
 const evnt = {
     name: Events.MessageUpdate,
+	/**
+	 * 
+	 * @param {Message} oldMessage 
+	 * @param {Message} newMessage 
+	 * @returns 
+	 */
 	async execute(oldMessage, newMessage) {
 		try{
+			if (oldMessage.partial) oldMessage = await oldMessage.fetch();
+			if (newMessage.partial) newMessage = await newMessage.fetch();
 			if (newMessage.author.bot) return;
 			if (!newMessage.editedAt) return;
 			if (newMessage.guildId != config.bloonGuildId) return;
-			if (oldMessage.partial) oldMessage = await oldMessage.fetch();
-			if (newMessage.partial) newMessage = await newMessage.fetch();
 			if (oldMessage == null || newMessage == null) return;
-			if (oldMessage.content == newMessage.content) return; // Just a stupid fix for when the bot was not present
 
-			//console.log(oldMessage);
 			console.log(`Message updated: ${oldMessage.content} -> ${newMessage.content}`);
-
-			const messageLink = `https://discord.com/channels/${newMessage.guildId}/${newMessage.channelId}/${newMessage.id}`;
+			
+			const messageLink = newMessage.url;
 
 			const textDecorator = "```";
 			const oldMessageText = `${oldMessage.content.length > 0 ? bloonUtils.deleteCodeBlocksFromText(oldMessage.content) : " "}`;
