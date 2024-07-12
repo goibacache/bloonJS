@@ -65,12 +65,10 @@ const evnt = {
                         console.log("SPAM FILTER: Message from random (not that one) user, deleting.");
                         console.log(`SPAM FILTER: Deleted message: ${message.content}`);
 
+                        const couldDelete = await message.delete().then(() => true).catch(() => false);
+                        const couldTimeOut = await userWhoMentionedEveryone.timeout(5 * 60 * 1000).then(() => true).catch(() => false); // 5 minutes.
+
                         const messageResume = bloonUtils.getTextAndAttachmentsFromMessage(message);
-
-                        await message.delete();
-                        await userWhoMentionedEveryone.timeout(5 * 60 * 1000); // 5 minutes.
-                        
-
                         /**
                          * @type { TextChannel }
                          */
@@ -79,7 +77,7 @@ const evnt = {
                          * @type { Message }
                          */
                         await modChatChannel.send({
-                            content: `🧐 It seems to me that the user <@${userWhoMentionedEveryone.id}> (${userWhoMentionedEveryone.user.tag}) is a compromised account. The account was timed out for 5 minutes 🔥 for posting the following: ${messageResume}`,
+                            content: `🧐 It seems to me that the user <@${userWhoMentionedEveryone.id}> (${userWhoMentionedEveryone.user.tag}) is a compromised account. ${couldDelete ? 'The message was deleted' : 'The message couldn\'t be deleted'} ${couldTimeOut ? 'and the account was timed out for 5 minutes 🔥' : 'but the account couldn\'t be timed out 😭'}  for posting the following: ${messageResume}`,
                             embeds: []
                         });
 

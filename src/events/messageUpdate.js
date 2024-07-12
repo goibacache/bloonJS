@@ -13,6 +13,8 @@ const evnt = {
 	 */
 	async execute(oldMessage, newMessage) {
 		try{
+			if (oldMessage == null) console.log(`Old message was null`);
+			if (newMessage == null) console.log(`New message was null`);
 			if (oldMessage.partial) oldMessage = await oldMessage.fetch();
 			if (newMessage.partial) newMessage = await newMessage.fetch();
 			if (newMessage.author.bot) return;
@@ -59,6 +61,7 @@ const evnt = {
 				const messages = [];
 				messages.push(`📝 New edit by <@${newMessage.author.id}> (${newMessage.author.username}) in ${messageLink}`);
 
+				// TODO: if it's just images (no text) don't add the textDecorator
 				if (oldMessageText.length + oldAttachments.length > maxSize){
 					messages.push(`_Old message:_${textDecorator}${oldMessageText.substring(0, maxSize)}${textDecorator}`);
 					messages.push(`_Old message (cont):_${textDecorator}${oldMessageText.substring(maxSize, oldMessageText.length)}${textDecorator}${oldAttachments}`);
