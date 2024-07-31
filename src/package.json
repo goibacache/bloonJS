@@ -1,15 +1,19 @@
 {
-  "name": "bloonv6",
+  "name": "bloonJS",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A Discord Bot replacement for our fallen comrade.\r Uses DiscordJS to handle the discord interactions and events.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "eslint": "eslint --ext js",
+    "start": "node ./bin/www"
+  },
   "dependencies": {
     "@discordjs/core": "^0.6.0",
     "canvas": "^2.11.2",
     "discord.js": "^14.11.0",
     "dotenv": "^16.3.1",
-    "mysql2": "^3.4.4",
-
+    "mysql2": ">=3.9.4",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
@@ -17,14 +21,11 @@
     "jade": "~1.11.0",
     "morgan": "~1.9.1"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./bin/www"
-  },
   "keywords": [],
-  "author": "Xixo",
+  "author": "",
   "license": "ISC",
   "devDependencies": {
-    "decache": "^4.6.2"
+    "decache": "^4.6.2",
+    "eslint": "^8.56.0"
   }
 }

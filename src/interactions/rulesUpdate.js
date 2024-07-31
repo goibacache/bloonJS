@@ -21,12 +21,12 @@ module.exports = {
             if (!channel) { 
                 await interaction.editReply( { content: `Couldn't find rule's channel`, ephemeral: true} );  	// Reply
                 return;
-            };
+            }
             const message = await channel.messages.fetch(config.rulesMessageId);
             if (!message) { 
                 await interaction.editReply( { content: "Couldn't find rule's message", ephemeral: true} );  	// Reply
                 return; 
-            };
+            }
             await message.edit({ embeds: [rulesAndInfoEmbed] });
             await interaction.editReply( { content: `Rules have been updated!`, ephemeral: true} );  	// Reply
 		}catch(error){

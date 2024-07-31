@@ -15,6 +15,8 @@ module.exports = {
 	bloonsideChannel:				"your-bloonside-channel",
 	bloonServerLogs:				"your-bloon-server-log",
 	modChatChannel:					"your-mod-chat-channel",
+	alertsChannel:					"your-alerts-channel",
+	moderationActionForumChannel:	"your-moderation-action-forum",
 
 	rulesMessageId:					"your-rules-message-id",
 	newsSubscribeMessageId:			"your-subscribe-to-news-message-id",
@@ -44,6 +46,7 @@ module.exports = {
 	twitchEmoji:					"<:your-twch-emoji:0000000000>",
 	discordEmoji:					"<:your-discord-emoji:0000000000>",
 	wikiEmoji:						"<:your-wiki-emoji:0000000000>",
+	tiktokEmoji:					"<:your-tiktok-emoji:0000000000>",
 
 	mysqlHost:						"your-sql-host",
 	mysqlDDBB:						"your-ddbb-name",

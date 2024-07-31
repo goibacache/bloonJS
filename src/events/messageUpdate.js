@@ -1,23 +1,30 @@
-const { Events, messageLink } = require('discord.js');
+// eslint-disable-next-line no-unused-vars
+const { Events, Message } = require('discord.js');
 const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 
 const evnt = {
     name: Events.MessageUpdate,
+	/**
+	 * 
+	 * @param {Message} oldMessage 
+	 * @param {Message} newMessage 
+	 * @returns 
+	 */
 	async execute(oldMessage, newMessage) {
 		try{
+			if (oldMessage == null) console.log(`Old message was null`);
+			if (newMessage == null) console.log(`New message was null`);
+			if (oldMessage.partial) oldMessage = await oldMessage.fetch();
+			if (newMessage.partial) newMessage = await newMessage.fetch();
 			if (newMessage.author.bot) return;
 			if (!newMessage.editedAt) return;
 			if (newMessage.guildId != config.bloonGuildId) return;
-			if (oldMessage.partial) oldMessage = await oldMessage.fetch();
-			if (newMessage.partial) newMessage = await newMessage.fetch();
 			if (oldMessage == null || newMessage == null) return;
-			if (oldMessage.content == newMessage.content) return; // Just a stupid fix for when the bot was not present
 
-			//console.log(oldMessage);
 			console.log(`Message updated: ${oldMessage.content} -> ${newMessage.content}`);
-
-			const messageLink = `https://discord.com/channels/${newMessage.guildId}/${newMessage.channelId}/${newMessage.id}`;
+			
+			const messageLink = newMessage.url;
 
 			const textDecorator = "```";
 			const oldMessageText = `${oldMessage.content.length > 0 ? bloonUtils.deleteCodeBlocksFromText(oldMessage.content) : " "}`;
@@ -47,22 +54,24 @@ const evnt = {
 				newAttachments += "\n";
 			}
 
-			// Check for total content length. If its length is over ~1700 split message into various ones.
+			const maxSize = 1500;
+			// Check for total content length. If its length is over ~1500 split message into various ones.
 			const channel = newMessage.guild.channels.cache.get(config.bloonServerLogs);
-			if (oldMessageText.length > 1500 || newMessageText.length > 1500 || ((oldMessageText.length + newMessageText.length) > 1700)){
+			if (oldMessageText.length > maxSize || newMessageText.length > maxSize || ((oldMessageText.length + newMessageText.length) > maxSize)){
 				const messages = [];
 				messages.push(`📝 New edit by <@${newMessage.author.id}> (${newMessage.author.username}) in ${messageLink}`);
 
-				if (oldMessageText.length > 1700){
-					messages.push(`_Old message:_${textDecorator}${oldMessageText.substring(0, 1700)}${textDecorator}$`);
-					messages.push(`_Old message (cont):_${textDecorator}${oldMessageText.substring(1700, oldMessageText.length)}${textDecorator}${oldAttachments}`);
+				// TODO: if it's just images (no text) don't add the textDecorator
+				if (oldMessageText.length + oldAttachments.length > maxSize){
+					messages.push(`_Old message:_${textDecorator}${oldMessageText.substring(0, maxSize)}${textDecorator}`);
+					messages.push(`_Old message (cont):_${textDecorator}${oldMessageText.substring(maxSize, oldMessageText.length)}${textDecorator}${oldAttachments}`);
 				}else{
 					messages.push(`_Old message:_${textDecorator}${oldMessageText}${textDecorator}${oldAttachments}`);
 				}
 
-				if (newMessageText.length > 1700){
-					messages.push(`_New message:_${textDecorator}${newMessageText.substring(0, 1700)}${textDecorator}`);
-					messages.push(`_New message (cont):_${textDecorator}${newMessageText.substring(1700, newMessageText.length)}${textDecorator}${newAttachments}`);
+				if (newMessageText.length + newAttachments.length > maxSize){
+					messages.push(`_New message:_${textDecorator}${newMessageText.substring(0, maxSize)}${textDecorator}`);
+					messages.push(`_New message (cont):_${textDecorator}${newMessageText.substring(maxSize, newMessageText.length)}${textDecorator}${newAttachments}`);
 				}else{
 					messages.push(`_New message:_${textDecorator}${newMessageText}${textDecorator}${newAttachments}`);
 				}

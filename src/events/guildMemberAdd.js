@@ -31,7 +31,7 @@ const evnt = {
 			.setTitle(`New User Joined | ${member.user.username}`)
 			.setThumbnail(avatarURL)
 			.setTimestamp()
-			.setDescription(`**ID:** ${member.user.id}\n**Tag**: <@${member.user.id}>`)
+			.setDescription(`**ID:** ${member.user.id}\n**Tag**: <@!${member.user.id}>`)
 			.setFooter({ text: `Account Created: ${dateJoined}` });
 
 			// Sends the embed into the General channel.

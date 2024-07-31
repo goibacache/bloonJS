@@ -1,5 +1,4 @@
 const { EmbedBuilder }  = require('@discordjs/builders');
-const { Events }        = require('discord.js');
 const bloonUtils        = require('../utils/utils.js');
 const config            = bloonUtils.getConfig();
 const fs 			    = require('fs');
@@ -32,7 +31,7 @@ const evnt = {
 
             lastRCID = readSavedRCID();
 
-            const response = await bloonUtils.getHHTPResult('https://sharklootgilt.superbossgames.com/wiki/api.php?action=query&format=json&list=recentchanges&rcprop=title|ids|sizes|flags|user|timestamp');
+            const response = await bloonUtils.getHTTPResult('https://sharklootgilt.superbossgames.com/wiki/api.php?action=query&format=json&list=recentchanges&rcprop=title|ids|sizes|flags|user|timestamp');
 
             const changes = response.query.recentchanges;
 
@@ -44,7 +43,7 @@ const evnt = {
             let lastRcidInList = 0;
 
             // Only create a message for the ones we haven't sent
-            for(change of changes.filter(x => x.rcid > lastRCID)){
+            for(let change of changes.filter(x => x.rcid > lastRCID)){
 
                 const changeURL             = `${config.wikiURL}index.php/${change.title.replace(/ /g, "_")}`;
                 const dateModified 	        = new Date(change.timestamp).toUTCString();

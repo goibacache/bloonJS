@@ -17,13 +17,13 @@ const evnt = {
 				type: AuditLogEvent.MemberKick,
 				limit: 1
 			});
-		  	const kickLog = kickedLog.entries.first();
+			const kickLog = kickedLog.entries.first();
 
 			const bannedLog = await member.guild.fetchAuditLogs({
 				type: AuditLogEvent.MemberBanAdd,
 				limit: 1
 			});
-		  	const banLog = bannedLog.entries.first();
+			const banLog = bannedLog.entries.first();
 
 			// Was the user kicked?
 			if (kickLog?.targetId === member.id){
@@ -45,7 +45,7 @@ const evnt = {
 			.setTitle(`🚪 User left | ${member.user.username}`)
 			.setThumbnail(avatarURL)
 			.setTimestamp()
-			.setDescription(`**ID:** ${member.user.id}\n**Tag**: <@${member.user.id}>`)
+			.setDescription(`**ID:** ${member.user.id}\n**Tag**: <@!${member.user.id}>`)
 			.setFooter({ text: `User joined: ${dateJoined}` });
 
 			// If it isn't a kick nor a ban, send the message to bloonside

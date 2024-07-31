@@ -2,13 +2,13 @@ const bloonUtils = require('../utils/utils.js');
 const mysql = require('mysql2/promise');
 const config = bloonUtils.getConfig();
 
-const moderationAction_Insert = async(moderationAction, banedUserDiscordId, banReason, handledByDiscordId, evidence = null) => {
+const moderationAction_Insert = async(moderationAction, banedUserDiscordId, banReason, handledByDiscordId, fullMessage = '') => {
     try{
-        const query = `CALL moderationAction_Insert(?, ?, ?, ?)`;
+        const query = `CALL moderationAction_Insert(?, ?, ?, ?, ?)`;
     
         const connection = await createConnection();
 
-        const [rows] = await connection.execute(query, [moderationAction.id, banedUserDiscordId, banReason, handledByDiscordId]);
+        const [rows] = await connection.execute(query, [moderationAction.id, banedUserDiscordId, banReason, handledByDiscordId, fullMessage]);
 
         return parseInt(rows[0][0]['res']); // Awful, but eh.
 
@@ -94,7 +94,6 @@ const createConnection = async () => {
         charset:    "utf8mb4_bin"
     });
 }
-
 
 module.exports = {
     moderationAction_Insert,
