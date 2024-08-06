@@ -1,0 +1,31 @@
+extends layout
+
+block content
+  noscript You need to enable JavaScript to run this app.
+
+  //- Language
+  script(src="/lang/lang.js", defer=true)
+  script(src="/js/translator.js", defer=true)
+
+  //- Scripts
+  script(src="/js/schedule.js", defer=true)
+
+  //- Hidden
+  //- input#oAutClientId(type="hidden", value=oAutClientId)
+
+  //- Page
+  div#schedule.container
+    div.col-sm-12(style="height:100vh;")
+      div.row
+        div.col-sm-2.pl-3.pr-2.pt-3.pb-2(style="height: 100vh;")
+          div.sb-border(style="height: calc(100vh - 50px);")
+            div.col-xs-12.p-0
+              div.sbg-identification.p-1 >MATCH INFO
+              h3.mt-2.text-center Match title
+        div.col-sm-10.pt-3.pb-3.pr-3
+          div.sb-border(style="height: calc(100vh - 50px);")
+            div.col-xs-12.p-0
+              div.sbg-identification.p-1 >PARTICIPANTS SCHEDULE
+              div.scroll
+                p Calendar will go here.
+                      

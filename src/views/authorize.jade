@@ -1,10 +1,11 @@
 extends layout
 
 block content
+  noscript You need to enable JavaScript to run this app.
+  
+  script(src="./js/authorize.js", defer=true)
 
-  script(src="./authorize.js")
-
-  div(class="d-flex align-items-center justify-content-center" style="height: 100vh;")
+  div(class="d-flex align-items-center justify-content-center", style="height: 100vh;")
     div(class="col-xs-12")
       div(class="row")
-        h3(class="text-white") Bloon - Authorizing...
+        h4#displayText(class="text-white") Loading ICL profile...

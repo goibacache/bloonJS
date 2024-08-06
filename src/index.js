@@ -440,7 +440,7 @@ var http = require('http');
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '80');
+var port = normalizePort(config.WEB_Port || '80');
 console.log("Listening on port " + port);
 app.set('port', port);
 

@@ -51,5 +51,14 @@ module.exports = {
 	mysqlHost:						"your-sql-host",
 	mysqlDDBB:						"your-ddbb-name",
 	mysqlUser:						"your-sql-user",
-	mysqlPass:						"your-sql-pass"
+	mysqlPass:						"your-sql-pass",
+
+	WEB_Host:						"http://yoursite.local",
+	WEB_Port:						"80",
+
+	// ICL site config
+	oAutClientId:					"your-discord-bot-client-id",
+	oAutClientSecret:				"your-discord-bot-client-secret",
+	oAuthReturnUrl:					"your-discord-bot-oauth-return-url",
+	oAuthTokenSecret:						"your-discord-bot-auth-token-to-sign-jwts"
 }

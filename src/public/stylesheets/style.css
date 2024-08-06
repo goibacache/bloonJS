@@ -1,0 +1,75 @@
+@font-face {
+    font-family: 'ShareTechMono';
+    src: url('../ShareTechMono-Regular.ttf');
+}
+
+body {
+    font-family: 'ShareTechMono', 'Helvetica' !important;
+}
+
+.bloonLogo {
+    width: 200px !important;
+    height: auto;
+    border-radius: 100%;
+    filter: drop-shadow(10px 10px 10px)
+}
+
+.sb-border{
+    border-radius: 5px;
+    border: 1px solid #676E71; 
+}
+
+.sbg-identification{
+    border-radius: 3px 3px 0px 0px;
+    color: #313131;
+    background: rgb(131,133,135);
+    background: linear-gradient(180deg, rgba(131,133,135,1) 0%, rgba(114,116,117,1) 5%, rgba(131,133,135,1) 10%, rgba(114,116,117,1) 15%, rgba(131,133,135,1) 20%, rgba(114,116,117,1) 25%, rgba(131,133,135,1) 30%, rgba(114,116,117,1) 35%, rgba(131,133,135,1) 40%, rgba(114,116,117,1) 45%, rgba(131,133,135,1) 50%, rgba(114,116,117,1) 55%, rgba(131,133,135,1) 60%, rgba(114,116,117,1) 65%, rgba(131,133,135,1) 70%, rgba(114,116,117,1) 75%, rgba(131,133,135,1) 80%, rgba(114,116,117,1) 85%, rgba(131,133,135,1) 90%, rgba(114,116,117,1) 95%, rgba(131,133,135,1) 100%); 
+}
+
+.sbg-primary { 
+    color: #E4E6E7 !important;
+    background-color: #AAAAEE; 
+    border-color: #676E71 #676E71 #676E71 #5c5027 !important; 
+    border-left-width: 5px !important;
+    border-radius: 0px !important;
+  }
+   
+  .sbg-primary:hover, 
+  .sbg-primary:focus, 
+  .sbg-primary:active, 
+  .sbg-primary.active, 
+  .open .dropdown-toggle.sbg-primary { 
+    color: #E4E6E7 !important; 
+    background-color: #3c4247 !important; 
+    border-color: #676E71 !important; 
+  } 
+   
+  .sbg-primary:active, 
+  .sbg-primary.active, 
+  .open .dropdown-toggle.sbg-primary { 
+    background-image: none; 
+  } 
+   
+  .sbg-primary.disabled, 
+  .sbg-primary[disabled], 
+  fieldset[disabled] .sbg-primary, 
+  .sbg-primary.disabled:hover, 
+  .sbg-primary[disabled]:hover, 
+  fieldset[disabled] .sbg-primary:hover, 
+  .sbg-primary.disabled:focus, 
+  .sbg-primary[disabled]:focus, 
+  fieldset[disabled] .sbg-primary:focus, 
+  .sbg-primary.disabled:active, 
+  .sbg-primary[disabled]:active, 
+  fieldset[disabled] .sbg-primary:active, 
+  .sbg-primary.disabled.active, 
+  .sbg-primary[disabled].active, 
+  fieldset[disabled] .sbg-primary.active { 
+    background-color: transparent; 
+    border-color: #676E71; 
+  } 
+   
+  .sbg-primary .badge { 
+    color: #AAAAEE; 
+    background-color: transparent; 
+  }
