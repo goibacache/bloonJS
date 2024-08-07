@@ -6,8 +6,13 @@ block content
   //- Language
   script(src="/lang/lang.js", defer=true)
   script(src="/js/translator.js", defer=true)
+  script(src="/js/spacetime.min.js")
 
   //- Scripts
+  //- link(rel="stylesheet", href="/stylesheets/toastui-calendar.min.css")
+  link(rel="stylesheet", href="/stylesheets/calendar.css")
+  link(rel="stylesheet", href="/stylesheets/switch.css")
+  //- script(src="/js/toastui-calendar.min.js")
   script(src="/js/schedule.js", defer=true)
 
   //- Hidden
@@ -17,15 +22,75 @@ block content
   div#schedule.container
     div.col-sm-12(style="height:100vh;")
       div.row
-        div.col-sm-2.pl-3.pr-2.pt-3.pb-2(style="height: 100vh;")
-          div.sb-border(style="height: calc(100vh - 50px);")
-            div.col-xs-12.p-0
-              div.sbg-identification.p-1 >MATCH INFO
-              h3.mt-2.text-center Match title
-        div.col-sm-10.pt-3.pb-3.pr-3
-          div.sb-border(style="height: calc(100vh - 50px);")
+        h3.mt-2.text-center Match title
+
+        //- Display filters and toggles
+        div#filter.row.p-0.m-0.justify-content-center
+          p.col-auto.me-2.mb-0 0/10+
+          div.sb-border.row.col-auto.p-0
+            div.active0.text-center.unselectable.pointer.p-0(style="width:  25px; height: 25px; background-color: black; border-radius: 5px 0px 0px 5px;", data-toggle="1") 0
+            div.active1.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="1") 1
+            div.active2.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="2") 2
+            div.active3.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="3") 3
+            div.active4.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="4") 4
+            div.active5.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="5") 5
+            div.active6.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="6") 6
+            div.active7.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="7") 7
+            div.active8.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="8") 8
+            div.active9.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="9") 9
+            div.active10.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width: 25px; height: 25px; border-radius: 0px 5px 5px 0px;", data-toggle="10") 10
+          p.col-auto.ms-2.mb-0 10+/10+
+
+        div.row
+          .float-left 👤
+          label.switch.float-left.ml-2
+            input(type="checkbox" checked="checked")
+            span.slider.round
+          .float-left 👥
+            
+        div.col-sm-12.p-0.mb-5
+          div.sb-border
             div.col-xs-12.p-0
               div.sbg-identification.p-1 >PARTICIPANTS SCHEDULE
-              div.scroll
-                p Calendar will go here.
-                      
+              table.unselectable#calendar
+                thead
+                  tr
+                    th.text-center.borderL(style="background-color:black;")
+                    th.text-center.borderH.col-sm-3(style="background-color:black;")
+                      p.m-0.small Oct 9
+                      p.m-0 Fri
+                    th.text-center.borderH.col-sm-3(style="background-color:black;")
+                      p.m-0.small Oct 10
+                      p.m-0 Sat
+                    th.text-center.borderH.col-sm-3(style="background-color:black;")
+                      p.m-0.small Oct 11
+                      p.m-0 Sun
+                    th.text-center.borderH.col-sm-3(style="background-color:black;")
+                      p.m-0.small Oct 12
+                      p.m-0 Mon
+                tbody 
+                  - var time = 0;
+                  - for (var i = 0; i < 48; ++i) {
+                    tr
+                      if i % 2 == 0
+                        td.calendarCell.borderH.text-center.timeText(rowspan=2, style="background-color:black;") #{time}:00
+                        td.calendarCell.borderL.text-center
+                          div.selectableDate
+                        td.calendarCell.borderL.text-center 
+                          div.selectableDate
+                        td.calendarCell.borderL.text-center 
+                          div.selectableDate
+                        td.calendarCell.borderL.text-center 
+                          div.selectableDate
+                        - time++;
+                      else 
+                        td.calendarCell.borderL.text-center 
+                          div.selectableDate
+                        td.calendarCell.borderL.text-center 
+                          div.selectableDate
+                        td.calendarCell.borderL.text-center 
+                          div.selectableDate
+                        td.calendarCell.borderL.text-center 
+                          div.selectableDate
+                  - }
+          
