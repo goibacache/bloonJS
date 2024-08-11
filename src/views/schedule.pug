@@ -20,30 +20,30 @@ block content
 
   //- Page
   div#schedule.container
-    div.col-sm-12(style="height:100vh;")
+    div.col-xs-12(style="height:100vh;")
+
+      //- Title
       div.row
-        h3.mt-2.text-center Match title
+        h3.mt-2.text-center.stickyC(style="--sticky-top: 0px;background-color:var(--site-bg); min-height: 40px") Match title
 
-        
-
-        div.row.p-0.ms-0.me-0.mt-4.justify-content-center
-          div.col-auto 👤 Me
-          label.switch.ml-2.col-auto
-            input(type="checkbox" checked="true")
-            span.slider.round
-          div.col-auto Team 👥
-
-        div.row.p-0.ms-0.me-0.mt-4.justify-content-center
+        div.row.p-0.ms-0.me-0.mt-4.justify-content-center.stickyC(style="--sticky-top: 34px;background-color:var(--site-bg)")
           div.col-auto.unselectable.tab 👤 Me
           div.col-auto.unselectable.tab.active Team 👥
             
-        div.col-sm-4.offset-4.p-0.mb-5
+        div.col-xs-12.col-sm-12.col-md-8.offset-md-2.col-lg-6.offset-lg-3.p-0.mb-5
           div.sb-border
             div.col-xs-12.p-0
-              div.sbg-identification.p-1 >PARTICIPANTS SCHEDULE
+              div.sbg-identification.p-1.stickyC(style="--sticky-top: 74px;") > SCHEDULE
+
+              //- Timezone
+              div.col-auto.text-center.pt-3(style="background-color: black") Time Zone 
+                select.col-auto#timezone(name="timezone", onchange="loadCalendar()")
+                  each timeZone in timeZones
+                    option=timeZone
+
               //- Display filters and toggles
-              div#filter.row.p-0.pt-4.pb-4.ms-0.me-0.justify-content-center(style="background-color: black")
-                p.col-auto.me-2.mb-0 0/10+
+              div#filter.row.p-0.pt-4.pb-4.ms-0.me-0.justify-content-center.stickyC(style="background-color: black; --sticky-top:106px;")
+                p.col-auto.me-2.mb-0.d-none.d-sm-block 0/10+
                 div.sb-border.row.col-auto.p-0
                   div.active0.text-center.unselectable.pointer.p-0(style="width:  25px; height: 25px; background-color: black; border-radius: 5px 0px 0px 5px;", data-toggle="1") 0
                   div.active1.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="1") 1
@@ -56,46 +56,6 @@ block content
                   div.active8.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="8") 8
                   div.active9.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="9") 9
                   div.active10.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width: 25px; height: 25px; border-radius: 0px 5px 5px 0px;", data-toggle="10") 10
-                p.col-auto.ms-2.mb-0 10+/10+
-              table.unselectable#calendar
-                thead
-                  tr
-                    th.text-center.borderL.t-time(style="background-color:black;")
-                    th.text-center.borderH.col-auto(style="background-color:black;")
-                      p.m-0.small Oct 9
-                      p.m-0 Fri
-                    th.text-center.borderH.col-auto(style="background-color:black;")
-                      p.m-0.small Oct 10
-                      p.m-0 Sat
-                    th.text-center.borderH.col-auto(style="background-color:black;")
-                      p.m-0.small Oct 11
-                      p.m-0 Sun
-                    //- th.text-center.borderH.col-sm-3(style="background-color:black;")
-                    //-   p.m-0.small Oct 12
-                    //-   p.m-0 Mon
-                tbody 
-                  - var time = 0;
-                  - for (var i = 0; i < 96; ++i) {
-                    tr
-                      if i % 4 == 0
-                        td.calendarCell.borderH.text-center.timeText(rowspan=4, style="background-color:black;") #{time}:00
-                        td.calendarCell.borderL.text-center
-                          div.selectableDate
-                        td.calendarCell.borderL.text-center 
-                          div.selectableDateDisabled
-                        td.calendarCell.borderL.text-center 
-                          div.selectableDate
-                        //- td.calendarCell.borderL.text-center 
-                        //-   div.selectableDate
-                        - time++;
-                      else 
-                        td.calendarCell.borderL.text-center
-                          div.selectableDate(data-toggle="tooltip", title="<em>Team1</em> <u>with</u> <b>HTML</b>")
-                        td.calendarCell.borderL.text-center 
-                          div.selectableDate(data-toggle="tooltip", title="<em>Team2</em> <u>with</u> <b>HTML</b>")
-                        td.calendarCell.borderL.text-center 
-                          div.selectableDate(data-toggle="tooltip", title="<em>Team3</em> <u>with</u> <b>HTML</b>")
-                        //- td.calendarCell.borderL.text-center 
-                        //-   div.selectableDate(data-toggle="tooltip", title="<em>Team4</em> <u>with</u> <b>HTML</b>")
-                  - }
-          
+                p.col-auto.ms-2.mb-0.d-none.d-sm-block 10+/10+
+
+              table.unselectable.bc-collapse#calendar

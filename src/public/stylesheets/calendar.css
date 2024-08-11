@@ -1,107 +1,138 @@
 :root {
-    --table-bg-color-empty: black;
-}  
+  --table-bg-color-empty: black;
+  --site-bg: #313338;
+}
 
-.pointer{
-    cursor: pointer;
+.pointer {
+  cursor: pointer;
 }
 
 .calendarCell {
-    height: 15px;
+  height: 15px;
 }
 
 table {
-    width: 100%
+  width: 100%;
+  background-color: black;
+  table-layout: fixed;
 }
 
-table th {
-    font-weight: 100 !important;
-}
+
+
 
 /* table tbody tr td {
     font-size: 10px;
 } */
 
 table * {
-    font-weight: 100 !important;
+  font-weight: 100 !important;
 }
 
 .unselectable {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .borderH {
-    border-top: 1px solid #676E71;
-    border-bottom: 1px solid #676E71;
-    border-left: 1px solid #676E71;
-    border-right: 1px solid #676E71;
+  /* border-top: 1px solid #676E71; */
+  border-bottom: 1px solid #676E71;
+  /* border-left: 1px solid #676E71; */
+  border-right: 1px solid #676E71;
+}
+
+.borderH:last-child{
+  border-bottom: 1px solid #676E71;
+  border-right: 0px solid #676E71;
+}
+
+.borderB{
+  border-bottom: 1px solid #676E71;
+}
+
+.borderBR{
+  border-bottom: 1px solid #676E71;
+  border-right: 1px solid #676E71;
+}
+
+
+.borderBR:last-child{
+  border-bottom: 1px solid #676E71 !important;
+  border-right: 0px !important;
 }
 
 .borderL {
-    border-top: 0px solid #5b676b;
-    border-bottom: 1px solid #5b676b;
-    border-left: 0px solid #5b676b;
-    border-right: 0px solid #5b676b;
+  border-top: 0px solid #5b676b;
+  border-bottom: 1px solid #5b676b;
+  border-left: 0px solid #5b676b;
+  border-right: 0px solid #5b676b;
 }
 
 .timeText {
-    color: #95a3a8;
+  color: #95a3a8;
 }
 
 .selectableDate {
-    width: 100%;
-    height: 15px;
-    background-color: var(--table-bg-color-empty);
-    /* transition: 0.05s; */
-}
-
-.selectableDateDisabled{
   width: 100%;
   height: 15px;
-  background: linear-gradient(135deg, #000000 0%, #000000 5%,transparent 5%, transparent 10%, #000000 10%, #000000 15%,transparent 15%,transparent 20%, #000000 20%, #000000 25%,transparent 25%,transparent 30%, #000000 30%, #000000 35%,transparent 35%,transparent 40%, #000000 40%, #000000 45%,transparent 45%,transparent 50%, #000000 50%, #000000 55%,transparent 55%,transparent 60%, #000000 60%, #000000 65%,transparent 65%,transparent 70%, #000000 70%, #000000 75%,transparent 70%,transparent 80%, #000000 80%, #000000 85%,transparent 85%,transparent 90%, #000000 90%, #000000 95%,transparent 95%);
+  background-color: var(--table-bg-color-empty);
+  /* transition: 0.05s; */
+}
+
+.selectableDateDisabled {
+  width: 100%;
+  height: 15px;
+  background: linear-gradient(135deg, #000000 0%, #000000 5%, transparent 5%, transparent 10%, #000000 10%, #000000 15%, transparent 15%, transparent 20%, #000000 20%, #000000 25%, transparent 25%, transparent 30%, #000000 30%, #000000 35%, transparent 35%, transparent 40%, #000000 40%, #000000 45%, transparent 45%, transparent 50%, #000000 50%, #000000 55%, transparent 55%, transparent 60%, #000000 60%, #000000 65%, transparent 65%, transparent 70%, #000000 70%, #000000 75%, transparent 70%, transparent 80%, #000000 80%, #000000 85%, transparent 85%, transparent 90%, #000000 90%, #000000 95%, transparent 95%);
   background-size: 3em 3em;
   background-color: #ffffff;
   opacity: 0.25
 }
 
 .mySelection {
-    background-color: rgb(34, 54, 113);
+  background-color: rgb(34, 54, 113);
 }
 
 .active1 {
-    background-color: rgba(100, 50, 0, 0.2);
-  }
-  .active2 {
-    background-color: rgba(90, 60, 10, 0.3);
-  }
-  .active3 {
-    background-color: rgba(80, 70, 20, 0.4);
-  }
-  .active4 {
-    background-color: rgba(70, 80, 30, 0.5);
-  }
-  .active5 {
-    background-color: rgba(60, 90, 40, 0.6);
-  }
-  .active6 {
-    background-color: rgba(50, 100, 50, 0.7);
-  }
-  .active7 {
-    background-color: rgba(40, 110, 60, 0.8);
-  }
-  .active8 {
-    background-color: rgba(30, 120, 70, 0.9);
-  }
-  .active9 {
-    background-color: rgba(20, 130, 80, 1);
-  }
-  .active10 {
-    background-color: rgb(0, 176, 52);
-  }
+  background-color: rgba(100, 50, 0, 0.5);
+}
+
+.active2 {
+  background-color: rgba(90, 60, 10, 0.6);
+}
+
+.active3 {
+  background-color: rgba(80, 70, 20, 0.7);
+}
+
+.active4 {
+  background-color: rgba(70, 80, 30, 0.8);
+}
+
+.active5 {
+  background-color: rgba(60, 90, 40, 0.6);
+}
+
+.active6 {
+  background-color: rgba(50, 100, 50, 0.7);
+}
+
+.active7 {
+  background-color: rgba(40, 110, 60, 0.8);
+}
+
+.active8 {
+  background-color: rgba(30, 120, 70, 0.9);
+}
+
+.active9 {
+  background-color: rgba(20, 130, 80, 1);
+}
+
+.active10 {
+  background-color: rgb(0, 176, 52);
+}
 
 .selectableDate:hover,
 .active1:hover,
@@ -114,67 +145,67 @@ table * {
 .active8:hover,
 .active9:hover,
 .active10:hover {
-    filter: brightness(1.2);
+  filter: brightness(1.2);
 }
 
 /* Now with .mySelection */
 .active1.mySelection {
-    background-color: rgb(51, 59, 75);
-  }
-  
-  .active2.mySelection {
-    background-color: rgb(51, 70, 95);
-  }
-  
-  .active3.mySelection {
-    background-color: rgb(51, 80, 115);
-  }
-  
-  .active4.mySelection {
-    background-color: rgb(51, 91, 135);
-  }
-  
-  .active5.mySelection {
-    background-color: rgb(0, 63, 130);
-  }
-  
-  .active6.mySelection {
-    background-color: rgb(0, 76, 155);
-  }
-  
-  .active7.mySelection {
-    background-color: rgb(0, 89, 180);
-  }
-  
-  .active8.mySelection {
-    background-color: rgb(0, 102, 205);
-  }
-  
-  .active9.mySelection {
-    background-color: rgb(0, 115, 230);
-  }
-  
-  .active10.mySelection {
-    background-color: rgb(0, 128, 255);
-  }
+  background-color: rgb(51, 59, 75);
+}
+
+.active2.mySelection {
+  background-color: rgb(51, 70, 95);
+}
+
+.active3.mySelection {
+  background-color: rgb(51, 80, 115);
+}
+
+.active4.mySelection {
+  background-color: rgb(51, 91, 135);
+}
+
+.active5.mySelection {
+  background-color: rgb(0, 63, 130);
+}
+
+.active6.mySelection {
+  background-color: rgb(0, 76, 155);
+}
+
+.active7.mySelection {
+  background-color: rgb(0, 89, 180);
+}
+
+.active8.mySelection {
+  background-color: rgb(0, 102, 205);
+}
+
+.active9.mySelection {
+  background-color: rgb(0, 115, 230);
+}
+
+.active10.mySelection {
+  background-color: rgb(0, 128, 255);
+}
 
 .float-left {
-    float: left;
+  float: left;
 }
 
 .float-right {
-    float: right;
+  float: right;
 }
 
-.forceInactive:not(.mySelection){
-    background-color: var(--table-bg-color-empty) !important;
+.forceInactive:not(.mySelection) {
+  background-color: var(--table-bg-color-empty) !important;
 }
 
-.t-time{
-  width: 20px;
+.t-time {
+  width: 50px;
 }
 
-.tooltipContainer{
+.tooltipContainer {
   border: 3px solid #be973d;
   border-radius: 5px;
   background-color: black;
@@ -184,22 +215,36 @@ table * {
   pointer-events: none;
 }
 
-.tab{
+.tab {
   background-color: black;
-  border-left: 3px solid #333637; 
-  border-top: 3px solid #333637; 
-  border-right: 3px solid #333637; 
+  border-left: 3px solid #333637;
+  border-top: 3px solid #333637;
+  border-right: 3px solid #333637;
   border-radius: 20px 20px 0px 0px;
   height: 40px;
   font-size: 25px;
-  filter:brightness(50%);
+  filter: brightness(50%);
   cursor: pointer;
 }
 
-.active{
+.active {
   /* background-color: #5b676b !important;
   color: var(--bs-body-color) !important; */
-  filter:brightness(100%) !important;
-  background: rgb(131,133,135);
-  background: linear-gradient(180deg, rgba(131,133,135,1) 0%, rgba(114,116,117,1) 5%, rgba(131,133,135,1) 10%, rgba(114,116,117,1) 15%, rgba(131,133,135,1) 20%, rgba(114,116,117,1) 25%, rgba(131,133,135,1) 30%, rgba(114,116,117,1) 35%, rgba(131,133,135,1) 40%, rgba(114,116,117,1) 45%, rgba(131,133,135,1) 50%, rgba(114,116,117,1) 55%, rgba(131,133,135,1) 60%, rgba(114,116,117,1) 65%, rgba(131,133,135,1) 70%, rgba(114,116,117,1) 75%, rgba(131,133,135,1) 80%, rgba(114,116,117,1) 85%, rgba(131,133,135,1) 90%, rgba(114,116,117,1) 95%, rgba(131,133,135,1) 100%); 
+  filter: brightness(100%) !important;
+  background: rgb(131, 133, 135);
+  background: linear-gradient(180deg, rgba(131, 133, 135, 1) 0%, rgba(114, 116, 117, 1) 5%, rgba(131, 133, 135, 1) 10%, rgba(114, 116, 117, 1) 15%, rgba(131, 133, 135, 1) 20%, rgba(114, 116, 117, 1) 25%, rgba(131, 133, 135, 1) 30%, rgba(114, 116, 117, 1) 35%, rgba(131, 133, 135, 1) 40%, rgba(114, 116, 117, 1) 45%, rgba(131, 133, 135, 1) 50%, rgba(114, 116, 117, 1) 55%, rgba(131, 133, 135, 1) 60%, rgba(114, 116, 117, 1) 65%, rgba(131, 133, 135, 1) 70%, rgba(114, 116, 117, 1) 75%, rgba(131, 133, 135, 1) 80%, rgba(114, 116, 117, 1) 85%, rgba(131, 133, 135, 1) 90%, rgba(114, 116, 117, 1) 95%, rgba(131, 133, 135, 1) 100%);
+}
+
+.stickyC {
+  z-index: 1;
+  position: sticky;
+  top: var(--sticky-top);
+}
+
+.bc-separate{
+  border-collapse: separate
+}
+
+.bc-collapse{
+  border-collapse: collapse;
 }

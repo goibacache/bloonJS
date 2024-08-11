@@ -24,11 +24,13 @@ const discordApiRequest = async(discordApiEndpoint, tokenType, accessToken) => {
 /* GET schedule */
 router.get('/:scheduleId', (req, res) => {
 
+  const timeZones = Intl.supportedValuesOf('timeZone');
+
   // Verify JWT token in cookies
   const jwtToken = req.cookies["jwt"];
 
   if (jwtToken == undefined || jwtToken == null){
-    res.render('schedule', { title: 'Bloon JS - Schedule', timeSlots: null, clearCookies: true });
+    res.render('schedule', { title: 'Bloon JS - Schedule', timeSlots: null, clearCookies: true, timeZones: timeZones });
     return;
   }
 
@@ -37,15 +39,17 @@ router.get('/:scheduleId', (req, res) => {
   try{
     tokenContent = jwt.verify(jwtToken, config.oAuthTokenSecret);
   }catch(error){
-    res.render('schedule', { title: 'Bloon JS - Schedule', error: 'Wrong token, please log-in again' });
+    res.render('schedule', { title: 'Bloon JS - Schedule', error: 'Wrong token, please log-in again', timeZones: timeZones });
     return;
   }
 
   // Verify JWT token is not expired
 
   const scheduleId = req.params["scheduleId"];
+
   res.render('schedule', { 
     title: 'Bloon JS - Authorize', 
+    timeZones: timeZones,
     teams: [
       { 
         id: "598636664432099331",
