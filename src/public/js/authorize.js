@@ -45,19 +45,23 @@ const getCode = async () => {
     });
 
     if (authorize.res){
-        changeStatus(`Welcome ${authorize.name}!`);
+        changeStatus(`Welcome ${authorize.name}! Redirecting to schedule...`);
 
         document.cookie = `jwt=${authorize.jwt};SameSite=Strict`;
         document.cookie = `name=${authorize.name};SameSite=Strict`;
         document.cookie = `avatar=${authorize.avatar};SameSite=Strict`;
 
+        // Handle redirection to site
+        const returnUrl = localStorage.getItem("returnUrl");
+
+        if (returnUrl != undefined && returnUrl.length > 0){
+            setTimeout(() => {
+                window.location.href = window.location.origin + localStorage.getItem("returnUrl");
+            }, 1500)
+        }
     }else{
         changeStatus('There was a problem authenticating you, sorry.')
     }
-
-    // setTimeout(() => {
-    //     window.location.href = window.location.origin;
-    // }, 1500)
 }
 
 const changeStatus = async (text) => {
