@@ -248,3 +248,22 @@ table * {
 .bc-collapse{
   border-collapse: collapse;
 }
+
+.badge{
+  border: 1px solid goldenrod;
+  border-radius: 5px;
+  margin-right: 5px;
+  margin-left: 5px;
+  margin-top: 5px;
+}
+
+
+.bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before, .bs-tooltip-top .tooltip-arrow::before{
+  border-top-color: goldenrod !important;
+}
+
+.tooltip-inner{
+  border: 2px solid goldenrod;
+  text-align: center;
+  padding: 12px;
+}

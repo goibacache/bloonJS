@@ -64,7 +64,6 @@ const moderationAction_Profile = async(_userId) => {
 }
 
 /**
- * 
  * @param {string} _userName    username with no spaces and all in lower case to trigger a response
  * @param {string} _phrase      the phrase the bot will answer when asked for the user
  * @param {boolean} _renewal    the bit that sets if it's just a renewal or if it's trying to add a new or update an old phrase
@@ -85,13 +84,49 @@ const kofi_InsertOrUpdate = async(_userName, _phrase = '', _renewal = null) => {
     }
 }
 
+/**
+ * 
+ * @param {string} _matchId The match id with underscores instead of spaces and the id at the end of the name 
+ */
+const match_GetInfo = async(_matchId) => {
+    try{
+        const query = `CALL match_GetInfo(?)`;
+
+        const connection = await createConnection();
+
+        const [rows] = await connection.execute(query, [_matchId]);
+
+        return rows[0][0]; // Get first result only.
+    }catch(error){
+        console.error("Error in match_GetInfo: ", error);
+        return null;
+    }
+}
+
+const match_GetDetails = async(_matchId, _role) => {
+    // match_GetDetails
+    try{
+        const query = `CALL match_GetDetails(?, ?)`;
+
+        const connection = await createConnection();
+
+        const [rows] = await connection.execute(query, [_matchId, _role]);
+
+        return rows[0]; // Awful, but eh.
+    }catch(error){
+        console.error("Error in match_GetDetails: ", error);
+        return null;
+    }
+}
+
 const createConnection = async () => {
     return await mysql.createConnection({
-        host:       config.mysqlHost,
-        user:       config.mysqlUser,
-        password:   config.mysqlPass,
-        database:   config.mysqlDDBB,
-        charset:    "utf8mb4_bin"
+        host:               config.mysqlHost,
+        user:               config.mysqlUser,
+        password:           config.mysqlPass,
+        database:           config.mysqlDDBB,
+        charset:            "utf8mb4_bin",
+        connectTimeout:     120 * 60
     });
 }
 
@@ -100,5 +135,7 @@ module.exports = {
     moderationAction_GetNewId,
     kofi_GetKofiPhrase,
     kofi_InsertOrUpdate,
-    moderationAction_Profile
+    moderationAction_Profile,
+    match_GetInfo,
+    match_GetDetails
 }

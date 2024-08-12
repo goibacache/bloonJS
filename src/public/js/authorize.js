@@ -2,7 +2,7 @@ const deleteAllCookies = () => {
     document.cookie.split(';').forEach(cookie => {
         const eqPos = cookie.indexOf('=');
         const name = eqPos > -1 ? cookie.substring(0, eqPos) : cookie;
-        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Strict';
     });
 }
 
@@ -45,8 +45,6 @@ const getCode = async () => {
     });
 
     if (authorize.res){
-        changeStatus(`Welcome ${authorize.name}! Redirecting to schedule...`);
-
         document.cookie = `jwt=${authorize.jwt};SameSite=Strict`;
         document.cookie = `name=${authorize.name};SameSite=Strict`;
         document.cookie = `avatar=${authorize.avatar};SameSite=Strict`;
@@ -55,9 +53,13 @@ const getCode = async () => {
         const returnUrl = localStorage.getItem("returnUrl");
 
         if (returnUrl != undefined && returnUrl.length > 0){
+            changeStatus(`Welcome ${authorize.name}! Redirecting you to the schedule...`);
+
             setTimeout(() => {
                 window.location.href = window.location.origin + localStorage.getItem("returnUrl");
             }, 1500)
+        }else{
+            changeStatus(`Welcome ${authorize.name}! You're logged in, go back to your schedule's link.`);
         }
     }else{
         changeStatus('There was a problem authenticating you, sorry.')

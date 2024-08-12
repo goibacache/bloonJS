@@ -6,14 +6,19 @@ block content
   //- Language
   script(src="/lang/lang.js", defer=true)
   script(src="/js/translator.js", defer=true)
-  //-script(src="/js/moment.js")
-  //-script(src="/js/moment-timezone.js")
+  script(src="/js/moment.js")
+  script(src="/js/moment-timezone.js")
   script(src="/js/spacetime.min.js")
 
   //- Scripts
   link(rel="stylesheet", href="/stylesheets/calendar.css")
   link(rel="stylesheet", href="/stylesheets/switch.css")
   script(src="/js/schedule.js", defer=true)
+
+  //- Passed variables
+  script.
+    var teamsJSON = '!{teams}'
+    var matchDetailsJSON = '!{matchDetails}';
 
   //- Hidden
   input#clearCookies(type="hidden", value=clearCookies.toString())
@@ -24,7 +29,7 @@ block content
 
       //- Title
       div.row
-        h3.mt-2.text-center.stickyC(style="--sticky-top: 0px;background-color:var(--site-bg); min-height: 40px") Match title
+        h3.mt-2.text-center.stickyC(style="--sticky-top: 0px;background-color:var(--site-bg); min-height: 40px")=matchTitle
 
         div.row.p-0.ms-0.me-0.mt-4.justify-content-center.stickyC(style="--sticky-top: 34px;background-color:var(--site-bg)")
           div.col-auto.unselectable.tab 👤 Me
@@ -36,10 +41,8 @@ block content
               div.sbg-identification.p-1.stickyC(style="--sticky-top: 74px;") > SCHEDULE
 
               //- Timezone
-              div.col-auto.text-center.pt-3(style="background-color: black") Time Zone 
+              div.col-auto.text-center.pt-3(style="background-color: black") Your time zone 
                 select.col-auto#timezone(name="timezone", onchange="loadCalendar()")
-                  each timeZone in timeZones
-                    option=timeZone
 
               //- Display filters and toggles
               div#filter.row.p-0.pt-4.pb-4.ms-0.me-0.justify-content-center.stickyC(style="background-color: black; --sticky-top:106px;")
