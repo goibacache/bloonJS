@@ -3,6 +3,11 @@ const modeValues = {
     remove: "remove"
 };
 
+const tabValues = {
+    team: "team", 
+    me: "me"
+};
+
 let matchDetails = null;
 
 /**
@@ -14,6 +19,8 @@ let calendar = null;
  * Can be "add" or "remove"
  */
 let mode = modeValues.add;
+
+let tab = tabValues.team;
 
 /**
  * Uses moment-timezones to load all of the timezones in the the time zone select
@@ -132,7 +139,7 @@ const loadCalendar = (clean = true, debug = false) => {
     //Clean calendar
     if (clean) {
         calendar.children().remove();
-        calendar.append('<thead class="stickyC" style="--sticky-top: 180px;"></thead>');
+        calendar.append('<thead class="stickyC" style="--sticky-top: 0px;"></thead>');
         $("#calendar thead").append("<tr></tr>");
         calendar.append('<tbody></tbody>');
     }
@@ -162,7 +169,7 @@ const loadCalendar = (clean = true, debug = false) => {
     const days = buildDayArray(daysToDraw + 1, startDate);
 
     // Create headers - Empty spacer
-    $('#calendar thead tr').append(`<th class="text-center borderBR t-time" style="background-color:black"></th>`);
+    $('#calendar thead tr').append(`<th class="text-center borderBR t-time" style="background-color: var(--panel-bg-color)"></th>`);
     days.forEach(day => {
 
         // If a column if exactly at 12:00am or after the end, skip it.
@@ -263,25 +270,58 @@ const loadTooltips = () => {
     });
 }
 
+/**
+ * 
+ * @param {HTMLElement} element 
+ * @param {Number} option 1: Team / 2: Me / 3: Quit
+ */
+const changeTab = (element, option) => {
+    $(".tab").removeClass('active');
+    $(element).addClass('active');
+
+    // TEAM:
+    if (option == 1){
+        tab = tabValues.team;
+        for (let i = 0; i < 10; i++) {
+            $(`tbody .active${i}Small`).removeClass(`active${i}Small`).addClass(`active${i}`);
+        }
+        $(".mySelection").removeClass('mySelection').addClass('mySelectionSmall');
+    }
+
+    // ME:
+    if (option == 2){
+        tab = tabValues.me;
+        for (let i = 0; i < 10; i++) {
+            $(`tbody .active${i}`).removeClass(`active${i}`).addClass(`active${i}Small`);
+        }
+        $(".mySelectionSmall").removeClass('mySelectionSmall').addClass('mySelection');
+    }
+}
+
 const handleMarks = () => {
     // Mark calendar
     $(".selectableDate").on('mouseenter', (e) => {
+
+        let selectionClass = (tab == tabValues.team ? 'mySelectionSmall' : 'mySelection');
+
         if (e.originalEvent.buttons > 0) { // more than one button that is the right click
             if (mode == modeValues.remove) {
-                $(e.currentTarget).removeClass('mySelection');
+                $(e.currentTarget).removeClass(selectionClass);
             } else {
-                $(e.currentTarget).addClass('mySelection');
+                $(e.currentTarget).addClass(selectionClass);
             }
         }
     });
 
     $(".selectableDate").on('mousedown', (e) => {
-        if ($(e.currentTarget).hasClass('mySelection')) {
+        let selectionClass = (tab == tabValues.team ? 'mySelectionSmall' : 'mySelection');
+
+        if ($(e.currentTarget).hasClass(selectionClass)) {
             mode = modeValues.remove;
-            $(e.currentTarget).removeClass('mySelection');
+            $(e.currentTarget).removeClass(selectionClass);
         } else {
             mode = modeValues.add;
-            $(e.currentTarget).addClass('mySelection');
+            $(e.currentTarget).addClass(selectionClass);
         }
     });
 }
@@ -294,9 +334,11 @@ const handleVisibilityButtons = () => {
         if ($(e.currentTarget).hasClass('forceInactive')) {
             mode = modeValues.remove;
             $(`.active${visibilityToHide}`).removeClass('forceInactive');
+            $(`.active${visibilityToHide}Small`).removeClass('forceInactive');
         } else {
             mode = modeValues.add;
             $(`.active${visibilityToHide}`).addClass('forceInactive');
+            $(`.active${visibilityToHide}Small`).addClass('forceInactive');
         }
     });
 
@@ -306,8 +348,10 @@ const handleVisibilityButtons = () => {
 
             if (mode == modeValues.remove) {
                 $(`.active${visibilityToHide}`).removeClass('forceInactive');
+                $(`.active${visibilityToHide}Small`).removeClass('forceInactive');
             } else {
                 $(`.active${visibilityToHide}`).addClass('forceInactive');
+                $(`.active${visibilityToHide}Small`).addClass('forceInactive');
             }
         }
     });

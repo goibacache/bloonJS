@@ -3,6 +3,8 @@ const getReturnUrl = () => {
     const returnUrl = params.get("returnUrl");
     if (returnUrl != null){
         localStorage.setItem("returnUrl", returnUrl);
+    }else{
+        localStorage.setItem("returnUrl", "");
     }
 }
 

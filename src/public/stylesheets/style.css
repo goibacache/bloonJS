@@ -1,3 +1,9 @@
+:root{
+  --site-bg: #182229;
+  --panel-grad-start: #20282f;
+  --panel-grad-end: #253038;
+}
+
 @font-face {
     font-family: 'ShareTechMono';
     src: url('../ShareTechMono-Regular.ttf');
@@ -15,15 +21,30 @@ body {
 }
 
 .sb-border{
-    border-radius: 5px;
+    /* border-radius: 5px; */
     border: 1px solid #676E71; 
 }
 
+.sb-backgroundColor{
+  background-color: var(--site-bg);
+}
+
+.sb-backgroundPattern{
+  background-image: url('../img/SB-BGFull.png'), url('../img/SB-BG.png');
+  background-repeat: round;
+  background-size: cover;
+}
+
 .sbg-identification{
-    border-radius: 3px 3px 0px 0px;
+    /* border-radius: 3px 3px 0px 0px; */
     color: #313131;
-    background: rgb(131,133,135);
-    background: linear-gradient(180deg, rgba(131,133,135,1) 0%, rgba(114,116,117,1) 5%, rgba(131,133,135,1) 10%, rgba(114,116,117,1) 15%, rgba(131,133,135,1) 20%, rgba(114,116,117,1) 25%, rgba(131,133,135,1) 30%, rgba(114,116,117,1) 35%, rgba(131,133,135,1) 40%, rgba(114,116,117,1) 45%, rgba(131,133,135,1) 50%, rgba(114,116,117,1) 55%, rgba(131,133,135,1) 60%, rgba(114,116,117,1) 65%, rgba(131,133,135,1) 70%, rgba(114,116,117,1) 75%, rgba(131,133,135,1) 80%, rgba(114,116,117,1) 85%, rgba(131,133,135,1) 90%, rgba(114,116,117,1) 95%, rgba(131,133,135,1) 100%); 
+
+    background-image: url('../img/header2.png');
+    background-repeat: round;
+    background-size: cover;
+
+    /* background: rgb(131,133,135);
+    background: linear-gradient(180deg, rgba(131,133,135,1) 0%, rgba(114,116,117,1) 5%, rgba(131,133,135,1) 10%, rgba(114,116,117,1) 15%, rgba(131,133,135,1) 20%, rgba(114,116,117,1) 25%, rgba(131,133,135,1) 30%, rgba(114,116,117,1) 35%, rgba(131,133,135,1) 40%, rgba(114,116,117,1) 45%, rgba(131,133,135,1) 50%, rgba(114,116,117,1) 55%, rgba(131,133,135,1) 60%, rgba(114,116,117,1) 65%, rgba(131,133,135,1) 70%, rgba(114,116,117,1) 75%, rgba(131,133,135,1) 80%, rgba(114,116,117,1) 85%, rgba(131,133,135,1) 90%, rgba(114,116,117,1) 95%, rgba(131,133,135,1) 100%);  */
 }
 
 .sbg-primary { 
@@ -72,4 +93,54 @@ body {
   .sbg-primary .badge { 
     color: #AAAAEE; 
     background-color: transparent; 
+  }
+
+  .panelBg{
+    background: rgb(131,133,135);
+    background: linear-gradient(90deg, var(--panel-grad-start) 0%, var(--panel-grad-end) 100%);
+  }
+
+  select{
+    border-radius: 0px !important;
+    border-color: rgb(145, 146, 147);
+  }
+
+  .tab {
+    position: relative;
+    top: 5px;
+    background-color: black;
+    border-left: 2px solid #919293;
+    border-top: 2px solid #919293;
+    border-right: 2px solid #919293;
+    color: #a9a9a9;
+    /* border-radius: 20px 20px 0px 0px; */
+    height: 35px;
+    font-size: 20px;
+    opacity: 80%;
+    cursor: pointer;
+    /* min-width: 170px; */
+    background: rgb(131,133,135);
+    background: linear-gradient(180deg, rgba(131,133,135,0) 0%, rgba(114,116,117,0.2) 5%, rgba(131,133,135,0) 10%, rgba(114,116,117,0.2) 15%, rgba(131,133,135,0) 20%, rgba(114,116,117,0.3) 25%, rgba(131,133,135,0) 30%, rgba(114,116,117,0.4) 35%, rgba(131,133,135,0) 40%, rgba(114,116,117,0.4) 45%, rgba(131,133,135,0) 50%, rgba(114,116,117,0.4) 55%, rgba(131,133,135,0) 60%, rgba(114,116,117,0.3) 65%, rgba(131,133,135,0) 70%, rgba(114,116,117,0.3) 75%, rgba(131,133,135,0) 80%, rgba(114,116,117,0.2) 85%, rgba(131,133,135,0) 90%, rgba(114,116,117,0.2) 95%, rgba(131,133,135,0) 100%);
+  }
+  
+  .active {
+    position: relative;
+    top: 0px;
+    /* background-color: #5b676b !important;
+    color: var(--bs-body-color) !important; */
+    opacity: 100%;
+    height: 40px;
+    font-size: 25px;
+    color: #dfc20d;
+    filter: brightness(100%) !important;
+    background: rgb(131,133,135);
+    background: linear-gradient(180deg, rgba(131,133,135,0) 0%, rgba(114,116,117,1) 5%, rgba(131,133,135,0) 10%, rgba(114,116,117,0.9) 15%, rgba(131,133,135,0) 20%, rgba(114,116,117,0.9) 25%, rgba(131,133,135,0) 30%, rgba(114,116,117,0.8) 35%, rgba(131,133,135,0) 40%, rgba(114,116,117,0.8) 45%, rgba(131,133,135,0) 50%, rgba(114,116,117,0.6) 55%, rgba(131,133,135,0) 60%, rgba(114,116,117,0.6) 65%, rgba(131,133,135,0) 70%, rgba(114,116,117,0.4) 75%, rgba(131,133,135,0) 80%, rgba(114,116,117,0.4) 85%, rgba(131,133,135,0) 90%, rgba(114,116,117,0.2) 95%, rgba(131,133,135,0) 100%);
+  }
+  
+  .active::after{
+    content: " ";
+    border-bottom: 3px solid #182129;
+    position: relative;
+    display: block;
+    top: 0;
   }

@@ -61,20 +61,29 @@ router.post('/', async (req, res) => {
     const signedJwt = jwt.sign({
       id: userData.id,
       avatar: userData.avatar,
-      name: userData.global_name,
+      name: superbossProfile.nick || userData.global_name,
       roles: superbossProfile.roles,
       iat: Math.floor(Date.now() / 1000),
       exp: Math.floor(Date.now() / 1000) + (expiresIn * 60),
     }, config.oAuthTokenSecret );
 
+    // Set cookies!
+    const cookieOptions = {
+      SameSite: "none", // Only on the same site
+      httpOnly: true, // The cookie only accessible by the web server
+      Secure: true
+    }
+
+    res.cookie('jwt', signedJwt, cookieOptions);
+    res.cookie('name', userData.global_name, cookieOptions);
+    res.cookie('avatar', userData.avatar, cookieOptions);
+
     // Check for the specific server and get roles
     return res.end(
         JSON.stringify(
         { 
-          res: true,
           name: userData.global_name,
-          avatar: userData.avatar,
-          jwt: signedJwt
+          res: true
          }
       )
     );

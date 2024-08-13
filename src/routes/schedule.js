@@ -31,6 +31,11 @@ router.get('/:scheduleId', async (req, res) => {
   const jwtToken = req.cookies["jwt"];
 
   if (jwtToken == undefined || jwtToken == null){
+    // Clear process cookies
+    res.clearCookie('jwt');
+    res.clearCookie('avatar');
+    res.clearCookie('name');
+
     const redirectTo = `/?returnUrl=` + encodeURIComponent(`/schedule/${scheduleId}`);
     res.redirect(redirectTo);
     return;
@@ -41,6 +46,11 @@ router.get('/:scheduleId', async (req, res) => {
   try{
     tokenContent = jwt.verify(jwtToken, config.oAuthTokenSecret);
   }catch(error){
+    // Clear process cookies
+    res.clearCookie('jwt');
+    res.clearCookie('avatar');
+    res.clearCookie('name');
+
     const redirectTo = `/?returnUrl=${encodeURIComponent(`/schedule/${scheduleId}`)}&error=${error}`;
     res.redirect(redirectTo);
     return;
@@ -90,8 +100,7 @@ router.get('/:scheduleId', async (req, res) => {
     matchTitle:       matchInfo.Name,
     teams:            JSON.stringify(teamsJson),
     matchDetails:     JSON.stringify(matchDetails),
-    isHiddenManager:  isHiddenManager,
-    clearCookies:     false
+    isHiddenManager:  isHiddenManager
   });
 });
 

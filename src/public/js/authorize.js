@@ -45,21 +45,22 @@ const getCode = async () => {
     });
 
     if (authorize.res){
-        document.cookie = `jwt=${authorize.jwt};SameSite=Strict`;
-        document.cookie = `name=${authorize.name};SameSite=Strict`;
-        document.cookie = `avatar=${authorize.avatar};SameSite=Strict`;
 
         // Handle redirection to site
         const returnUrl = localStorage.getItem("returnUrl");
 
-        if (returnUrl != undefined && returnUrl.length > 0){
+        if (returnUrl != undefined && returnUrl != null && returnUrl.length > 0){
             changeStatus(`Welcome ${authorize.name}! Redirecting you to the schedule...`);
 
             setTimeout(() => {
                 window.location.href = window.location.origin + localStorage.getItem("returnUrl");
             }, 1500)
         }else{
-            changeStatus(`Welcome ${authorize.name}! You're logged in, go back to your schedule's link.`);
+            changeStatus(`Welcome ${authorize.name}! Redirecting you to your team's schedules.`);
+
+            setTimeout(() => {
+                window.location.href = window.location.origin + '/scheduleList';
+            }, 1500)
         }
     }else{
         changeStatus('There was a problem authenticating you, sorry.')
