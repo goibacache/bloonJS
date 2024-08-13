@@ -119,6 +119,26 @@ const match_GetDetails = async(_matchId, _role) => {
     }
 }
 
+/**
+ * 
+ * @param {string} _roles Role list coma separated (,) [IK, IK...]
+ */
+const match_GetAllMatches = async(_roles) => {
+    // match_GetAllMatches
+    try{
+        const query = `CALL match_GetAllMatches(?)`;
+
+        const connection = await createConnection();
+
+        const [rows] = await connection.execute(query, [_roles]);
+
+        return rows[0]; // Awful, but eh.
+    }catch(error){
+        console.error("Error in match_GetAllMatches: ", error);
+        return null;
+    }
+}
+
 const createConnection = async () => {
     return await mysql.createConnection({
         host:               config.mysqlHost,
@@ -137,5 +157,6 @@ module.exports = {
     kofi_InsertOrUpdate,
     moderationAction_Profile,
     match_GetInfo,
-    match_GetDetails
+    match_GetDetails,
+    match_GetAllMatches
 }

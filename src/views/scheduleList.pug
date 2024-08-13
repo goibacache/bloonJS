@@ -22,4 +22,6 @@ block content
             div.col-xs-12.p-0
               div.sbg-identification.p-1 > YOUR TEAM'S SCHEDULES
 
-              div#comingSoon Coming soon.
+              div
+                each match in matches
+                  a(href='schedule/' + match.Name.replace(' ', '_')+'-'+match.Id) #{match.Name}
