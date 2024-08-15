@@ -99,90 +99,97 @@ table * {
 
 .mySelection {
   background-color: rgb(34, 54, 113);
+  width: 100%;
+  transition: 0.25s;
 }
 
 .mySelectionSmall {
+  background-color: black;
   border-left: 5px solid rgb(34, 54, 113);
+  border-right: 5px solid rgb(34, 54, 113);
+  width: 100%;
+  transition: 0.25s;
+  filter: brightness(150%);
 }
 
-.active1 {
+.active1:not(.forceInactive) {
   background-color: rgba(100, 50, 0, 0.5);
 }
 
-.active2 {
+.active2:not(.forceInactive) {
   background-color: rgba(90, 60, 10, 0.6);
 }
 
-.active3 {
+.active3:not(.forceInactive) {
   background-color: rgba(80, 70, 20, 0.7);
 }
 
-.active4 {
+.active4:not(.forceInactive) {
   background-color: rgba(70, 80, 30, 0.8);
 }
 
-.active5 {
+.active5:not(.forceInactive) {
   background-color: rgba(60, 90, 40, 0.6);
 }
 
-.active6 {
+.active6:not(.forceInactive) {
   background-color: rgba(50, 100, 50, 0.7);
 }
 
-.active7 {
+.active7:not(.forceInactive) {
   background-color: rgba(40, 110, 60, 0.8);
 }
 
-.active8 {
+.active8:not(.forceInactive) {
   background-color: rgba(30, 120, 70, 0.9);
 }
 
-.active9 {
+.active9:not(.forceInactive) {
   background-color: rgba(20, 130, 80, 1);
 }
 
-.active10 {
+.active10:not(.forceInactive) {
   background-color: rgb(0, 176, 52);
 }
 
 
-.active1Small {
+.active1Small:not(.forceInactive) {
   border-left: 5px solid rgba(100, 50, 0, 0.5);
 }
 
-.active2Small {
+.active2Small:not(.forceInactive) {
   border-left: 5px solid rgba(90, 60, 10, 0.6);
 }
 
-.active3Small {
+.active3Small:not(.forceInactive) {
   border-left: 5px solid rgba(80, 70, 20, 0.7);
 }
 
-.active4Small {
+.active4Small:not(.forceInactive) {
   border-left: 5px solid rgba(70, 80, 30, 0.8);
 }
 
-.active5Small {
+.active5Small:not(.forceInactive) {
   border-left: 5px solid rgba(60, 90, 40, 0.6);
 }
 
-.active6Small {
+.active6Small:not(.forceInactive) {
   border-left: 5px solid rgba(50, 100, 50, 0.7);
 }
 
-.active7Small {
+.active7Small:not(.forceInactive) {
   border-left: 5px solid rgba(40, 110, 60, 0.8);
 }
 
-.active8Small {
+.active8Small:not(.forceInactive) {
   border-left: 5px solid rgba(30, 120, 70, 0.9);
 }
 
-.active9Small {
+.active9Small:not(.forceInactive) {
   border-left: 5px solid rgba(20, 130, 80, 1);
 }
 
-.active10Small {
+.active10Small:not(.forceInactive) {
   border-left: 5px solid rgb(0, 176, 52);
 }
 
@@ -249,10 +256,10 @@ table * {
   float: right;
 }
 
-.forceInactive {
+/* .forceInactive {
   background-color: var(--table-bg-color-empty) !important;
   border-left: 0px solid !important;
-}
+} */
 
 .t-time {
   width: 50px;

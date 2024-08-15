@@ -26,7 +26,7 @@ let tab = tabValues.team;
  * Uses moment-timezones to load all of the timezones in the the time zone select
  */
 const addMomentTimezones = () => {
-    const extraNames = moment.tz.names();
+    const extraNames = moment.tz.names().filter((value, index, array) => array.indexOf(value) === index);
     
     extraNames.forEach(e => {
         $("#timezone").append(`<option value="${e}">${e.replace('_', ' ')}</option>`);
@@ -39,7 +39,8 @@ const addMomentTimezones = () => {
  */
 const getUserTimezone = () => {
     return Intl.DateTimeFormat().resolvedOptions().timeZone;
-    //return "Pacific/Gambier" // For testing.
+    //return "Pacific/Gambier" // For testing. GO: test: TODO:
+    //return "America/Los_Angeles" // For testing. GO: test: TODO:
 }
 
 /**
@@ -47,7 +48,7 @@ const getUserTimezone = () => {
  */
 const selectUserTimeZone = () => {
     const currentTimeZone = getUserTimezone();
-    $(`#timezone`).val(currentTimeZone).change();
+    $(`#timezone`).val(currentTimeZone).change(); // triggers onChange();
 }
 
 /**
@@ -61,15 +62,6 @@ const getMatchDetailsJSON = (selectedTimeZone = null) => {
 
     const matchDetails = [];
     const originalMatchDetails = JSON.parse(matchDetailsJSON);
-
-    /*
-    DateTime: "10.08.2024.03:00"
-    TeamRoleId: "598636664432099331"
-    TimeZone: "America/Los_Angeles"
-    UserDiscordId: 171450453068873730
-    UserDiscordName: "Xixo"
-    userDiscordAvatar: "b32ff4c65f027e4e1db5ed5e727cf80c"
-    */
 
     originalMatchDetails.forEach(md => {
         // DD.MM.YYYY.HH:MM
@@ -122,6 +114,10 @@ const drawTooltipResume = (hour, currentScheduledTimes) => {
     return text;
 }
 
+const isItMeOnTheSchedule = (myDiscordId, currentScheduledTimes) => {
+    return currentScheduledTimes.some(x => x.UserDiscordId == myDiscordId);
+}
+
 const loadCalendar = (clean = true, debug = false) => {
     calendar = $('#calendar');
     /**
@@ -144,21 +140,33 @@ const loadCalendar = (clean = true, debug = false) => {
         calendar.append('<tbody></tbody>');
     }
 
-    const daysToDraw = 3;
+    const startDateParts = matchInfoStartDate.split('.');
+    const endDateParts = matchInfoEndDate.split('.');
 
     /**
      * Start date in the original time zone. yyyy, mm(-1), dd, hh, mm
      */
-    const startDate = spacetime([2024, 7, 9, 0, 0], 'America/Los_Angeles').goto(timezone); // 2024-08-09
-    /**
-     * End date in the original time zone
-     */
-    const endDate = startDate.add(daysToDraw, 'days');
+    const startDate = spacetime([startDateParts[2], parseInt(startDateParts[1])-1, startDateParts[0], startDateParts[3], startDateParts[4]], matchInfoDateTimeZone);
 
     /**
      * Start date in the user's time zone (it will start at 00:00 of the first day)
      */
-    const localStartDate = spacetime([2024, 7, 9], timezone); // Will start at 00:00
+    const localStartDate = spacetime([startDateParts[2], parseInt(startDateParts[1])-1, startDateParts[0], startDateParts[3], startDateParts[4]], matchInfoDateTimeZone).goto(timezone).startOf('day'); // Will start at 00:00
+
+    
+
+    /**
+     * End date in the original time zone. yyyy, mm(-1), dd, hh, mm
+     */
+    const endDate = spacetime([endDateParts[2], parseInt(endDateParts[1])-1, endDateParts[0], endDateParts[3], endDateParts[4]], matchInfoDateTimeZone);
+
+    /**
+     * End date in the user's time zone (it will start at 00:00 of the first day)
+     */
+    const localEndDate = spacetime([endDateParts[2], parseInt(endDateParts[1])-1, endDateParts[0], endDateParts[3], endDateParts[4]], matchInfoDateTimeZone).goto(timezone).startOf('day'); // Will start at 00:00
+    
+
+    // endDateParts
 
     let currentDate = localStartDate;
 
@@ -166,21 +174,25 @@ const loadCalendar = (clean = true, debug = false) => {
      * Holds an array of days to draw. Adds one more to the daysToDraw variable, 
      * the idea if that if it ends at 00:00 it will not draw the column
      */
-    const days = buildDayArray(daysToDraw + 1, startDate);
+    const days = buildDayArray(startDate, localStartDate, endDate, localEndDate);
+    headerColumns = days.length;
 
     // Create headers - Empty spacer
     $('#calendar thead tr').append(`<th class="text-center borderBR t-time" style="background-color: var(--panel-bg-color)"></th>`);
     days.forEach(day => {
 
-        // If a column if exactly at 12:00am or after the end, skip it.
-        if (days.indexOf(day) == days.length - 1 && (day.startTime == "12:00am" || currentDate.add(days.indexOf(day), 'days').isAfter(endDate) || currentDate.add(days.indexOf(day), 'days').isEqual(endDate))) {
-            return;
-        }
+        // This is done in buildDayArray()
+        // const indexOfDay = days.indexOf(day);
 
-        headerColumns++;
+        // // If a column if exactly at 12:00am or after the end, skip it.
+        // if (currentDate.add(indexOfDay, 'days').isAfter(endDate) || currentDate.add(indexOfDay, 'days').isEqual(endDate)) {
+        //     return;
+        // }
+
+        //headerColumns++;
 
         $('#calendar thead tr').append(`
-                <th class="text-center borderBR w-auto" style="background-color:black">
+                <th class="text-center borderBR w-auto pb-3" style="background-color:black">
                     <p class="m-0 small">${day.monthDay}</p>
                     <p class="m-0 small">${day.nameOfDay}</p>
                 </th>`
@@ -202,13 +214,19 @@ const loadCalendar = (clean = true, debug = false) => {
 
         // For each day, create a TD
         days.forEach(day => {
+
+            const indexOfDay = days.indexOf(day);
+            if (startDate.isBefore(localStartDate)){
+                startAtDay = Math.ceil(startDate.diff(localStartDate,'hours') / 24) * -1;
+            }
+
             // If the last day starts at midnight, skip it 'cause it's the end.
-            if (days.indexOf(day) == days.length - 1 && days.indexOf(day) >= headerColumns) {
+            if (indexOfDay == days.length - 1 && indexOfDay >= headerColumns) {
                 return;
             }
 
             // If it is before the start date, draw "not available spaces"
-            if (currentDate.add(days.indexOf(day), 'days').isBefore(startDate) || currentDate.add(days.indexOf(day), 'days').isAfter(endDate) || currentDate.add(days.indexOf(day), 'days').isEqual(endDate)) {
+            if (currentDate.add(indexOfDay, 'days').isBefore(startDate) || currentDate.add(indexOfDay, 'days').isAfter(endDate) || currentDate.add(indexOfDay, 'days').isEqual(endDate)) {
                 currentTr.innerHTML += `
                     <td class="calendarCell borderH text-center">
                         <div class="selectableDateDisabled">
@@ -216,15 +234,16 @@ const loadCalendar = (clean = true, debug = false) => {
                     </td>`;
             } else {
                 // Filter all of the dates that match the current drawn column :^)
-                const scheduleMatches = scheduledTimes.filter(x => x.DateTime.isEqual(currentDate.add(days.indexOf(day), 'days')));
+                const scheduleMatches = scheduledTimes.filter(x => x.DateTime.isEqual(currentDate.add(indexOfDay, 'days')));
                 const cssActiveClass = `active${scheduleMatches.length}`;
-                const tooltipTitle = currentDate.add(days.indexOf(day), 'days').format('time-24');
+                const tooltipTitle = currentDate.add(indexOfDay, 'days').format('time-24');
                 const tooltipResume = drawTooltipResume(tooltipTitle, scheduleMatches);
+                const selectionClass = isItMeOnTheSchedule(currentPlayerId, scheduleMatches) == true ? 'mySelectionSmall' : '';
 
 
                 currentTr.innerHTML += `
                     <td class="calendarCell borderH text-center">
-                        <div class="selectableDate ${cssActiveClass}" data-toggle="tooltip" title="${tooltipResume}">
+                        <div class="selectableDate ${cssActiveClass} ${selectionClass}" data-toggle="tooltip" title="${tooltipResume}">
                         </div>
                     </td>`;
             }
@@ -234,23 +253,32 @@ const loadCalendar = (clean = true, debug = false) => {
         $("#calendar tbody").append(currentTr);
     }
 
-    if (debug){
+    // if (debug){
         console.log('startDate', startDate.format('nice'));
         console.log('endDate', endDate.format('nice'));
-        console.log('localStartDate', localStartDate.format('time'));
+        console.log('localStartDate', localStartDate.format('nice'));
+        console.log('localEndDate', localEndDate.format('nice'));
         console.log("days:", days);
-        console.log("game date:", startDate.format('time-'));
-    }
+        console.log("game date:", startDate.format('time'));
+    // }
 
     handleMarks();
     loadTooltips();
 }
 
-const buildDayArray = (amountOfDays = 3, startDate) => {
+const buildDayArray = (startDate, localStartDate, endDate, localEndDate) => {
     const days = [];
 
+    const amountOfDays = localStartDate.diff(localEndDate.add(1, 'days'), 'days');
+
     for (let i = 0; i < amountOfDays; i++) {
-        const currentDate = startDate.add(i, 'days')
+        const currentDate = localStartDate.add(i, 'days')
+
+        if (currentDate.isAfter(localEndDate) || (currentDate.isEqual(endDate) && endDate.format('time') === '12:00am')) {
+            console.log(`!!!! ${currentDate.format('nice')} is equal or after ${localEndDate.format('nice')}`)
+            continue;
+        }
+
         days.push({
             monthDay: `${currentDate.format('month-short')} ${currentDate.format('date')}`,
             nameOfDay: currentDate.format('day'),
@@ -364,6 +392,6 @@ $(document).ready(() => {
     addMomentTimezones();
     selectUserTimeZone();
     handleVisibilityButtons();
-    loadCalendar();
+    //loadCalendar();
     loadTooltips();
 });

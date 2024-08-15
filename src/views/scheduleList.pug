@@ -16,12 +16,15 @@ block content
 
       //- Title
       .row
-            
-        div.col-xs-12.col-sm-12.col-md-8.offset-md-2.col-lg-6.offset-lg-3.p-0.mb-5
-          div.sb-border
+        div.col-xs-12.col-sm-12.col-md-8.offset-md-2.col-lg-6.offset-lg-3.p-0.mt-5
+          div.sb-border.panelBg
             div.col-xs-12.p-0
               div.sbg-identification.p-1 > YOUR TEAM'S SCHEDULES
 
-              div
+              ul.mt-3.mb-3
+                if matches.length == 0
+                  li
+                    a.link There's no matches for your team.
                 each match in matches
-                  a(href='schedule/' + match.Name.replace(' ', '_')+'-'+match.Id) #{match.Name}
+                  li
+                    a.link(href='schedule/' + match.Name.replace(' ', '_')+'-'+match.Id) #{match.Name}

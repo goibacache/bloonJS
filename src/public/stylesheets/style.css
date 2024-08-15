@@ -144,3 +144,12 @@ body {
     display: block;
     top: 0;
   }
+
+  ul {
+    list-style-type: none;
+  }
+
+  .link {
+    color: white;
+    text-decoration: none;
+  }
