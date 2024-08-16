@@ -14,30 +14,34 @@ router.get('/', async(req, res) => {
     // Check if user have token in cookies
     const jwtToken = req.cookies["jwt"];
     let tokenContent = null;
+    let session = null;
 
     // Check if token is valid, if it is, it's logged, send him to the main page
     if (jwtToken == undefined || jwtToken == null || jwtToken.length == null) {
         // Clear process cookies
         const cookieOptions = { SameSite: "none", secure: true };
         res.clearCookie('jwt', cookieOptions);
-        res.clearCookie('avatar', cookieOptions);
-        res.clearCookie('name', cookieOptions);
         res.redirect('/');
     }
     if (jwtToken != undefined && jwtToken != null) {
         try {
             tokenContent = jwt.verify(jwtToken, config.oAuthTokenSecret);
+            session = bloonUtils.getSessionFromTokenContent(tokenContent, [config.role_LeagueOfficial]);
         } catch (error) {
             res.clearCookie('jwt');
-            res.clearCookie('avatar');
-            res.clearCookie('name');
             res.redirect('/');
         }
     }
 
-    const matches = await match_GetAllMatches(tokenContent.roles.toString());
+    const matches = await match_GetAllMatches(session.leagueOfficial ? null : tokenContent.roles.toString());
 
-    res.render('scheduleList', { title: `Bloon JS - Your team's schedules`, matches: matches });
+    // Parse matches and add them as DateTime to sort them in the main view
+    matches.forEach(match => {
+        const dateParts = match.StartDate.split('.');
+        match.JSDateTime = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
+    });
+
+    res.render('scheduleList', { title: `Bloon JS - Your team's schedules`, matches: matches, session: session });
 });
 
 

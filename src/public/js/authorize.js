@@ -1,16 +1,9 @@
-const deleteAllCookies = () => {
-    document.cookie.split(';').forEach(cookie => {
-        const eqPos = cookie.indexOf('=');
-        const name = eqPos > -1 ? cookie.substring(0, eqPos) : cookie;
-        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Strict';
-    });
-}
+var playerName = "";
 
 const getCode = async () => {
-    deleteAllCookies();
 
     const urlParams = new URLSearchParams(window.location.hash.slice(1));
-    if (urlParams.size != 4){
+    if (urlParams.size != 4) {
         window.location.href = window.location.origin; // Send to login
         return;
     }
@@ -29,41 +22,79 @@ const getCode = async () => {
     const authorize = await $.ajax({
         type: 'POST',
         url: '/authorize',
-		contentType: 'application/json',
+        contentType: 'application/json',
         data: JSON.stringify({
-            accessToken: accessToken, 
-            tokenType: tokenType, 
+            accessToken: accessToken,
+            tokenType: tokenType,
             expiresIn: expiresIn
         }),
-        success: (res) => {
-            return res;
-        },
+        success: (res) => res,
         onerror: (error) => {
             console.error(error);
             return { res: false, msg: error };
         }
     });
 
-    if (authorize.res){
+    if (authorize.res == false) {
+        changeStatus('There was a problem authenticating you, sorry.');
+        return;
+    }
 
-        // Handle redirection to site
-        const returnUrl = localStorage.getItem("returnUrl");
+    playerName = authorize.name;
 
-        if (returnUrl != undefined && returnUrl != null && returnUrl.length > 0){
-            changeStatus(`Welcome ${authorize.name}! Redirecting you to the schedule...`);
+    if (authorize.leagueOfficial) {
+        // Draw the select if league official or normal player.
+        await $("#displayText").fadeOut(100).promise();
+        await $("#selectProfile").fadeIn(100).promise();
+    } else {
+        redirectOrSendToList(playerName);
+    }
+}
 
-            setTimeout(() => {
-                window.location.href = window.location.origin + localStorage.getItem("returnUrl");
-            }, 1500)
-        }else{
-            changeStatus(`Welcome ${authorize.name}! Redirecting you to your team's schedules.`);
+const loginAsLeagueOfficial = async () => {
+    await $("#selectProfile").fadeOut(100).promise();
+    redirectOrSendToList(playerName);
+}
 
-            setTimeout(() => {
-                window.location.href = window.location.origin + '/scheduleList';
-            }, 1500)
+const loginAsPlayer = async () => {
+
+    const loginAsPlayer = await $.ajax({
+        type: 'POST',
+        url: '/authorize/noLeagueOfficial',
+        success: (res) => res,
+        onerror: (error) => {
+            console.error('ERROR!: ' + error);
+            return { res: false, msg: error };
         }
+    });
+
+    if (loginAsPlayer.res){
+        await $("#selectProfile").fadeOut(100).promise();
+        redirectOrSendToList(playerName);
     }else{
-        changeStatus('There was a problem authenticating you, sorry.')
+        await $("#selectProfile").fadeOut(100).promise();
+        changeStatus('There was a problem authenticating you as a player, sorry.');
+        return;
+    }
+}
+
+const redirectOrSendToList = (playerName) => {
+
+    // Handle redirection to site
+    const returnUrl = localStorage.getItem("returnUrl");
+
+    if (returnUrl != undefined && returnUrl != null && returnUrl.length > 0) {
+        changeStatus(`Welcome ${playerName}! Redirecting you to the schedule...`);
+
+        setTimeout(() => {
+            window.location.href = window.location.origin + localStorage.getItem("returnUrl");
+        }, 1500)
+    } else {
+        changeStatus(`Welcome ${playerName}! Redirecting you to schedules.`);
+
+        setTimeout(() => {
+            window.location.href = window.location.origin + '/scheduleList';
+        }, 1500)
     }
 }
 

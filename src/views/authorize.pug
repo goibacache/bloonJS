@@ -9,3 +9,12 @@ block content
     div(class="col-xs-12")
       div(class="row")
         h4#displayText(class="text-white") Loading ICL profile...
+
+        div#selectProfile(style="display: none")
+          div.row
+            div.col-xs-12.p-0
+              div.sbg-identification.p-1#IdentificationTitle >SELECT PROFILE
+            div.mt-3.mb-3.text-center.panelBg.sb-border
+              p.col-xs-12.center.mt-2 Select if you want to join as a League official or as a Player
+              button.btn.sbg-primary.me-5.mb-2(type="button", onClick="loginAsPlayer()") Login as a player
+              button.btn.sbg-primary.row.mb-2(type="button", onClick="loginAsLeagueOfficial()") Login as league official

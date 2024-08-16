@@ -20,8 +20,6 @@ router.get('/', (req, res) => {
       res.redirect('/scheduleList');
     }catch(error){
       res.clearCookie('jwt');
-      res.clearCookie('avatar');
-      res.clearCookie('name');
     }
   }
 

@@ -25,9 +25,12 @@ block content
     var daysToSchedule = '#{matchInfo.DaysToSchedule}';
     var currentPlayerId = '#{currentPlayerId}';
 
+  //- Session
+  include parts/sessionHeader.pug
+
   //- Page
   div#schedule.container
-    div.col-xs-12(style="height:100vh;")
+    div.col-xs-12(style="height:calc(100vh - 40px);")
 
       //- Title
       div.row
@@ -48,7 +51,7 @@ block content
           div.col-sx-12.p-0.mt-4.panelBg.sb-border
             //- Timezone
             div.col-auto.text-center.pt-3.unselectable Your time zone 
-              select.col-auto#timezone(name="timezone", onchange="loadCalendar()")
+              select.col-auto.p-0#timezone(name="timezone", onchange="loadCalendar()")
 
             //- Display filters and toggles
             div#filter.row.p-0.pt-4.pb-4.ms-0.me-0.justify-content-center

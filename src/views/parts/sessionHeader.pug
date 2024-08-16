@@ -1,0 +1,10 @@
+script(src="/js/general.js", defer=true)
+
+//- Session
+div.d-flex.align-items-center.sessionContainer.p-0
+    img.unselectable.align-middle.ms-5(src=session.avatarUrl, style="height: 32px; width: auto")
+    p.unselectable.col-auto.p-0.m-0.align-middle.ms-3=session.name
+    if session.leagueOfficial
+        p.badge.unselectable League Official
+
+    button.btn.sbg-danger.ms-auto.me-5#logoutButton(type="button", onClick="logOut()") Logout

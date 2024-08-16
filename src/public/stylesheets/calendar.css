@@ -35,14 +35,6 @@ table * {
   font-weight: 100 !important;
 }
 
-.unselectable {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
 .borderH {
   /* border-top: 1px solid #676E71; */
   border-bottom: 1px solid #676E71;
@@ -287,14 +279,6 @@ table * {
 
 .bc-collapse{
   border-collapse: collapse;
-}
-
-.badge{
-  border: 1px solid goldenrod;
-  border-radius: 5px;
-  margin-right: 5px;
-  margin-left: 5px;
-  margin-top: 5px;
 }
 
 

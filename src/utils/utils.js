@@ -1,42 +1,40 @@
 const { EmbedBuilder, ThreadAutoArchiveDuration, ChannelType } = require('discord.js');
 const https = require('https');
-
-
 //#region initialization
 
 /**
  * Array of regions to their emoji equivalents
  */
-const regionsToEmojis   = [];
-regionsToEmojis["EU"]   = "<:eu:1125796021574844520>";
-regionsToEmojis["US"]   = "<:us:1125796012263481456>";
-regionsToEmojis["USW"]  = "<:us:1125796012263481456>";
+const regionsToEmojis = [];
+regionsToEmojis["EU"] = "<:eu:1125796021574844520>";
+regionsToEmojis["US"] = "<:us:1125796012263481456>";
+regionsToEmojis["USW"] = "<:us:1125796012263481456>";
 regionsToEmojis["Asia"] = "<:Asia:1125796013454667787>";
-regionsToEmojis["JP"]   = "<:jp:1125796026092093601>";
-regionsToEmojis["AU"]   = "<:au:1125796016097083543>";
-regionsToEmojis["SA"]   = "<:br:1125796009428144188> ";
-regionsToEmojis["CAE"]  = "<:ca:1125796017909014579>";
-regionsToEmojis["KR"]   = "<:kr:1125796028369616968>";
-regionsToEmojis["IN"]   = "<:in:1125796023147704370>";
-regionsToEmojis["RU"]   = "<:ru:1125796030777131078>";
-regionsToEmojis["CN"]   = "<:cn:1125796020090048545>"; // Unused?
+regionsToEmojis["JP"] = "<:jp:1125796026092093601>";
+regionsToEmojis["AU"] = "<:au:1125796016097083543>";
+regionsToEmojis["SA"] = "<:br:1125796009428144188> ";
+regionsToEmojis["CAE"] = "<:ca:1125796017909014579>";
+regionsToEmojis["KR"] = "<:kr:1125796028369616968>";
+regionsToEmojis["IN"] = "<:in:1125796023147704370>";
+regionsToEmojis["RU"] = "<:ru:1125796030777131078>";
+regionsToEmojis["CN"] = "<:cn:1125796020090048545>"; // Unused?
 
 /**
  * Definition of moderation actions
  */
 const moderationActions = {
-    Timeout:    { name: 'Timeout',  id: 1, conjugation: "Timeout",  color: 0x00DD00, emoji: '⏰'   }, // name & value used for options | colors: Green
-    Kick:       { name: 'Kick',     id: 2, conjugation: "Kicked",   color: 0xDDDD00, emoji: '🦶'   }, // name & value used for options | colors: Yellow
-    Ban:        { name: 'Ban',      id: 3, conjugation: "Banned",   color: 0xDD0000, emoji: '🔥'   }, // name & value used for options | colors: Red
-    Warn:       { name: 'Warn',     id: 4, conjugation: "Warned",   color: 0x000000, emoji: '⚡'   }, // name & value used for options | colors: Black
-    Unban:      { name: 'Unban',    id: 5, conjugation: "Unbanned", color: 0xFFFFFF, emoji: '😇'   },  // name & value used for options | colors: White
-    Note:       { name: 'Note',     id: 6, conjugation: "Noted",    color: 0xFFFFFF, emoji: '📄'   }  // name & value used for options | colors: White
+    Timeout: { name: 'Timeout', id: 1, conjugation: "Timeout", color: 0x00DD00, emoji: '⏰' }, // name & value used for options | colors: Green
+    Kick: { name: 'Kick', id: 2, conjugation: "Kicked", color: 0xDDDD00, emoji: '🦶' }, // name & value used for options | colors: Yellow
+    Ban: { name: 'Ban', id: 3, conjugation: "Banned", color: 0xDD0000, emoji: '🔥' }, // name & value used for options | colors: Red
+    Warn: { name: 'Warn', id: 4, conjugation: "Warned", color: 0x000000, emoji: '⚡' }, // name & value used for options | colors: Black
+    Unban: { name: 'Unban', id: 5, conjugation: "Unbanned", color: 0xFFFFFF, emoji: '😇' },  // name & value used for options | colors: White
+    Note: { name: 'Note', id: 6, conjugation: "Noted", color: 0xFFFFFF, emoji: '📄' }  // name & value used for options | colors: White
 };
 
 /**
  * Used to translate Cyrillic to "standard" characters since the font don't support them
  */
-const transliterate = {"Ё":"YO","Й":"I","Ц":"TS","У":"U","К":"K","Е":"E","Н":"N","Г":"G","Ш":"SH","Щ":"SCH","З":"Z","Х":"H","Ъ":"'","ё":"yo","й":"i","ц":"ts","у":"u","к":"k","е":"e","н":"n","г":"g","ш":"sh","щ":"sch","з":"z","х":"h","ъ":"'","Ф":"F","Ы":"I","В":"V","А":"A","П":"P","Р":"R","О":"O","Л":"L","Д":"D","Ж":"ZH","Э":"E","ф":"f","ы":"i","в":"v","а":"a","п":"p","р":"r","о":"o","л":"l","д":"d","ж":"zh","э":"e","Я":"Ya","Ч":"CH","С":"S","М":"M","И":"I","Т":"T","Ь":"'","Б":"B","Ю":"YU","я":"ya","ч":"ch","с":"s","м":"m","и":"i","т":"t","ь":"'","б":"b","ю":"yu"};
+const transliterate = { "Ё": "YO", "Й": "I", "Ц": "TS", "У": "U", "К": "K", "Е": "E", "Н": "N", "Г": "G", "Ш": "SH", "Щ": "SCH", "З": "Z", "Х": "H", "Ъ": "'", "ё": "yo", "й": "i", "ц": "ts", "у": "u", "к": "k", "е": "e", "н": "n", "г": "g", "ш": "sh", "щ": "sch", "з": "z", "х": "h", "ъ": "'", "Ф": "F", "Ы": "I", "В": "V", "А": "A", "П": "P", "Р": "R", "О": "O", "Л": "L", "Д": "D", "Ж": "ZH", "Э": "E", "ф": "f", "ы": "i", "в": "v", "а": "a", "п": "p", "р": "r", "о": "o", "л": "l", "д": "d", "ж": "zh", "э": "e", "Я": "Ya", "Ч": "CH", "С": "S", "М": "M", "И": "I", "Т": "T", "Ь": "'", "Б": "B", "Ю": "YU", "я": "ya", "ч": "ch", "с": "s", "м": "m", "и": "i", "т": "t", "ь": "'", "б": "b", "ю": "yu" };
 
 // #endregion
 
@@ -65,7 +63,7 @@ const getHTTPResult = (requestURL, encoding = "utf8") => {
             const responseIsJson = /^application\/json/.test(contentType);
             const responseIsImg = /^image\/.*/.test(contentType);
 
-            if (!responseIsJson && !responseIsImg){
+            if (!responseIsJson && !responseIsImg) {
                 resolve();
             }
 
@@ -74,21 +72,21 @@ const getHTTPResult = (requestURL, encoding = "utf8") => {
             res.on('data', (chunk) => {
                 // When it is an IMG the response are various base64buffers
                 rawData += chunk;
-            });            
+            });
 
             res.on('end', () => {
-            try {
+                try {
 
-                if (responseIsJson){
-                    //const parsedData = JSON.parse(rawData);
-                    resolve(JSON.parse(rawData));
-                }else{
-                    const buffer = Buffer.from(rawData, 'binary').toString('base64');
-                    resolve(`data:${contentType};base64,${buffer}`);
+                    if (responseIsJson) {
+                        //const parsedData = JSON.parse(rawData);
+                        resolve(JSON.parse(rawData));
+                    } else {
+                        const buffer = Buffer.from(rawData, 'binary').toString('base64');
+                        resolve(`data:${contentType};base64,${buffer}`);
+                    }
+                } catch (e) {
+                    reject(e.message);
                 }
-            } catch (e) {
-                reject(e.message);
-            }
             });
         }).on('error', (e) => {
             reject(`Got error: ${e.message}`);
@@ -105,9 +103,9 @@ const getHTTPResult = (requestURL, encoding = "utf8") => {
 const getQuotedText = (text) => {
     var re = new RegExp(/"(.*)"/g);
     var match = text.match(re);
-    if (match){
+    if (match) {
         return match.toString();
-    }else{
+    } else {
         return "";
     }
 }
@@ -137,8 +135,8 @@ const deleteCodeBlocksFromText = (text) => {
  * @returns 
  */
 const CyrillicOrStandard = (string) => {
-    return string.split('').map(function (char) { 
-        return transliterate[char] || char; 
+    return string.split('').map(function (char) {
+        return transliterate[char] || char;
     }).join("");
 }
 
@@ -148,7 +146,7 @@ const CyrillicOrStandard = (string) => {
  * @returns 
  */
 const timePlayedToHours = (timePlayed) => {
-    return Math.trunc(timePlayed/3600)+"H";
+    return Math.trunc(timePlayed / 3600) + "H";
 }
 
 /**
@@ -160,14 +158,14 @@ const timePlayedToHours = (timePlayed) => {
  * @returns 
  */
 const truncateOrComplete = (text, maxLength = 28, padRight = false) => {
-    text = text+""; // Transform to text, just in case.
-    if (padRight){
+    text = text + ""; // Transform to text, just in case.
+    if (padRight) {
         text = text.padStart(maxLength); // Max is 28, fixed.
-    }else{
+    } else {
         text = text.padEnd(maxLength); // Max is 28, fixed.    
     }
-    if (text.length > maxLength){
-        text = text.substring(0, maxLength-3) + "...";
+    if (text.length > maxLength) {
+        text = text.substring(0, maxLength - 3) + "...";
     }
 
     return text;
@@ -182,13 +180,13 @@ const truncateOrComplete = (text, maxLength = 28, padRight = false) => {
  * @returns 
  */
 const hardTruncateOrComplete = (text, maxLength = 28, padRight = false) => {
-    text = text+""; // Transform to text, just in case.
-    if (padRight){
+    text = text + ""; // Transform to text, just in case.
+    if (padRight) {
         text = text.padStart(maxLength); // Max is 28, fixed.
-    }else{
+    } else {
         text = text.padEnd(maxLength); // Max is 28, fixed.    
     }
-    if (text.length > maxLength){
+    if (text.length > maxLength) {
         text = text.substr(0, maxLength);
     }
 
@@ -202,8 +200,8 @@ const hardTruncateOrComplete = (text, maxLength = 28, padRight = false) => {
  * @returns 
  */
 const hardTruncate = (text, maxLength = 28) => {
-    text = text+""; // Transform to text, just in case.
-    if (text.length > maxLength){
+    text = text + ""; // Transform to text, just in case.
+    if (text.length > maxLength) {
         text = text.substring(0, maxLength);
     }
     return text;
@@ -215,7 +213,7 @@ const hardTruncate = (text, maxLength = 28) => {
  */
 const getRunArgs = () => {
     // From the third on it's a valid arg
-    if (process.argv.length <= 2){
+    if (process.argv.length <= 2) {
         return ["develop"];
     }
 
@@ -236,10 +234,10 @@ const getConfig = () => {
 
 const moderationActionsToChoices = () => {
     let choices = [];
-    for (const key in moderationActions){
+    for (const key in moderationActions) {
         choices.push({
             name: moderationActions[key].name,
-            value: (moderationActions[key].id-1).toString()
+            value: (moderationActions[key].id - 1).toString()
         });
     }
 
@@ -247,9 +245,9 @@ const moderationActionsToChoices = () => {
 }
 
 const capitalizeFirstLetter = (text) => {
-    if (text.length > 1){
+    if (text.length > 1) {
         return `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
-    }else{
+    } else {
         return text.charAt(0).toUpperCase();
     }
 }
@@ -259,17 +257,17 @@ const groupBy = (key, array) => {
     for (let i = 0; i < array.length; i++) {
         let added = false;
         for (let j = 0; j < result.length; j++) {
-        if (result[j][key] == array[i][key]) {
-            result[j].items.push(array[i]);
-            added = true;
-            break;
-        }
+            if (result[j][key] == array[i][key]) {
+                result[j].items.push(array[i]);
+                added = true;
+                break;
+            }
         }
         if (!added) {
-        let entry = {items: []};
-        entry[key] = array[i][key];
-        entry.items.push(array[i]);
-        result.push(entry);
+            let entry = { items: [] };
+            entry[key] = array[i][key];
+            entry.items.push(array[i]);
+            result.push(entry);
         }
     }
     return result;
@@ -280,7 +278,7 @@ const createRulesAndInfoEmbed = () => {
     const config = getConfig();
 
     // Creates the embed parts
-    const description = 
+    const description =
         `**Server Rules**\n` +
         `⚠️ **Minor offenses (Warnings/Timeouts/Kicks)**:\n` +
         `1. Being disrespectful/having a derogatory attitude.\n` +
@@ -299,14 +297,14 @@ const createRulesAndInfoEmbed = () => {
         `13. Impersonating or mimicking another user's identity (name, image, bio, etc).\n\n` +
         `**Nevertheless, moderation actions are discretionary and based on severity.**`;
 
-    const roles = 
+    const roles =
         `<@&${config.role_Developer}> : The developers of Intruder!\n` +
         `<@&${config.role_CommunityManagementTeam}> : Official staff partners working along with the developer for community management.\n` +
         `<@&${config.role_Mod}> : The amazing community volunteers assisting the team to keep the peace.\n` +
         `<@&${config.role_Aug}> : A group of serious players who engage the community.\n` +
         `<@&${config.role_Agent}> : All members of the community.`;
 
-    const importantLinks = 
+    const importantLinks =
         `${config.youtubeEmoji} | [**Youtube**](https://www.youtube.com/superbossgames)\n` +
         `${config.tiktokEmoji} | [**TikTok**](https://www.tiktok.com/@superbossgames)\n` +
         `${config.twitterEmoji} | [**Twitter**](https://twitter.com/SuperbossGames/)\n` +
@@ -317,11 +315,11 @@ const createRulesAndInfoEmbed = () => {
         `${config.discordEmoji} | [**Server Invite**](https://discord.gg/superbossgames)`;
 
     const rulesAndInfoEmbed = new EmbedBuilder()
-    .setColor(0x1799b1)
-    .setTitle(`**Welcome to the Official Intruders Discord server!**`)
-    .setTimestamp()
-    .setDescription(description)
-    .setFooter({ text: `SuperbossGames Discord - #rules-and-info | Last updated ` });
+        .setColor(0x1799b1)
+        .setTitle(`**Welcome to the Official Intruders Discord server!**`)
+        .setTimestamp()
+        .setDescription(description)
+        .setFooter({ text: `SuperbossGames Discord - #rules-and-info | Last updated ` });
 
     rulesAndInfoEmbed.addFields({ name: `Roles`, value: roles });
 
@@ -332,24 +330,24 @@ const createRulesAndInfoEmbed = () => {
 
 const createModerationActionEmbed = (moderationAction, actedUponMember, caseId, reason, handledBy, attachmentUrl, DMsent = false) => {
     const banEmbed = new EmbedBuilder()
-    .setColor(moderationAction.color)
-    .setTitle(`${moderationAction.name}: Case #${caseId}`)
-    .setTimestamp();
+        .setColor(moderationAction.color)
+        .setTitle(`${moderationAction.name}: Case #${caseId}`)
+        .setTimestamp();
 
-    if (attachmentUrl != null && attachmentUrl.length > 0){
+    if (attachmentUrl != null && attachmentUrl.length > 0) {
         banEmbed.setImage(attachmentUrl)
     }
 
     banEmbed.addFields(
-        { name: `User ${moderationAction.conjugation}:`,  value: `<@!${actedUponMember.id}>\n${actedUponMember.id}`, inline: true },
-        { name: 'Handled by:',  value: `<@!${handledBy.id}>\n${handledBy.id}`, inline: true },
-        { name: `${moderationAction.name} reason:`,  value: reason, inline: false },
+        { name: `User ${moderationAction.conjugation}:`, value: `<@!${actedUponMember.id}>\n${actedUponMember.id}`, inline: true },
+        { name: 'Handled by:', value: `<@!${handledBy.id}>\n${handledBy.id}`, inline: true },
+        { name: `${moderationAction.name} reason:`, value: reason, inline: false },
     );
 
     // Add attachments one by one.
-    
+
     banEmbed.addFields(
-        { name: 'Direct message:',  value: DMsent ? `Delivered.` : `Couldn't be delivered.`, inline: true },
+        { name: 'Direct message:', value: DMsent ? `Delivered.` : `Couldn't be delivered.`, inline: true },
     );
 
 
@@ -366,65 +364,65 @@ const loadModerationProfileEmbeds = async (moderationProfile) => {
 
     let resume = ``;
 
-    if (moderationProfile.length == 0){
+    if (moderationProfile.length == 0) {
         resume += `😇 This profile has **no** previous moderation actions\n`;
-    }else{
+    } else {
         const groupedByType = groupBy('Type', moderationProfile);
 
         resume += '```'; // Start quote
 
         groupedByType.forEach((group, index) => {
 
-            if (group.items.length == 0){
+            if (group.items.length == 0) {
                 return;
             }
             //console.log("group.Type: ", group.Type);
             const emoji = moderationActions[group.Type].emoji;
             //console.log("emoji found:", emoji);
-            if (index > 0){
+            if (index > 0) {
                 resume += ` | `;
             }
             //resume += `${emoji} **${group.Type}**: ${group.items.length}`;      
-            resume += `${emoji} ${group.Type}: ${group.items.length}`;      
+            resume += `${emoji} ${group.Type}: ${group.items.length}`;
         });
 
         resume += '```'; // End quote
     }
 
-    if (moderationProfile.length == 0){
+    if (moderationProfile.length == 0) {
         const roomEmbed = new EmbedBuilder()
-        .setColor(0x0099FF)
-        .setTitle(`Moderation profile`)
-        .setTimestamp();
-    
-        roomEmbed.addFields({ name: `No moderation actions found for this user`, value: `-` });
-    
-        roomEmbed.setFooter({ text: `SuperbossGames | #moderation action` });
-    
-        moderationProfileEmbeds.push(roomEmbed);
-    }else{
-        // TODO: Do 3 mod actions in ONE embed.
-
-        moderationProfile.forEach((current, index) => {
-            const roomEmbed = new EmbedBuilder()
             .setColor(0x0099FF)
             .setTitle(`Moderation profile`)
             .setTimestamp();
 
-            roomEmbed.addFields({ name: `**Moderation resume**`, value: resume+"\n\n" }); // Header
+        roomEmbed.addFields({ name: `No moderation actions found for this user`, value: `-` });
+
+        roomEmbed.setFooter({ text: `SuperbossGames | #moderation action` });
+
+        moderationProfileEmbeds.push(roomEmbed);
+    } else {
+        // TODO: Do 3 mod actions in ONE embed.
+
+        moderationProfile.forEach((current, index) => {
+            const roomEmbed = new EmbedBuilder()
+                .setColor(0x0099FF)
+                .setTitle(`Moderation profile`)
+                .setTimestamp();
+
+            roomEmbed.addFields({ name: `**Moderation resume**`, value: resume + "\n\n" }); // Header
 
             // Create current embed
             const date = new Date(current.timeStamp);
-            const dateText = `${date.toLocaleDateString("en-US", {day: 'numeric', month: 'long', year: 'numeric', timeZone: 'utc'})} ${date.toLocaleTimeString("en-US")}`;
-        
+            const dateText = `${date.toLocaleDateString("en-US", { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'utc' })} ${date.toLocaleTimeString("en-US")}`;
+
             const emoji = moderationActions[current.Type].emoji;
-   
-            roomEmbed.addFields({ name: `Moderation action Nº ${index+1} of ${moderationProfile.length}`, value: `${emoji} ${current.Type}` }); // Header
+
+            roomEmbed.addFields({ name: `Moderation action Nº ${index + 1} of ${moderationProfile.length}`, value: `${emoji} ${current.Type}` }); // Header
             roomEmbed.addFields({ name: `Reason`, value: `${current.reason.replace(/(\r\n\r\n|\n\n|\r\r)/gm, "")}` });
             roomEmbed.addFields({ name: `📅 Date`, value: `${dateText}` });
 
             roomEmbed.setFooter({ text: `SuperbossGames | #moderation action` });
-        
+
             moderationProfileEmbeds.push(roomEmbed);
         });
     }
@@ -439,15 +437,15 @@ const getModerationProfileEmbed = (currentActionIndex, moderationProfileEmbeds, 
 }
 
 const resolveButtonState = (currentActionIndex, maxActionIndex, previousButton, nextButton) => {
-    if (currentActionIndex == 0){
+    if (currentActionIndex == 0) {
         previousButton.setDisabled(true);
-    }else{
+    } else {
         previousButton.setDisabled(false);
     }
 
-    if (currentActionIndex == maxActionIndex){
+    if (currentActionIndex == maxActionIndex) {
         nextButton.setDisabled(true);
-    }else{
+    } else {
         nextButton.setDisabled(false);
     }
 }
@@ -478,15 +476,15 @@ const createOrFindModerationActionThread = async (client, name) => {
         let thread = await channel.threads.cache.find(x => x.name === name);
 
         // If null, create a new thread.
-        if (!thread){
-            thread = await channel.threads.create({ 
+        if (!thread) {
+            thread = await channel.threads.create({
                 name: name, // Max 100 chars
                 autoArchiveDuration: ThreadAutoArchiveDuration.ThreeDays, // Three days for now
                 invitable: true,
                 rateLimitPerUser: 15,
                 reason: 'Moderation action',
                 type: ChannelType.PublicThread,
-                message: { 
+                message: {
                     content: name
                 }
             });
@@ -511,11 +509,11 @@ const getTextAndAttachmentsFromMessage = (message) => {
     let messageResume = '';
     const textDecorator = "```";
 
-    if (message.content.length > 0){
+    if (message.content.length > 0) {
         messageResume += `${textDecorator}${deleteCodeBlocksFromText(message.content)}${textDecorator}`;
     }
 
-    if (message.attachments.size > 0){
+    if (message.attachments.size > 0) {
         messageResume += `_Attachments_:\n`;
     }
     message.attachments.forEach((attachment) => {
@@ -525,8 +523,64 @@ const getTextAndAttachmentsFromMessage = (message) => {
     return messageResume;
 }
 
+/**
+ * Creates a request towars the discord API.
+ * @param {String} discordApiEndpoint 
+ * @param {String} tokenType 
+ * @param {String} accessToken 
+ * @returns 
+ */
+const discordApiRequest = async (discordApiEndpoint, tokenType, accessToken) => {
+    return await fetch(`https://discord.com/api/${discordApiEndpoint}`, {
+        headers: {
+            authorization: `${tokenType} ${accessToken}`,
+        },
+    }).then(result => result.json())
+    .catch(error => {
+        console.error(error);
+        return null;
+    });
+};
+
+/**
+ * Gets the Discord's avatar url
+ * @param {String} userId 
+ * @param {String} avatarId 
+ * @param {String} size 
+ * @returns 
+ */
+const getAvatarUrl = (userId, avatarId, size = 32) => {
+    return `https://cdn.discordapp.com/avatars/${userId}/${avatarId}.png?size=${size}`;
+}
+
+/**
+ * Returns an object with "name" and "avatarUrl"
+ * @param {String} jwtToken 
+ * @param {String} leagueOfficialRoles The league official roles arrays. Generally HiddenManager and LeagueOfficial
+ * @returns 
+ */
+const getSessionFromTokenContent = (jwtToken, leagueOfficialRoles = []) => {
+    try {
+        // Check if it has the hidden manager or league official role.
+        let leagueOfficial = false;
+        if (jwtToken.roles.some(x => leagueOfficialRoles.indexOf(x) > -1)) {
+            leagueOfficial = true;
+        }
+
+        return {
+            name: jwtToken.name,
+            avatarUrl: getAvatarUrl(jwtToken.id, jwtToken.avatar, 32),
+            leagueOfficial: leagueOfficial
+        }
+
+    } catch (error) {
+        return null;
+    }
+}
+
 
 module.exports = {
+    moderationActions,
     getHTTPResult,
     timePlayedToHours,
     getQuotedText,
@@ -542,11 +596,13 @@ module.exports = {
     deleteCodeBlocksFromText,
     groupBy,
     createRulesAndInfoEmbed,
-    moderationActions,
     createModerationActionEmbed,
     loadModerationProfileEmbeds,
     getModerationProfileEmbed,
     resolveButtonState,
     createOrFindModerationActionThread,
     getTextAndAttachmentsFromMessage,
+    discordApiRequest,
+    getAvatarUrl,
+    getSessionFromTokenContent,
 }
