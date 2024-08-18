@@ -15,14 +15,17 @@ block content
 
   //- Page
   div.container
-    div.col-xs-12(style="height:calc(100vh - 40px);")
+    div.col-xs-12(style="height:calc(100vh - 55px);")
 
       //- Title
       .row
         div.col-xs-12.col-sm-12.col-md-8.offset-md-2.col-lg-6.offset-lg-3.p-0.mt-5
           div
             div.col-xs-12.p-0
-              div.sbg-identification.p-1.unselectable > YOUR TEAM'S SCHEDULES
+              if session.leagueOfficial
+                div.p-1.ps-2.sbg-identification.unselectable#ScheduleTitleLeagueOfficial > ALL TEAM'S SCHEDULES
+              else
+                div.p-1.ps-2.sbg-identification.unselectable#ScheduleTitle > YOUR TEAM'S SCHEDULES
 
             div.col-xs-12.p-0.sb-border.panelBg.mt-4
               ul.mt-3.mb-3
@@ -32,4 +35,6 @@ block content
                 each match in matches
                   li
                     p.badge.ms-0.mt-0.mr-0.mb-1 #{match.JSDateTime.toLocaleDateString()}
-                    a.link(href='schedule/' + match.Name.replace(' ', '_')+'-'+match.Id) #{match.Name}
+                    a.link(href='schedule/' + match.Name.replaceAll(" ", "-")+'-'+match.Id) #{match.Name}
+
+  include parts/footer.pug

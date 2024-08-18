@@ -5,6 +5,7 @@ const router = express.Router();
 const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 const jwt = require('jsonwebtoken');
+const { match_GetExternalUser } = require('../utils/storedProcedures.js');
 
 const ICLDiscordServerId = config.ICLServerId;
 
@@ -25,30 +26,50 @@ router.post('/', async (req, res) => {
 
     const userData = await bloonUtils.discordApiRequest('users/@me', tokenType, accessToken);
     if (userData === null) {
-      return { res: false, msg: `Couldn't get your discord profile information.` }
+      return res.end(JSON.stringify({ res: false, msg: `Couldn't get your discord profile information.` }));
     }
 
+    // Load all servers
     const userServers = await bloonUtils.discordApiRequest('users/@me/guilds', tokenType, accessToken);
     if (userServers === null) {
-      return { res: false, msg: `There was a problem getting your server list from Discord.` }
+      return res.end(JSON.stringify({ res: false, msg: `There was a problem getting your server list from Discord.` }));
     }
 
-    // Check if user in superboss'
+    let discordServerProfile;
+    // Check if user in the ICL server
     if (!userServers.some(x => x.id === ICLDiscordServerId)) {
-      return { res: false, msg: `Sorry ${userData.global_name}, you don't appear to be in the Superboss' Discord server. To ask for an exclusion contact @Xixo.` }
+
+      // Check on external user database table
+      const externalUser = await match_GetExternalUser(userData.id);
+
+      // If user doesn't exists in external database, sorry.
+      if (externalUser == null || externalUser.length == 0){
+        return res.end(JSON.stringify({ res: false, msg: `Sorry ${userData.global_name}, you don't appear to be in the Superboss' Discord server. To ask for an exclusion contact @Xixo.` }));
+      }
+
+      if (externalUser[0].UserDiscordTeamRoleId == null || externalUser[0].UserDiscordTeamRoleId.length == 0){
+        return res.end(JSON.stringify({ res: false, msg: `Sorry ${userData.global_name}, There's no roles associated to your account.` }));
+      }
+
+      discordServerProfile = {
+        name: externalUser[0].UserDiscordName,
+        roles: [externalUser[0].UserDiscordTeamRoleId]
+      };
+    }else{
+      // Get info from the ICL server
+      discordServerProfile = await bloonUtils.discordApiRequest(`users/@me/guilds/${ICLDiscordServerId}/member`, tokenType, accessToken);
+      if (discordServerProfile === null || discordServerProfile.code === 0) {
+        return res.end(JSON.stringify({ res: false, msg: `Sorry ${userData.global_name}, You're in the ICL server, but I can get your information right now.` }));
+      }
     }
 
-    // Check for servers and see if superboss' is one of them
-    const discordServerProfile = await bloonUtils.discordApiRequest(`users/@me/guilds/${ICLDiscordServerId}/member`, tokenType, accessToken);
-    if (discordServerProfile === null) {
-      return { res: false, msg: `There was a problem getting your profile from the Superboss' server.` }
-    }
+
 
     // Create self-signed JWT token to save in localStorage
     const signedJwt = jwt.sign({
       id: userData.id,
       name: discordServerProfile.nick || userData.global_name,
-      avatar: userData.avatar,
+      avatar: userData.avatar ?? 'NULL',
       roles: discordServerProfile.roles,
       iat: Math.floor(Date.now() / 1000),
       exp: Math.floor(Date.now() / 1000) + (expiresIn * 60),
@@ -82,7 +103,9 @@ router.post('/', async (req, res) => {
   } catch (error) {
     return res.end(
       JSON.stringify(
-        { res: false, msg: error }
+        { res: false, 
+          msg: error.toString() 
+        }
       )
     );
   }
@@ -101,7 +124,7 @@ router.post('/noLeagueOfficial/', async (req, res) => {
 
     if (jwtToken == undefined || jwtToken == null) {
       // Clear process cookies
-      return { res: false, msg: `Couldn't find token.` };
+      res.end(JSON.parse({ res: false, msg: `Couldn't find token.` }));
     }
 
     const tokenContent = jwt.verify(jwtToken, config.oAuthTokenSecret);

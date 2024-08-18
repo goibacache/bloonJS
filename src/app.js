@@ -23,7 +23,10 @@ if (process.argv.length <= 2){ // Two means it's dev
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: 0, // forever
+  etag: true
+}));
 
 app.use('/', indexRouter);
 app.use('/authorize', authorizeRouter);

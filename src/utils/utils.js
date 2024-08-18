@@ -209,7 +209,7 @@ const hardTruncate = (text, maxLength = 28) => {
 
 /**
  * Gets the args of the node execution. ie: node . test will return ["test"]
- * @returns array of args
+ * @returns [String]
  */
 const getRunArgs = () => {
     // From the third on it's a valid arg
@@ -550,6 +550,15 @@ const discordApiRequest = async (discordApiEndpoint, tokenType, accessToken) => 
  * @returns 
  */
 const getAvatarUrl = (userId, avatarId, size = 32) => {
+    if (avatarId == null || avatarId == "NULL"){
+        return ''; // I've seen worse code, ok?
+    }
+
+    // If it is an external avatar, load it.
+    if (avatarId.indexOf('http') > 0){
+        return avatarId;
+    }
+
     return `https://cdn.discordapp.com/avatars/${userId}/${avatarId}.png?size=${size}`;
 }
 
@@ -568,6 +577,7 @@ const getSessionFromTokenContent = (jwtToken, leagueOfficialRoles = []) => {
         }
 
         return {
+            id: jwtToken.id,
             name: jwtToken.name,
             avatarUrl: getAvatarUrl(jwtToken.id, jwtToken.avatar, 32),
             leagueOfficial: leagueOfficial

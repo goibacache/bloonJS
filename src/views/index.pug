@@ -15,19 +15,19 @@ block content
   input#oAutClientId(type="hidden", value=oAutClientId)
   input#oAuthReturnUrl(type="hidden", value=oAuthReturnUrl)
 
+  include parts/sessionHeader.pug
+
   //- Page
   div#login
-    div.d-flex.align-items-center.justify-content-center(style="height:calc(100vh - 40px);")
-      div.row.sb-border.panelBg
+    div.d-flex.align-items-center.justify-content-center(style="height:calc(100vh - 171px);")
+      div.row
+      
         div.col-xs-12.p-0
-          div.sbg-identification.p-1#IdentificationTitle >IDENTIFICATION
-        div.mt-3.mb-3.text-center
+          div.p-1.ps-2.sbg-identification.unselectable#IdentificationTitle >IDENTIFICATION
+        div.mt-3.mb-3.text-center.sb-border.panelBg.pt-3.pb-3
           p.col-xs-12.center#PleaseSignIn Please identify yourself using your discord account.
           button.btn.sbg-primary.row#loginButton(type="button", onClick="authorizeWithDiscord()") Login with Discord
           
 
-  //- h1=title
-  //- p Welcome to #{title}
-  //- button.btn.btn-primary(type="button") now this is news
-
+  include parts/footer.pug
   

@@ -1,39 +1,53 @@
 const bloonUtils = require('../utils/utils.js');
 const mysql = require('mysql2/promise');
 const config = bloonUtils.getConfig();
+const runArgs = bloonUtils.getRunArgs();
 
 const moderationAction_Insert = async(moderationAction, banedUserDiscordId, banReason, handledByDiscordId, fullMessage = '') => {
+    let connection;
     try{
         const query = `CALL moderationAction_Insert(?, ?, ?, ?, ?)`;
     
-        const connection = await createConnection();
+        connection = await createConnection();
 
         const [rows] = await connection.execute(query, [moderationAction.id, banedUserDiscordId, banReason, handledByDiscordId, fullMessage]);
 
-        return parseInt(rows[0][0]['res']); // Awful, but eh.
+        connection.release();
+
+        return parseInt(rows[0][0]['res']); 
 
     }catch(error){
+        if (connection != null){
+            connection.release();
+        }
         console.error("Error in sp_banInsert: ", error);
         return 0;
     }
 }
 
 const moderationAction_GetNewId = async(moderationAction) => {
+    let connection;
     try{
         const query = `CALL moderationAction_GetNewId(?)`;
 
-        const connection = await createConnection();
+        connection = await createConnection();
     
         const [rows] = await connection.execute(query, [moderationAction.id]);
+
+        connection.release();
     
-        return parseInt(rows[0][0]['res']); // Awful, but eh.
+        return parseInt(rows[0][0]['res']); 
     }catch(error){
+        if (connection != null){
+            connection.release();
+        }
         console.error("Error in moderationAction_GetNewId: ", error);
         return 0;
     }
 }
 
 const kofi_GetKofiPhrase = async(_userName) => {
+    let connection;
     try{
         const query = `CALL kofiphrase_get(?)`;
 
@@ -41,14 +55,20 @@ const kofi_GetKofiPhrase = async(_userName) => {
 
         const [rows] = await connection.execute(query, [_userName]);
 
-        return rows[0]; // Awful, but eh.
+        connection.release();
+
+        return rows[0]; 
     }catch(error){
+        if (connection != null){
+            connection.release();
+        }
         console.error("Error in kofiphrase_get: ", error);
         return null;
     }
 }
 
 const moderationAction_Profile = async(_userId) => {
+    let connection;
     try{
         const query = `CALL moderationAction_Profile(?)`;
 
@@ -56,8 +76,13 @@ const moderationAction_Profile = async(_userId) => {
 
         const [rows] = await connection.execute(query, [_userId]);
 
-        return rows[0]; // Awful, but eh.
+        connection.release();
+
+        return rows[0]; 
     }catch(error){
+        if (connection != null){
+            connection.release();
+        }
         console.error("Error in moderationAction_Profile: ", error);
         return null;
     }
@@ -70,15 +95,21 @@ const moderationAction_Profile = async(_userId) => {
  * @returns 
  */
 const kofi_InsertOrUpdate = async(_userName, _phrase = '', _renewal = null) => {
+    let connection;
     try{
         const query = `CALL kofiphrase_InsertOrUpdate(?, ?, ?)`;
 
-        const connection = await createConnection();
+        connection = await createConnection();
 
         const [rows] = await connection.execute(query, [_userName, _phrase, _renewal ?? 0]);
 
-        return rows[0]; // Awful, but eh.
+        connection.release();
+
+        return rows[0]; 
     }catch(error){
+        if (connection != null){
+            connection.release();
+        }
         console.error("Error in kofiphrase_InsertOrUpdate: ", error);
         return null;
     }
@@ -89,31 +120,42 @@ const kofi_InsertOrUpdate = async(_userName, _phrase = '', _renewal = null) => {
  * @param {string} _matchId The match id with underscores instead of spaces and the id at the end of the name 
  */
 const match_GetInfo = async(_matchId) => {
+    let connection;
     try{
         const query = `CALL match_GetInfo(?)`;
 
-        const connection = await createConnection();
+        connection = await createConnection();
 
         const [rows] = await connection.execute(query, [_matchId]);
 
+        connection.release();
+
         return rows[0][0]; // Get first result only.
     }catch(error){
+        if (connection != null){
+            connection.release();
+        }
         console.error("Error in match_GetInfo: ", error);
         return null;
     }
 }
 
 const match_GetDetails = async(_matchId, _role) => {
-    // match_GetDetails
+    let connection;
     try{
         const query = `CALL match_GetDetails(?, ?)`;
 
-        const connection = await createConnection();
+        connection = await createConnection();
 
         const [rows] = await connection.execute(query, [_matchId, _role]);
 
-        return rows[0]; // Awful, but eh.
+        connection.release();
+
+        return rows[0]; 
     }catch(error){
+        if (connection != null){
+            connection.release();
+        }
         console.error("Error in match_GetDetails: ", error);
         return null;
     }
@@ -124,30 +166,101 @@ const match_GetDetails = async(_matchId, _role) => {
  * @param {string} _roles Role list coma separated (,) [IK, IK...]
  */
 const match_GetAllMatches = async(_roles) => {
-    // match_GetAllMatches
+    let connection;
     try{
         const query = `CALL match_GetAllMatches(?)`;
 
-        const connection = await createConnection();
+        connection = await createConnection();
 
         const [rows] = await connection.execute(query, [_roles]);
 
-        return rows[0]; // Awful, but eh.
+        connection.release();
+
+        return rows[0]; 
     }catch(error){
+        if (connection != null){
+            connection.release();
+        }
+        console.error("Error in match_GetAllMatches: ", error);
+        return null;
+    }
+}
+
+const match_UpdateMyTimes = async(_matchId, _userDiscordId, _userDiscordName, _userDiscordAvatar, _dateAndTimeZone, _TeamRoleId) => {
+    let connection;
+    try{        
+        const _formattedDateAndTimeZone = _dateAndTimeZone.map(x => x.DateTimeStr+"|"+x.TimeZone).join(',');
+        const query = `CALL match_UpdateMyTimes(?, ?, ?, ?, ?, ?)`;
+
+        connection = await createConnection();
+
+        const [rows] = await connection.execute(query, [_matchId, _userDiscordId, _userDiscordName, _userDiscordAvatar, _formattedDateAndTimeZone, _TeamRoleId]);
+
+        connection.release();
+
+        return rows[0];
+    }catch(error){
+        if (connection != null){
+            connection.release();
+        }
+        console.error("Error in match_UpdateMyTimes: ", error);
+        return null;
+    }
+}
+
+/**
+ * Based on the user Discord ID it checks the external users table
+ * @param {String} _userDiscordId 
+ * @returns 
+ */
+const match_GetExternalUser = async(_userDiscordId) => {
+    let connection;
+    try{
+        const query = `CALL match_GetExternalUser(?)`;
+
+        connection = await createConnection();
+
+        const [rows] = await connection.execute(query, [_userDiscordId]);
+
+        connection.release();
+
+        return rows[0]; 
+    }catch(error){
+        if (connection != null){
+            connection.release();
+        }
         console.error("Error in match_GetAllMatches: ", error);
         return null;
     }
 }
 
 const createConnection = async () => {
-    return await mysql.createConnection({
-        host:               config.mysqlHost,
-        user:               config.mysqlUser,
-        password:           config.mysqlPass,
-        database:           config.mysqlDDBB,
-        charset:            "utf8mb4_bin",
-        connectTimeout:     120 * 60
-    });
+    // Create global pool object to avoid reconnecting to the MySQL instance multiple times
+    if (global.poolObject === undefined) {
+        global.poolObject = await mysql.createPool({
+            host:               config.mysqlHost,
+            user:               config.mysqlUser,
+            password:           config.mysqlPass,
+            database:           config.mysqlDDBB,
+            charset:            "utf8mb4_bin",
+            connectTimeout:     120 * 60,
+            connectionLimit:    0,
+            waitForConnections: true
+        });
+
+        if (runArgs[0] === "develop"){ // Two means it's dev
+            global.poolObject.on('connection', (connection) => {
+                console.log('new pool mysql connection!', connection.threadId);
+            })
+
+            global.poolObject.on('release', function (connection) {
+                console.log('Connection %d released', connection.threadId);
+            });
+        }
+        return await global.poolObject.getConnection();
+    }else{
+        return await global.poolObject.getConnection();
+    }
 }
 
 module.exports = {
@@ -158,5 +271,7 @@ module.exports = {
     moderationAction_Profile,
     match_GetInfo,
     match_GetDetails,
-    match_GetAllMatches
+    match_GetAllMatches,
+    match_UpdateMyTimes,
+    match_GetExternalUser
 }

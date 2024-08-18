@@ -11,7 +11,7 @@ const getReturnUrl = () => {
 const authorizeWithDiscord = () => {
     const oAutClientId = $("#oAutClientId").val();
     const oAuthReturnUrl = encodeURIComponent($("#oAuthReturnUrl").val());
-    window.location.href = `https://discord.com/oauth2/authorize?client_id=${oAutClientId}&response_type=token&redirect_uri=${oAuthReturnUrl}&scope=identify+guilds`;
+    window.location.href = `https://discord.com/oauth2/authorize?client_id=${oAutClientId}&response_type=token&redirect_uri=${oAuthReturnUrl}&scope=identify+guilds+guilds.members.read`;
 }
 
 getReturnUrl();

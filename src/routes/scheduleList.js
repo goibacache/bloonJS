@@ -17,19 +17,27 @@ router.get('/', async(req, res) => {
     let session = null;
 
     // Check if token is valid, if it is, it's logged, send him to the main page
+    
     if (jwtToken == undefined || jwtToken == null || jwtToken.length == null) {
         // Clear process cookies
         const cookieOptions = { SameSite: "none", secure: true };
         res.clearCookie('jwt', cookieOptions);
         res.redirect('/');
+        res.end();
+        return;
     }
+
     if (jwtToken != undefined && jwtToken != null) {
         try {
             tokenContent = jwt.verify(jwtToken, config.oAuthTokenSecret);
-            session = bloonUtils.getSessionFromTokenContent(tokenContent, [config.role_LeagueOfficial]);
+            if (tokenContent.roles != null || tokenContent.roles.length > 0){
+                session = bloonUtils.getSessionFromTokenContent(tokenContent, [config.role_LeagueOfficial]);
+            }
         } catch (error) {
             res.clearCookie('jwt');
             res.redirect('/');
+            res.end();
+            return;
         }
     }
 
@@ -41,7 +49,12 @@ router.get('/', async(req, res) => {
         match.JSDateTime = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
     });
 
-    res.render('scheduleList', { title: `Bloon JS - Your team's schedules`, matches: matches, session: session });
+    // Prepare breadcrumbs
+    const breadCrumbs = [
+        { url: '/scheduleList', name: 'Schedule List' }
+    ];
+
+    res.render('scheduleList', { title: `Bloon JS - Your team's schedules`, matches: matches, session: session, breadCrumbs: breadCrumbs });
 });
 
 

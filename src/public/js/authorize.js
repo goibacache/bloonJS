@@ -31,12 +31,12 @@ const getCode = async () => {
         success: (res) => res,
         onerror: (error) => {
             console.error(error);
-            return { res: false, msg: error };
+            return error;
         }
     });
 
     if (authorize.res == false) {
-        changeStatus('There was a problem authenticating you, sorry.');
+        changeStatus(authorize.msg);
         return;
     }
 
