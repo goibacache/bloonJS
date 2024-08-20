@@ -18,6 +18,8 @@ router.get('/', (req, res) => {
     try{
       jwt.verify(jwtToken, config.oAuthTokenSecret);
       res.redirect('/scheduleList');
+      res.end();
+      return;
     }catch(error){
       res.clearCookie('jwt');
     }

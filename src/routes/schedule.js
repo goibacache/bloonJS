@@ -32,7 +32,7 @@ router.get('/:scheduleId', async (req, res) => {
     let session;
     try {
       tokenContent = jwt.verify(jwtToken, config.oAuthTokenSecret);
-      session = bloonUtils.getSessionFromTokenContent(tokenContent, [config.role_LeagueOfficial]);
+      session = bloonUtils.getSessionFromTokenContent(tokenContent, [config.role_LeagueOfficial, config.role_HiddenManager]);
     } catch (error) {
       // Clear process cookies
       res.clearCookie('jwt');
@@ -155,7 +155,7 @@ router.put('/:scheduleId', async (req, res) => {
     let session;
     try {
       tokenContent = jwt.verify(jwtToken, config.oAuthTokenSecret);
-      session = bloonUtils.getSessionFromTokenContent(tokenContent, [config.role_LeagueOfficial]);
+      session = bloonUtils.getSessionFromTokenContent(tokenContent, [config.role_LeagueOfficial, config.role_HiddenManager]);
     } catch (error) {
       // Clear process cookies
       res.clearCookie('jwt');

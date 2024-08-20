@@ -19,7 +19,7 @@ const translate = () => {
     // Translate for each key:
     const langKeys = Object.keys(languageForPage.strings);
     langKeys.forEach(key => {
-        console.log(`translating ${key} with ${languageForPage.strings[key][language]}`)
+        // console.log(`translating ${key} with ${languageForPage.strings[key][language]}`)
         $(`#${key}`).text(languageForPage.strings[key][language]);
     });
 
@@ -32,7 +32,7 @@ const translate = () => {
     // Translate for each key:
     const generalKeys = Object.keys(generalLanguage.strings);
     generalKeys.forEach(key => {
-        console.log(`translating general ${key} with ${generalLanguage.strings[key][language]}`)
+        // console.log(`translating general ${key} with ${generalLanguage.strings[key][language]}`)
         $(`#${key}`).text(generalLanguage.strings[key][language]);
     });
 }

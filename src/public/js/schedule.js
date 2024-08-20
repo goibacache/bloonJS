@@ -1,10 +1,10 @@
 const modeValues = {
-    add: "add", 
+    add: "add",
     remove: "remove"
 };
 
 const tabValues = {
-    team: "team", 
+    team: "team",
     me: "me"
 };
 
@@ -23,11 +23,18 @@ let tab = tabValues.team;
 let mySelections = [];
 
 /**
+ * Viselect selection
+ */
+let selection = null;
+
+let scheduledTimes = null;
+
+/**
  * Uses moment-timezones to load all of the timezones in the the time zone select
  */
 const addMomentTimezones = () => {
     const extraNames = moment.tz.names().filter((value, index, array) => array.indexOf(value) === index);
-    
+
     extraNames.forEach(e => {
         $("#timezone").append(`<option value="${e}">${e.replace('_', ' ')}</option>`);
     });
@@ -39,8 +46,6 @@ const addMomentTimezones = () => {
  */
 const getUserTimezone = () => {
     return Intl.DateTimeFormat().resolvedOptions().timeZone;
-    //return "Pacific/Gambier" // For testing. GO: test: TODO:
-    //return "America/Los_Angeles" // For testing. GO: test: TODO:
 }
 
 /**
@@ -48,12 +53,12 @@ const getUserTimezone = () => {
  */
 const selectUserTimeZone = (triggerChange = false) => {
     const currentTimeZone = getUserTimezone();
-    if (triggerChange){
+    if (triggerChange) {
         $(`#timezone`).val(currentTimeZone).change(); // triggers onChange();
-    }else{
+    } else {
         $(`#timezone`).val(currentTimeZone); // Doesn't trigger onChange();
     }
-    
+
 }
 
 /**
@@ -61,7 +66,7 @@ const selectUserTimeZone = (triggerChange = false) => {
  * @param {string} timezone 
  */
 const getMatchDetailsJSON = (selectedTimeZone = null) => {
-    if (selectedTimeZone == null){
+    if (selectedTimeZone == null) {
         selectedTimeZone = $(`#timezone`).val();
     }
 
@@ -73,7 +78,7 @@ const getMatchDetailsJSON = (selectedTimeZone = null) => {
         const dateTimeParts = md.DateTime.split('.');
 
         matchDetails.push({
-            DateTime: spacetime([dateTimeParts[2], parseInt(dateTimeParts[1])-1, dateTimeParts[0], dateTimeParts[3], dateTimeParts[4]], md.TimeZone).goto(selectedTimeZone),
+            DateTime: spacetime([dateTimeParts[2], parseInt(dateTimeParts[1]) - 1, dateTimeParts[0], dateTimeParts[3], dateTimeParts[4]], md.TimeZone).goto(selectedTimeZone),
             UserDiscordId: md.UserDiscordId,
             UserDiscordName: md.UserDiscordName,
             userDiscordAvatar: md.userDiscordAvatar,
@@ -89,7 +94,7 @@ const getMatchDetailsJSON = (selectedTimeZone = null) => {
  */
 const loadMySelections = () => {
 
-    if (leagueOfficial){
+    if (leagueOfficial) {
         return;
     }
 
@@ -104,7 +109,7 @@ const loadMySelections = () => {
 
         mySelections.push({
             DateTimeStr: x.DateTime,
-            DateTime: spacetime([dateTimeParts[2], parseInt(dateTimeParts[1])-1, dateTimeParts[0], dateTimeParts[3], dateTimeParts[4]], x.TimeZone).goto(selectedTimeZone),
+            DateTime: spacetime([dateTimeParts[2], parseInt(dateTimeParts[1]) - 1, dateTimeParts[0], dateTimeParts[3], dateTimeParts[4]], x.TimeZone).goto(selectedTimeZone),
             TimeZone: x.TimeZone
         });
     })
@@ -126,7 +131,7 @@ const getCurrentSelectionFromScreen = () => {
 
         currentSelection.push({
             DateTimeStr: time,
-            DateTime: spacetime([dateTimeParts[2], parseInt(dateTimeParts[1])-1, dateTimeParts[0], dateTimeParts[3], dateTimeParts[4]], timeZone),
+            DateTime: spacetime([dateTimeParts[2], parseInt(dateTimeParts[1]) - 1, dateTimeParts[0], dateTimeParts[3], dateTimeParts[4]], timeZone),
             TimeZone: timeZone
         });
     });
@@ -138,7 +143,7 @@ const getCurrentSelectionFromScreen = () => {
 
         currentSelection.push({
             DateTimeStr: time,
-            DateTime: spacetime([dateTimeParts[2], parseInt(dateTimeParts[1])-1, dateTimeParts[0], dateTimeParts[3], dateTimeParts[4]], timeZone),
+            DateTime: spacetime([dateTimeParts[2], parseInt(dateTimeParts[1]) - 1, dateTimeParts[0], dateTimeParts[3], dateTimeParts[4]], timeZone),
             TimeZone: timeZone
         });
     });
@@ -149,7 +154,7 @@ const getCurrentSelectionFromScreen = () => {
 const drawTooltipResume = (hour, currentScheduledTimes, mySelectionsOnTime) => {
     let text = `<b>${hour}</b>`;
 
-    if (currentScheduledTimes.length == 0 && mySelectionsOnTime.length == 0){
+    if (currentScheduledTimes.length == 0 && mySelectionsOnTime.length == 0) {
         return text;
     }
 
@@ -173,7 +178,7 @@ const drawTooltipResume = (hour, currentScheduledTimes, mySelectionsOnTime) => {
         });
 
         // Only if it's the real team...
-        if (team.RoleId === myTeam){
+        if (team.RoleId === myTeam) {
             mySelectionsOnTime.forEach(mySelections => {
                 text += `<b class='col-auto badge'>${myName}</b>`;
             });
@@ -188,8 +193,6 @@ const drawTooltipResume = (hour, currentScheduledTimes, mySelectionsOnTime) => {
 
 const loadCalendar = (debug = false) => {
 
-    $(".tooltip.bs-tooltip-auto.show").remove(); // Destroy all tooltips
-
     calendar = $('#calendar');
     /**
      * Current select timezone
@@ -201,7 +204,7 @@ const loadCalendar = (debug = false) => {
      */
     let headerColumns = 0;
 
-    const scheduledTimes = getMatchDetailsJSON();
+    scheduledTimes = getMatchDetailsJSON();
 
     //Clean calendar
     calendar.children().remove();
@@ -216,25 +219,25 @@ const loadCalendar = (debug = false) => {
     /**
      * Start date in the original time zone. yyyy, mm(-1), dd, hh, mm
      */
-    const startDate = spacetime([startDateParts[2], parseInt(startDateParts[1])-1, startDateParts[0], startDateParts[3], startDateParts[4]], matchInfoDateTimeZone);
+    const startDate = spacetime([startDateParts[2], parseInt(startDateParts[1]) - 1, startDateParts[0], startDateParts[3], startDateParts[4]], matchInfoDateTimeZone);
 
     /**
      * Start date in the user's time zone (it will start at 00:00 of the first day)
      */
-    const localStartDate = spacetime([startDateParts[2], parseInt(startDateParts[1])-1, startDateParts[0], startDateParts[3], startDateParts[4]], matchInfoDateTimeZone).goto(timezone).startOf('day'); // Will start at 00:00
+    const localStartDate = spacetime([startDateParts[2], parseInt(startDateParts[1]) - 1, startDateParts[0], startDateParts[3], startDateParts[4]], matchInfoDateTimeZone).goto(timezone).startOf('day'); // Will start at 00:00
 
-    
+
 
     /**
      * End date in the original time zone. yyyy, mm(-1), dd, hh, mm
      */
-    const endDate = spacetime([endDateParts[2], parseInt(endDateParts[1])-1, endDateParts[0], endDateParts[3], endDateParts[4]], matchInfoDateTimeZone);
+    const endDate = spacetime([endDateParts[2], parseInt(endDateParts[1]) - 1, endDateParts[0], endDateParts[3], endDateParts[4]], matchInfoDateTimeZone);
 
     /**
      * End date in the user's time zone (it will start at 00:00 of the first day)
      */
-    const localEndDate = spacetime([endDateParts[2], parseInt(endDateParts[1])-1, endDateParts[0], endDateParts[3], endDateParts[4]], matchInfoDateTimeZone).goto(timezone).startOf('day'); // Will start at 00:00
-    
+    const localEndDate = spacetime([endDateParts[2], parseInt(endDateParts[1]) - 1, endDateParts[0], endDateParts[3], endDateParts[4]], matchInfoDateTimeZone).goto(timezone).startOf('day'); // Will start at 00:00
+
     let currentDate = localStartDate;
 
     /**
@@ -263,9 +266,9 @@ const loadCalendar = (debug = false) => {
         // Create first column only on the first iteration
         if (i % 4 == 0) {
             currentTr.innerHTML += `
-                <td rowspan="4" class="calendarCell borderH text-center timeText" style="background-color: var(--panel-bg-color-left);">
+                <th rowspan="4" class="calendarCell borderH text-center timeText" style="background-color: var(--panel-bg-color-left);">
                     ${i / 4}:00
-                </td>`;
+                </th>`;
         }
 
         // For each day, create a TD
@@ -300,7 +303,7 @@ const loadCalendar = (debug = false) => {
 
                 currentTr.innerHTML += `
                     <td class="calendarCell borderH text-center">
-                        <div class="selectableDate ${cssActiveClass} ${selectionClass}" data-time="${currentDate.add(indexOfDay, 'days').unixFmt('dd.MM.yyyy.HH.mm')}" data-toggle="tooltip" title="${tooltipResume}">
+                        <div class="selectableDate ${cssActiveClass} ${selectionClass}" data-time="${currentDate.add(indexOfDay, 'days').unixFmt('dd.MM.yyyy.HH.mm')}" title="${tooltipResume}" data-toggle="tooltip">
                         </div>
                     </td>`;
             }
@@ -310,7 +313,7 @@ const loadCalendar = (debug = false) => {
         $("#calendar tbody").append(currentTr);
     }
 
-    if (debug){
+    if (debug) {
         console.log('startDate', startDate.format('nice'));
         console.log('endDate', endDate.format('nice'));
         console.log('localStartDate', localStartDate.format('nice'));
@@ -328,8 +331,13 @@ const buildDayArray = (startDate, localStartDate, endDate, localEndDate) => {
 
     const amountOfDays = localStartDate.diff(localEndDate.add(1, 'days'), 'days');
 
+    const language = localStorage.getItem('language') ?? "en";
+
+    const generalLanguage = languageDefinition.filter(x => x.page == '*')[0];
+    const languageObj = generalLanguage.strings.SpaceTime[language];
+
     for (let i = 0; i < amountOfDays; i++) {
-        const currentDate = localStartDate.add(i, 'days')
+        const currentDate = localStartDate.add(i, 'days').i18n(languageObj);
 
         if (currentDate.isAfter(localEndDate) || (currentDate.isEqual(endDate) && endDate.format('time') === '12:00am')) {
             continue;
@@ -348,9 +356,12 @@ const buildDayArray = (startDate, localStartDate, endDate, localEndDate) => {
 
 // Load tooltips
 const loadTooltips = () => {
-    $('[data-toggle="tooltip"]').tooltip({
+    $('body').tooltip({
+        selector: '.selectableDate',
         html: true,
-        animation: false
+        animation: false,
+        track: true,
+        content: () => $(this).attr('title')
     });
 }
 
@@ -364,7 +375,7 @@ const changeTab = (element, option) => {
     $(element).addClass('active');
 
     // TEAM:
-    if (option == 1){
+    if (option == 1) {
         tab = tabValues.team;
         for (let i = 0; i < 10; i++) {
             $(`tbody .active${i}Small`).removeClass(`active${i}Small`).addClass(`active${i}`);
@@ -373,7 +384,7 @@ const changeTab = (element, option) => {
     }
 
     // ME:
-    if (option == 2){
+    if (option == 2) {
         tab = tabValues.me;
         for (let i = 0; i < 10; i++) {
             $(`tbody .active${i}`).removeClass(`active${i}`).addClass(`active${i}Small`);
@@ -383,37 +394,188 @@ const changeTab = (element, option) => {
 }
 
 const handleMarks = () => {
-    if (leagueOfficial){
+    console.log("handleMarks");
+
+    if (leagueOfficial) {
         return;
     }
     // Mark calendar
-    $(".selectableDate").on('mouseenter', (e) => {
+    // $(".selectableDate").on('mouseenter', (e) => {
 
-        let selectionClass = (tab == tabValues.team ? 'mySelectionSmall' : 'mySelection');
+    //     let selectionClass = (tab == tabValues.team ? 'mySelectionSmall' : 'mySelection');
 
-        if (e.originalEvent.buttons > 0) { // more than one button that is the right click
-            if (mode == modeValues.remove) {
-                $(e.currentTarget).removeClass(selectionClass);
+    //     if (e.originalEvent.buttons > 0) { // more than one button that is the right click
+    //         if (mode == modeValues.remove) {
+    //             $(e.currentTarget).removeClass(selectionClass);
+    //         } else {
+    //             $(e.currentTarget).addClass(selectionClass);
+    //         }
+    //     }
+    // });
+
+    // $(".selectableDate").on('click', (e) => {
+    //     const selectionClass = (tab == tabValues.team ? 'mySelectionSmall' : 'mySelection');
+
+    //     if ($(e.currentTarget).hasClass(selectionClass)) {
+    //         mode = modeValues.remove;
+    //     } else {
+    //         mode = modeValues.add;
+    //     }
+    // });
+
+    // $(".selectableDate").on('mousedown', (e) => {
+    //     const selectionClass = (tab == tabValues.team ? 'mySelectionSmall' : 'mySelection');
+
+    //     if ($(e.currentTarget).hasClass(selectionClass)) {
+    //         mode = modeValues.remove;
+    //     } else {
+    //         mode = modeValues.add;
+    //     }
+    // });
+
+    /* CONFIG VISELECT */
+    selection = new SelectionArea({
+        selectables: ['.selectableDate'],
+        boundaries: ['tbody'],
+        behaviour: {
+            intersect: "touch"
+        },
+        features: {
+            touch: true,
+            // Range selection.
+            range: false,
+            // Configuration in case a selectable gets just clicked.
+            singleTap: {
+                // Enable single-click selection (Also disables range-selection via shift + ctrl).
+                allow: true,
+                // 'native' (element was mouse-event target) or 'touch' (element visually touched).
+                intersect: 'native'
+            }
+        }
+    }).on("start", ({ store, event }) => {
+        if ((event).shiftKey) {
+            mode = modeValues.remove;
+        } else {
+            mode = modeValues.add;
+        }
+        selection.deselect(null, true);
+    }).on(
+        "move",
+        ({
+            store: {
+                changed: { added, removed }
+            }
+        }) => {
+            for (const el of added) {
+                el.classList.add("mySelectionTemp");
+            }
+
+            for (const el of removed) {
+                el.classList.remove("mySelectionTemp");
+            }
+        }
+    ).on("stop", async ({ store: { stored } }) => {
+        const selectionClass = (tab == tabValues.team ? 'mySelectionSmall' : 'mySelection');
+        let action = null;
+
+        for (const el of stored) {
+            if ($(el).hasClass('mySelection') || $(el).hasClass('mySelectionSmall')) {
+                el.classList.remove('mySelection');
+                el.classList.remove('mySelectionSmall');
+                action = modeValues.remove;
             } else {
-                $(e.currentTarget).addClass(selectionClass);
+                el.classList.add(selectionClass);
+                action = modeValues.add;
+            }
+
+            // Modifies the current class to go up or down with limits
+            const activeClass = Array.from(el.classList).filter(x => x != "forceInactive" && x.indexOf("active") > -1)[0];
+            const isSmall = activeClass.indexOf('Small') > -1;
+            let classNumber = parseInt(activeClass.replace('active', '').replace('Small', '')) + (action == modeValues.add ? 1 : -1);
+            if (isNaN(classNumber)){
+                console.error("NAN error");
+                debugger;
+            }
+            if (classNumber > 10) {
+                classNumber = 10;
+            }
+            if (classNumber < 0) {
+                classNumber = 0;
+            }
+
+            el.classList.remove("mySelectionTemp");
+            el.classList.remove(activeClass); // remove old class
+            const newClass = `active${classNumber}${isSmall ? 'Small' : ''}`;
+            el.classList.add(newClass); // adds new class
+
+            // Check if the filter is marked as active/inactive. If it is, add the ForceInactive class, if it isn't, remove it.
+            if ($(`.toggleCalendarVisibility.active${classNumber}`).first().hasClass('forceInactive') && !Array.from(el.classList).some(x => x == "forceInactive")){
+                el.classList.add('forceInactive');
+            }
+
+            if (!$(`.toggleCalendarVisibility.active${classNumber}`).first().hasClass('forceInactive') && Array.from(el.classList).some(x => x == "forceInactive")){
+                el.classList.remove('forceInactive');
+            }
+        }
+
+        selection.clearSelection(true, true);
+        selection.deselect();
+
+        // Save on end!
+        const currentSelection = getCurrentSelectionFromScreen();
+        if (!areArraysEqual(currentSelection, mySelections)) {
+
+            mySelections.splice(mySelections.length);
+            mySelections = [...currentSelection];
+
+            // send to DDBB
+            const update = await $.ajax({
+                type: 'PUT',
+                url: '',
+                contentType: 'application/json',
+                data: JSON.stringify(currentSelection),
+                success: (res) => res,
+                onerror: (error) => error
+            });
+
+            if (update.res) {
+                toastr.success(update.msg);
+
+                // Redraw tooltips!
+
+                // Get current time
+                const timeZone = $("#timezone").val();
+                scheduledTimes = getMatchDetailsJSON();
+
+                for (const el of stored) {
+                    const dateTimeParts = $(el).data('time').split('.');
+                    const currentDate = spacetime([dateTimeParts[2], parseInt(dateTimeParts[1]) - 1, dateTimeParts[0], dateTimeParts[3], dateTimeParts[4]], timeZone);
+                    const tooltipTitle = currentDate.format('time-24');
+                    const scheduleMatchesOnTime = scheduledTimes.filter(x => x.DateTime.isEqual(currentDate));
+                    const mySelectionsOnTime = mySelections.filter(x => x.DateTime.goto(timeZone).isEqual(currentDate));
+                    const tooltipContent = drawTooltipResume(tooltipTitle, scheduleMatchesOnTime, mySelectionsOnTime);
+                    
+                    // Step 1: Dispose
+                    $(el).tooltip('dispose');   
+                    // Step 2: Change title
+                    $(el).attr('title', tooltipContent)
+                    // Step 3: Create again
+                    $(el).tooltip({             
+                        html: true,
+                        animation: false,
+                        track: true,
+                        content: () => $(this).attr('title')
+                    });
+
+                }
+
+            } else {
+                toastr.error(update.msg);
             }
         }
     });
 
-    $(".selectableDate").on('mousedown', (e) => {
-        let selectionClass = (tab == tabValues.team ? 'mySelectionSmall' : 'mySelection');
-
-        if ($(e.currentTarget).hasClass(selectionClass)) {
-            mode = modeValues.remove;
-            $(e.currentTarget).removeClass(selectionClass);
-        } else {
-            mode = modeValues.add;
-            $(e.currentTarget).addClass(selectionClass);
-        }
-    });
 }
-
-
 
 const handleVisibilityButtons = () => {
     // Mark filter
@@ -448,13 +610,13 @@ const handleVisibilityButtons = () => {
 
 const handleMouseUp = () => {
 
-    if (leagueOfficial){
+    if (leagueOfficial) {
         return;
     }
 
     $(document).on('mouseup', async () => {
         const currentSelection = getCurrentSelectionFromScreen();
-        if (!areArraysEqual(currentSelection, mySelections)){
+        if (!areArraysEqual(currentSelection, mySelections)) {
 
             mySelections.splice(mySelections.length);
             mySelections = [...currentSelection];
@@ -469,10 +631,10 @@ const handleMouseUp = () => {
                 onerror: (error) => error
             });
 
-            if (update.res){
+            if (update.res) {
                 toastr.success(update.msg);
-                loadCalendar();
-            }else{
+                //loadCalendar();
+            } else {
                 toastr.error(update.msg);
             }
         }
@@ -485,21 +647,18 @@ const areArraysEqual = (currentSelection, oldSelection) => {
 
 $(document).ready(() => {
     // On start functions
-    leagueOfficial = leagueOfficial == "true"; // ew
+    leagueOfficial = (leagueOfficial == "true"); // ew
 
     getMatchDetailsJSON();
     addMomentTimezones();
     selectUserTimeZone();
     handleVisibilityButtons();
     loadMySelections();
-    
-    loadTooltips();
+
+    //loadTooltips();
     //getCurrentSelectionFromScreen();
-    handleMouseUp();
+    //handleMouseUp();
 
     loadCalendar();
-
-    
-
     $("#schedule").fadeIn(100);
 });

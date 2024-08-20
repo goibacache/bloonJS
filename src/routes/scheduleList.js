@@ -31,7 +31,7 @@ router.get('/', async(req, res) => {
         try {
             tokenContent = jwt.verify(jwtToken, config.oAuthTokenSecret);
             if (tokenContent.roles != null || tokenContent.roles.length > 0){
-                session = bloonUtils.getSessionFromTokenContent(tokenContent, [config.role_LeagueOfficial]);
+                session = bloonUtils.getSessionFromTokenContent(tokenContent, [config.role_LeagueOfficial, config.role_HiddenManager]);
             }
         } catch (error) {
             res.clearCookie('jwt');
