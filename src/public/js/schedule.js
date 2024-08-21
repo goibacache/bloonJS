@@ -226,8 +226,6 @@ const loadCalendar = (debug = false) => {
      */
     const localStartDate = spacetime([startDateParts[2], parseInt(startDateParts[1]) - 1, startDateParts[0], startDateParts[3], startDateParts[4]], matchInfoDateTimeZone).goto(timezone).startOf('day'); // Will start at 00:00
 
-
-
     /**
      * End date in the original time zone. yyyy, mm(-1), dd, hh, mm
      */
@@ -394,44 +392,9 @@ const changeTab = (element, option) => {
 }
 
 const handleMarks = () => {
-    console.log("handleMarks");
-
     if (leagueOfficial) {
         return;
     }
-    // Mark calendar
-    // $(".selectableDate").on('mouseenter', (e) => {
-
-    //     let selectionClass = (tab == tabValues.team ? 'mySelectionSmall' : 'mySelection');
-
-    //     if (e.originalEvent.buttons > 0) { // more than one button that is the right click
-    //         if (mode == modeValues.remove) {
-    //             $(e.currentTarget).removeClass(selectionClass);
-    //         } else {
-    //             $(e.currentTarget).addClass(selectionClass);
-    //         }
-    //     }
-    // });
-
-    // $(".selectableDate").on('click', (e) => {
-    //     const selectionClass = (tab == tabValues.team ? 'mySelectionSmall' : 'mySelection');
-
-    //     if ($(e.currentTarget).hasClass(selectionClass)) {
-    //         mode = modeValues.remove;
-    //     } else {
-    //         mode = modeValues.add;
-    //     }
-    // });
-
-    // $(".selectableDate").on('mousedown', (e) => {
-    //     const selectionClass = (tab == tabValues.team ? 'mySelectionSmall' : 'mySelection');
-
-    //     if ($(e.currentTarget).hasClass(selectionClass)) {
-    //         mode = modeValues.remove;
-    //     } else {
-    //         mode = modeValues.add;
-    //     }
-    // });
 
     /* CONFIG VISELECT */
     selection = new SelectionArea({
@@ -645,8 +608,8 @@ const areArraysEqual = (currentSelection, oldSelection) => {
     return currentSelection.sort().toString() == oldSelection.sort().toString();
 }
 
+// On start functions
 $(document).ready(() => {
-    // On start functions
     leagueOfficial = (leagueOfficial == "true"); // ew
 
     getMatchDetailsJSON();
@@ -654,10 +617,6 @@ $(document).ready(() => {
     selectUserTimeZone();
     handleVisibilityButtons();
     loadMySelections();
-
-    //loadTooltips();
-    //getCurrentSelectionFromScreen();
-    //handleMouseUp();
 
     loadCalendar();
     $("#schedule").fadeIn(100);

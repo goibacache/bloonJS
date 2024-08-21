@@ -208,6 +208,7 @@ const match_UpdateMyTimes = async(_matchId, _userDiscordId, _userDiscordName, _u
     }
 }
 
+
 /**
  * Based on the user Discord ID it checks the external users table
  * @param {String} _userDiscordId 
@@ -230,6 +231,73 @@ const match_GetExternalUser = async(_userDiscordId) => {
             connection.release();
         }
         console.error("Error in match_GetAllMatches: ", error);
+        return null;
+    }
+}
+
+/**
+ * Creates a Match for the users
+ * @param {*} Name 
+ * @param {*} Team1Name 
+ * @param {*} Team2Name 
+ * @param {*} Team1RoleId 
+ * @param {*} Team2RoleId 
+ * @param {*} StartDate 
+ * @param {*} EndDate 
+ * @param {*} DateTimeZone 
+ * @returns 
+ */
+const match_CreateMatch = async(Name, Team1Name, Team2Name, Team1RoleId, Team2RoleId, StartDate, EndDate, DateTimeZone) => {
+    let connection;
+    try{
+        const query = `CALL match_CreateMatch(?, ?, ?, ?, ?, ?, ?, ?)`;
+
+        connection = await createConnection();
+
+        const [rows] = await connection.execute(query, [Name, Team1Name, Team2Name, Team1RoleId, Team2RoleId, StartDate, EndDate, DateTimeZone]);
+
+        connection.release();
+
+        return rows[0][0]["matchUrl"];
+    }catch(error){
+        if (connection != null){
+            connection.release();
+        }
+        console.error("Error in match_CreateMatch: ", error);
+        return null;
+    }
+}
+
+
+/**
+ * Creates a Match for the users
+ * @param {*} Name 
+ * @param {*} Team1Name 
+ * @param {*} Team2Name 
+ * @param {*} Team1RoleId 
+ * @param {*} Team2RoleId 
+ * @param {*} StartDate 
+ * @param {*} EndDate 
+ * @param {*} DateTimeZone 
+ * @returns 
+ */
+const match_GetBasicAuthorization = async(Name, PasswordHash) => {
+    let connection;
+    try{
+        const query = `CALL match_GetBasicAuthorization(?, ?)`;
+
+        connection = await createConnection();
+
+        const [rows] = await connection.execute(query, [Name, PasswordHash]);
+
+        connection.release();
+
+        return rows[0];
+    }catch(error){
+        if (connection != null){
+            connection.release();
+        }
+        console.error("Error in match_GetBasicAuthorization: ", error);
         return null;
     }
 }
@@ -273,5 +341,7 @@ module.exports = {
     match_GetDetails,
     match_GetAllMatches,
     match_UpdateMyTimes,
-    match_GetExternalUser
+    match_GetExternalUser,
+    match_CreateMatch,
+    match_GetBasicAuthorization
 }
