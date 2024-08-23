@@ -17,3 +17,13 @@ $(document).ready(() => {
         "hideMethod": "fadeOut"
       }
 });
+
+const openMenu = () => {
+  $("#menu").fadeIn();
+  $("body").css({ overflow: "hidden" });
+}
+
+const closeMenu = () => {
+  $("#menu").fadeOut();
+  $("body").css({ overflow: "auto" });
+}

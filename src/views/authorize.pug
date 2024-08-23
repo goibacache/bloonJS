@@ -5,10 +5,10 @@ block content
   
   script(src="./js/authorize.js", defer=true)
 
-  div(class="d-flex align-items-center justify-content-center", style="height: 100vh;")
-    div(class="col-xs-12")
-      div(class="row")
-        h4#displayText(class="text-white") Loading ICL profile...
+  div.d-flex.align-items-center.justify-content-center(style="height: 100vh;")
+    div.col-10.offset-1.col-sm-10.offset-sm-1.col-md-8.offset-md-2.col-lg-8.offset-lg-2.m-0
+      div.row
+        h4.text-white.text-center#displayText Loading ICL profile...
 
         div#selectProfile(style="display: none")
           div.row
@@ -16,5 +16,5 @@ block content
               div.sbg-identification.p-1#IdentificationTitle >SELECT PROFILE
             div.mt-3.mb-3.text-center.panelBg.sb-border.pb-3.pt-3
               p.col-xs-12.center Select if you want to join as a League official or as a Player
-              button.btn.sbg-primary.me-5(type="button", onClick="loginAsPlayer()") Login as a player
-              button.btn.sbg-primary.row(type="button", onClick="loginAsLeagueOfficial()") Login as league official
+              button.btn.sbg-primary.col-auto.col-sm-6.offset-sm-1.m-0.m-em-2(type="button", onClick="loginAsPlayer()") As player
+              button.btn.sbg-primary.col-auto.col-sm-6.offset-sm-1.m-0(type="button", onClick="loginAsLeagueOfficial()") As League Official

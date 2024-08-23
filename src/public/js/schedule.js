@@ -571,39 +571,6 @@ const handleVisibilityButtons = () => {
     });
 }
 
-const handleMouseUp = () => {
-
-    if (leagueOfficial) {
-        return;
-    }
-
-    $(document).on('mouseup', async () => {
-        const currentSelection = getCurrentSelectionFromScreen();
-        if (!areArraysEqual(currentSelection, mySelections)) {
-
-            mySelections.splice(mySelections.length);
-            mySelections = [...currentSelection];
-
-            // send to DDBB
-            const update = await $.ajax({
-                type: 'PUT',
-                url: '',
-                contentType: 'application/json',
-                data: JSON.stringify(currentSelection),
-                success: (res) => res,
-                onerror: (error) => error
-            });
-
-            if (update.res) {
-                toastr.success(update.msg);
-                //loadCalendar();
-            } else {
-                toastr.error(update.msg);
-            }
-        }
-    });
-}
-
 const areArraysEqual = (currentSelection, oldSelection) => {
     return currentSelection.sort().toString() == oldSelection.sort().toString();
 }

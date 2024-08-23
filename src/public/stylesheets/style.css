@@ -228,7 +228,7 @@ ul.breadcrumb li {
 }
 
 ul.breadcrumb li+li:before {
-  padding: 8px;
+  padding: 4px;
   content: "/\00a0";
 }
 
@@ -298,4 +298,34 @@ ul.breadcrumb li a:hover {
   background: rgba(46, 115, 252, 0.176);
   border: 2px solid rgba(98, 155, 255, 0.81);
   border-radius: 0.1em;
+}
+
+.fakeToggler{
+  --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* HAMBURGER MENU */
+.menuContainer{
+  height: 100vh;
+  width: 100%;
+  background-color: #000000cc;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 5;
+}
+
+.closeMenu{
+  position: fixed;
+  top: 5px;
+  right: 2px;
+  background-color: transparent;
+  width: 50px;
+  border: none;
+  color: white;
+  font-size: xx-large;
+}
+
+.optionsContainer{
+  height: 100vh;
 }

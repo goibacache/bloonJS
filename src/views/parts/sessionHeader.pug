@@ -4,14 +4,16 @@ script(src="/js/general.js", defer=true)
 div.d-flex.align-items-center.sessionContainer.p-0
     if session != null
         if session.avatarUrl != null && session.avatarUrl.length > 0
-            img.unselectable.align-middle.ms-5(src=session.avatarUrl, style="height: 32px; width: auto")
-        p.unselectable.col-auto.p-0.m-0.align-middle.ms-3=session.name
+            a(href="/scheduleList") 
+                img.unselectable.align-middle.ms-2.ms-sm-3(src=session.avatarUrl, style="height: 32px; width: auto")
+        a.link.col-auto.p-0.m-0.align-middle.ms-3(href="/scheduleList")=session.name
         if session.leagueOfficial
-            p.badge.unselectable League Official
+            p.badge.unselectable.d-none.d-md-inline-block.d-lg-inline-block League Official
+            p.badge.unselectable.d-inline-block.d-xs-inline-block.d-sm-inline-block.d-md-none.d-lg-none LO
 
     //- For bread crumbs
     if breadCrumbs != null
-        ul.breadcrumb.align-middle.p-0.m-0
+        ul.breadcrumb.align-middle.p-0.m-0.d-none.d-sm-block
             li
             each breadCrumb in breadCrumbs
                 if (breadCrumbs.indexOf(breadCrumb) == breadCrumbs.length -1)
@@ -20,11 +22,25 @@ div.d-flex.align-items-center.sessionContainer.p-0
                     li
                         a(href=breadCrumb.url) #{breadCrumb.name}
 
-    div.ms-auto.me-5
-        button.btn.gb.me-1(style="width: 30px; height: 20px;", onClick="changeLanguage('en')")
-        button.btn.br.me-1(style="width: 30px; height: 20px;", onClick="changeLanguage('pg')")
-        button.btn.es.me-5(style="width: 30px; height: 20px;", onClick="changeLanguage('es')")
+    div.ms-auto.me-2.me-sm-3
+        button.btn.gb.me-1.d-none.d-sm-inline-block(style="width: 30px; height: 20px;" onClick="changeLanguage('en')")
+        button.btn.br.me-1.d-none.d-sm-inline-block(style="width: 30px; height: 20px;" onClick="changeLanguage('pg')")
+        button.btn.es.me-5.d-none.d-sm-inline-block(style="width: 30px; height: 20px;" onClick="changeLanguage('es')")
         if session != null
-            button.btn.sbg-danger.ms-auto.me-5#LogoutButton(type="button" onClick="logOut()") Logout
+            button.btn.sbg-danger.ms-auto.d-none.d-sm-inline-block#LogoutButton(type="button" onClick="logOut()") Logout
+
+    button.navbar-toggler.me-3.d-block.d-sm-none(type="button" onclick="openMenu()" data-bs-toggle="collapse" data-bs-target="#navBar" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation")
+      span.navbar-toggler-icon.fakeToggler
+
+    div.menuContainer#menu(style="display:none")
+        button.closeMenu(type="button" onclick="closeMenu()") X
+        div.optionsContainer.d-flex.flex-column.justify-content-center
+            h2#LanguageMenu(style="align-self: center;") Language
+            div.row(style="align-self: center;")
+                button.btn.gb.mt-5(style="width: 50px; height: 40px; align-self: center;" onClick="changeLanguage('en')")
+                button.btn.br.mt-5.ms-4(style="width: 50px; height: 40px; align-self: center;" onClick="changeLanguage('pg')")
+                button.btn.es.mt-5.ms-4(style="width: 50px; height: 40px; align-self: center;" onClick="changeLanguage('es')")
+            if session != null
+                button.btn.sbg-danger.mt-5.col-6#LogoutButtonMenu(type="button" onClick="logOut()" style="align-self: center") Logout
 
     

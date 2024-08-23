@@ -63,7 +63,17 @@ const languageDefinition = [
     {
         page: '*',
         strings: {
+            LanguageMenu: {
+                'en': `Language`,
+                'es': 'Lenguaje',
+                'pg': 'Idioma'
+            },
             LogoutButton: {
+                'en': `Logout`,
+                'es': 'Cerrar sesión',
+                'pg': 'Sair'
+            },
+            LogoutButtonMenu: {
                 'en': `Logout`,
                 'es': 'Cerrar sesión',
                 'pg': 'Sair'

@@ -4,6 +4,18 @@
   --panel-bg-color-top: #11161c;
   --panel-bg-color: #20282f;
   
+  --active-1: rgba(53, 59, 91, 0.51);
+  --active-2: rgba(49, 66, 100, 0.6);
+  --active-3: rgba(63, 80, 106, 0.7);
+  --active-4: rgba(66, 87, 113, 0.8);
+  --active-5: rgba(70, 122, 142, 0.6);
+  --active-6: rgba(66, 119, 66, 0.7);
+  --active-7: rgba(44, 123, 67, 0.8);
+  --active-8: rgba(45, 136, 86, 0.9);
+  --active-9: rgb(31, 153, 98);
+  --active-10:  rgb(27, 168, 68);
+
+  --mySelection: rgba(34, 76, 113, 0.7);
 }
 
 .tabSpacer{
@@ -93,7 +105,7 @@ table * {
 }
 
 .mySelection {
-  background-color: rgb(34, 54, 113);
+  background-color: var(--mySelection);
   width: 100%;
   transition: 0.25s;
 }
@@ -104,92 +116,92 @@ table * {
 
 .mySelectionSmall {
   background-color: var(--table-bg-color-empty);
-  border-left: 5px solid rgb(34, 54, 113);
-  /* border-right: 5px solid rgb(34, 54, 113); */
+  border-left: 5px solid var(--mySelection);
   width: 100%;
   transition: 0.25s;
-  /* filter: brightness(150%); */
 }
 
+
+
 .active1:not(.forceInactive) {
-  background-color: rgba(70, 56, 42, 0.5);
+  background-color: var(--active-1);
 }
 
 .active2:not(.forceInactive) {
-  background-color: rgba(90, 60, 10, 0.6);
+  background-color: var(--active-2)
 }
 
 .active3:not(.forceInactive) {
-  background-color: rgba(80, 70, 20, 0.7);
+  background-color: var(--active-3)
 }
 
 .active4:not(.forceInactive) {
-  background-color: rgba(70, 80, 30, 0.8);
+  background-color: var(--active-4)
 }
 
 .active5:not(.forceInactive) {
-  background-color: rgba(60, 90, 40, 0.6);
+  background-color: var(--active-5)
 }
 
 .active6:not(.forceInactive) {
-  background-color: rgba(50, 100, 50, 0.7);
+  background-color: var(--active-6)
 }
 
 .active7:not(.forceInactive) {
-  background-color: rgba(40, 110, 60, 0.8);
+  background-color: var(--active-7)
 }
 
 .active8:not(.forceInactive) {
-  background-color: rgba(30, 120, 70, 0.9);
+  background-color: var(--active-8)
 }
 
 .active9:not(.forceInactive) {
-  background-color: rgba(20, 130, 80, 1);
+  background-color: var(--active-9)
 }
 
 .active10:not(.forceInactive) {
-  background-color: rgb(0, 176, 52);
+  background-color: var(--active-10)
 }
 
 
 .active1Small:not(.forceInactive) {
-  border-left: 5px solid rgba(70, 56, 42, 0.5);
+  border-left: 10px solid var(--active-1);
 }
 
 .active2Small:not(.forceInactive) {
-  border-left: 5px solid rgba(90, 60, 10, 0.6);
+  border-left: 20px solid var(--active-2);
 }
 
 .active3Small:not(.forceInactive) {
-  border-left: 5px solid rgba(80, 70, 20, 0.7);
+  border-left: 30px solid var(--active-3);
 }
 
 .active4Small:not(.forceInactive) {
-  border-left: 5px solid rgba(70, 80, 30, 0.8);
+  border-left: 40px solid var(--active-4);
 }
 
 .active5Small:not(.forceInactive) {
-  border-left: 5px solid rgba(60, 90, 40, 0.6);
+  border-left: 50px solid var(--active-5);
 }
 
 .active6Small:not(.forceInactive) {
-  border-left: 5px solid rgba(50, 100, 50, 0.7);
+  border-left: 60px solid var(--active-6);
 }
 
 .active7Small:not(.forceInactive) {
-  border-left: 5px solid rgba(40, 110, 60, 0.8);
+  border-left: 70px solid var(--active-7);
 }
 
 .active8Small:not(.forceInactive) {
-  border-left: 5px solid rgba(30, 120, 70, 0.9);
+  border-left: 80px solid var(--active-8);
 }
 
 .active9Small:not(.forceInactive) {
-  border-left: 5px solid rgba(20, 130, 80, 1);
+  border-left: 90px solid var(--active-9);
 }
 
 .active10Small:not(.forceInactive) {
-  border-left: 5px solid rgb(0, 176, 52);
+  border-left: 100px solid var(--active-10);
 }
 
 .selectableDate:hover,

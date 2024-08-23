@@ -32,23 +32,23 @@ block content
   include parts/sessionHeader.pug
 
   //- Page
-  div.container(style="min-height: 2000px;")
-    div.col-xs-12#schedule(style="display:none;")
+  div.container-fluid(style="min-height: 2000px;")
+    div.col-10.offset-1.col-sm-8.offset-sm-2.col-md-8.offset-md-2.col-lg-6.offset-lg-3#schedule(style="display:none;")
 
       //- Title
       div.row
         h2.mt-4.mb-4.text-center(style="min-height: 40px")=matchInfo.Name
 
-        div.col-xs-12.col-sm-12.col-md-8.offset-md-2.col-lg-6.offset-lg-3.p-0
+        div.p-0
           div.row.p-0.m-0
             div.offset-2.col-4.unselectable.tab.active.me-3.text-center.p-0#TeamTab(onclick="changeTab(this, 1)") TEAM
             div.col-4.unselectable.tab.text-center.p-0#MeTab(onclick="changeTab(this, 2)") ME
           
-        div.tabSpacer.mb-3.col-xs-12.col-sm-12.col-md-8.offset-md-2.col-lg-6.offset-lg-3.p-0
+        div.tabSpacer.mb-3
             
-        div.col-xs-12.col-sm-12.col-md-8.offset-md-2.col-lg-6.offset-lg-3.p-0.mb-5
+        div.p-0.mb-5
           
-          div.col-xs-12.p-1.ps-2.sbg-identification.unselectable#ScheduleTitle > SCHEDULE
+          div.p-1.ps-2.sbg-identification.unselectable#ScheduleTitle > SCHEDULE
             //- div.sbg-identification.p-1 > SCHEDULE
 
           div.col-sx-12.p-0.mt-4.panelBg.sb-border

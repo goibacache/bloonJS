@@ -15,11 +15,11 @@ block content
 
   //- Page
   div.container
-    div.col-xs-12(style="height:calc(100vh - 55px);")
+    div.col-10.offset-1.col-sm-10.offset-sm-1.col-md-8.offset-md-2.col-lg-8.offset-lg-2(style="height:calc(100vh - 55px);")
 
       //- Title
       .row
-        div.col-xs-12.col-sm-12.col-md-8.offset-md-2.col-lg-6.offset-lg-3.p-0.mt-5
+        div.p-0.mt-5
           div
             div.col-xs-12.p-0
               if session.leagueOfficial
@@ -29,7 +29,7 @@ block content
 
             div.col-xs-12.p-0.sb-border.panelBg.mt-4
               ul.mt-3.mb-3
-                if matches.length == 0
+                if matches == null || matches.length == 0
                   li
                     a.link There's no matches for your team.
                 each match in matches
