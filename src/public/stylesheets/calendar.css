@@ -16,6 +16,8 @@
   --active-10:  rgb(27, 168, 68);
 
   --mySelection: rgba(34, 76, 113, 0.7);
+  --active-small-opacity: 35%;
+  --active-small-opacity-notSelected: 100%;
 }
 
 .tabSpacer{
@@ -93,6 +95,17 @@ table * {
   height: 15px;
   background-color: var(--table-bg-color-empty);
   transition: 0.25s;
+  position: relative;
+}
+
+.selectableDate::before{
+  content: " ";
+  position: absolute;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background-color: none;
+  transition: 0.25s;
 }
 
 .selectableDateDisabled {
@@ -104,104 +117,283 @@ table * {
   opacity: 0.25
 }
 
-.mySelection {
-  background-color: var(--mySelection);
-  width: 100%;
-  transition: 0.25s;
-}
-
+/* For when you select with your mouse: */
 .mySelectionTemp{
   border: 3px dotted #a2861c66;
 }
 
-.mySelectionSmall {
+.mySelection {
   background-color: var(--table-bg-color-empty);
-  border-left: 5px solid var(--mySelection);
   width: 100%;
   transition: 0.25s;
 }
 
+.mySelection::after {
+  transition: 0.25s;
+  background-color: #dbb0182e;
+  line-height: 1.3em;
+  text-align: center;
+  content: " ";
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  padding: 2px;
+  left: 0px;
+  top: 0; /* Middle */
+  border-radius: 0%;
+
+  clip-path: polygon(100% 0, 100% 50%, 100% 100%, 0 100%, 0 50%, 0 0);
+  -webkit-clip-path: polygon(100% 0, 100% 50%, 100% 100%, 0 100%, 0 50%, 0 0);
+}
 
 
-.active1:not(.forceInactive) {
+
+.mySelectionSmall {
+  background-color: var(--table-bg-color-empty);
+  width: 100%;
+  transition: 0.25s;
+}
+
+/* Creates pseudo element: rhomboid */
+.mySelectionSmall::after {
+  transition: all 0.25s ease, clip-path 0.25s cubic-bezier(1,.01,1,.67);
+  background-color: #8a6f11;
+  line-height: 1.3em;
+  text-align: center;
+  content: " ";
+  height: 100%;
+  width: 10%;
+  position: absolute;
+  padding: 0;
+  left: 0;
+  top: 0;
+  border-radius: 25%;
+
+  /* Chevron */
+  clip-path: polygon(40% 20%, 55% 50%, 40% 80%, 5% 80%, 20% 50%, 5% 20%);
+  -webkit-clip-path: polygon(40% 20%, 55% 50%, 40% 80%, 5% 80%, 20% 50%, 5% 20%);
+  /* ME */
+  /* clip-path: polygon(8% 75%, 20% 20%, 30% 20%, 35% 53%, 42% 20%, 51% 21%, 55% 42%, 55% 20%, 80% 20%, 80% 30%, 65% 30%, 65% 40%, 80% 40%, 80% 55%, 65% 55%, 65% 65%, 80% 65%, 80% 75%, 48% 75%, 44% 51%, 39% 75%, 28% 75%, 23% 51%, 18% 75%);
+  -webkit-clip-path: polygon(8% 75%, 20% 20%, 30% 20%, 35% 53%, 42% 20%, 51% 21%, 55% 42%, 55% 20%, 80% 20%, 80% 30%, 65% 30%, 65% 40%, 80% 40%, 80% 55%, 65% 55%, 65% 65%, 80% 65%, 80% 75%, 48% 75%, 44% 51%, 39% 75%, 28% 75%, 23% 51%, 18% 75%); */
+  /* Right arrow */
+  /* clip-path: polygon(0% 20%, 14% 20%, 10% 0, 100% 50%, 10% 100%, 13% 80%, 0 80%);
+  -webkit-clip-path: polygon(0% 20%, 14% 20%, 10% 0, 100% 50%, 10% 100%, 13% 80%, 0 80%); */
+  /* Bloon */
+  /* clip-path: polygon(50% 0%, 90% 10%, 85% 54%, 60% 74%, 65% 90%, 50% 100%, 35% 90%, 40% 75%, 15% 55%, 10% 10%);
+  -webkit-clip-path: polygon(50% 0%, 90% 10%, 85% 54%, 60% 74%, 65% 90%, 50% 100%, 35% 90%, 40% 75%, 15% 55%, 10% 10%); */
+  /* Match */
+  /* clip-path: polygon(50% 0%, 61% 35%, 75% 0, 100% 50%, 75% 100%, 50% 41%, 25% 100%, 0 50%, 25% 0, 39% 35%);
+  -webkit-clip-path: polygon(50% 0%, 61% 35%, 75% 0, 100% 50%, 75% 100%, 50% 41%, 25% 100%, 0 50%, 25% 0, 39% 35%); */
+  /* Thunder */
+  /* clip-path: polygon(64% 0, 65% 0, 49% 44%, 93% 23%, 66% 60%, 32% 100%, 54% 58%, 10% 83%, 36% 42%, 48% 23%);
+  -webkit-clip-path: polygon(64% 0, 65% 0, 49% 44%, 93% 23%, 66% 60%, 32% 100%, 54% 58%, 10% 83%, 36% 42%, 48% 23%); */
+  /* N */
+  /* clip-path: polygon(75% 49%, 75% 0, 100% 0, 100% 100%, 75% 100%, 25% 46%, 25% 100%, 0 100%, 0 0, 25% 0);
+  -webkit-clip-path: polygon(75% 49%, 75% 0, 100% 0, 100% 100%, 75% 100%, 25% 46%, 25% 100%, 0 100%, 0 0, 25% 0); */
+  /* Star */
+  /* clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  -webkit-clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); */
+}
+
+.active1.toggleCalendarVisibility:not(.forceInactive) {
   background-color: var(--active-1);
 }
 
-.active2:not(.forceInactive) {
+.active1:not(.forceInactive)::before {
+  width: 10%;
+  background-color: var(--active-1);
+}
+
+.active2.toggleCalendarVisibility:not(.forceInactive) {
   background-color: var(--active-2)
 }
 
-.active3:not(.forceInactive) {
+.active2:not(.forceInactive)::before {
+  width: 20%;
+  background-color: var(--active-2);
+}
+
+.active3.toggleCalendarVisibility:not(.forceInactive) {
   background-color: var(--active-3)
 }
 
-.active4:not(.forceInactive) {
+.active3:not(.forceInactive)::before {
+  width: 30%;
+  background-color: var(--active-3);
+}
+
+.active4.toggleCalendarVisibility:not(.forceInactive) {
   background-color: var(--active-4)
 }
 
-.active5:not(.forceInactive) {
+.active4:not(.forceInactive)::before {
+  width: 40%;
+  background-color: var(--active-4);
+}
+
+.active5.toggleCalendarVisibility:not(.forceInactive) {
   background-color: var(--active-5)
 }
 
-.active6:not(.forceInactive) {
+.active5:not(.forceInactive)::before {
+  width: 50%;
+  background-color: var(--active-5);
+}
+
+.active6.toggleCalendarVisibility:not(.forceInactive) {
   background-color: var(--active-6)
 }
 
-.active7:not(.forceInactive) {
+.active6:not(.forceInactive)::before {
+  width: 60%;
+  background-color: var(--active-6);
+}
+
+.active7.toggleCalendarVisibility:not(.forceInactive) {
   background-color: var(--active-7)
 }
 
-.active8:not(.forceInactive) {
+.active7:not(.forceInactive)::before {
+  width: 70%;
+  background-color: var(--active-7);
+}
+
+.active8.toggleCalendarVisibility:not(.forceInactive) {
   background-color: var(--active-8)
 }
 
-.active9:not(.forceInactive) {
+.active8:not(.forceInactive)::before {
+  width: 80%;
+  background-color: var(--active-8);
+}
+
+.active9.toggleCalendarVisibility:not(.forceInactive) {
   background-color: var(--active-9)
 }
 
-.active10:not(.forceInactive) {
+.active9:not(.forceInactive)::before {
+  width: 90%;
+  background-color: var(--active-9);
+}
+
+.active10.toggleCalendarVisibility:not(.forceInactive) {
   background-color: var(--active-10)
 }
 
-
-.active1Small:not(.forceInactive) {
-  border-left: 10px solid var(--active-1);
+.active10:not(.forceInactive)::before {
+  width: 100%;
+  background-color: var(--active-10);
 }
 
-.active2Small:not(.forceInactive) {
-  border-left: 20px solid var(--active-2);
+
+.active1Small:not(.forceInactive)::before {
+  width: 10%;
+  background-color: var(--active-1);
 }
 
-.active3Small:not(.forceInactive) {
-  border-left: 30px solid var(--active-3);
+.active1Small.mySelection:not(.forceInactive)::before {
+  filter: grayscale(100%);
+  width: 10%;
+  background-color: var(--active-1);
 }
 
-.active4Small:not(.forceInactive) {
-  border-left: 40px solid var(--active-4);
+.active2Small:not(.forceInactive)::before {
+  width: 20%;
+  background-color: var(--active-2);
 }
 
-.active5Small:not(.forceInactive) {
-  border-left: 50px solid var(--active-5);
+.active2Small.mySelection:not(.forceInactive)::before {
+  filter: grayscale(100%);
+  width: 20%;
+  background-color: var(--active-2);
 }
 
-.active6Small:not(.forceInactive) {
-  border-left: 60px solid var(--active-6);
+.active3Small:not(.forceInactive)::before {
+  width: 30%;
+  background-color: var(--active-3);
 }
 
-.active7Small:not(.forceInactive) {
-  border-left: 70px solid var(--active-7);
+.active3Small.mySelection:not(.forceInactive)::before {
+  filter: grayscale(100%);
+  width: 30%;
+  background-color: var(--active-3);
 }
 
-.active8Small:not(.forceInactive) {
-  border-left: 80px solid var(--active-8);
+.active4Small:not(.forceInactive)::before {
+  width: 40%;
+  background-color: var(--active-4);
 }
 
-.active9Small:not(.forceInactive) {
-  border-left: 90px solid var(--active-9);
+.active4Small.mySelection:not(.forceInactive)::before {
+  filter: grayscale(100%);
+  width: 40%;
+  background-color: var(--active-4);
 }
 
-.active10Small:not(.forceInactive) {
-  border-left: 100px solid var(--active-10);
+.active5Small:not(.forceInactive)::before {
+  width: 50%;
+  background-color: var(--active-5);
+}
+
+.active5Small.mySelection:not(.forceInactive)::before {
+  filter: grayscale(100%);
+  width: 50%;
+  background-color: var(--active-5);
+}
+
+.active6Small:not(.forceInactive)::before {
+  width: 60%;
+  background-color: var(--active-6);
+}
+
+.active6Small.mySelection:not(.forceInactive)::before {
+  filter: grayscale(100%);
+  width: 60%;
+  background-color: var(--active-6);
+}
+
+.active7Small:not(.forceInactive)::before {
+  width: 70%;
+  background-color: var(--active-7);
+}
+
+.active7Small.mySelection:not(.forceInactive)::before {
+  filter: grayscale(100%);
+  width: 70%;
+  background-color: var(--active-7);
+}
+
+.active8Small:not(.forceInactive)::before {
+  width: 80%;
+  background-color: var(--active-8);
+}
+
+.active8Small.mySelection:not(.forceInactive)::before {
+  filter: grayscale(100%);
+  width: 80%;
+  background-color: var(--active-8);
+}
+
+.active9Small:not(.forceInactive)::before {
+  width: 90%;
+  background-color: var(--active-9);
+}
+
+.active9Small.mySelection:not(.forceInactive)::before {
+  filter: grayscale(100%);
+  width: 90%;
+  background-color: var(--active-9);
+}
+
+.active10Small:not(.forceInactive)::before {
+  width: 100%;
+  background-color: var(--active-10);
+}
+
+.active10Small.mySelection:not(.forceInactive)::before {
+  filter: grayscale(100%);
+  width: 100%;
+  background-color: var(--active-10);
 }
 
 .selectableDate:hover,
@@ -218,46 +410,6 @@ table * {
   filter: brightness(1.2);
 }
 
-/* Now with .mySelection */
-.active1.mySelection {
-  background-color: rgb(51, 59, 75);
-}
-
-.active2.mySelection {
-  background-color: rgb(51, 70, 95);
-}
-
-.active3.mySelection {
-  background-color: rgb(51, 80, 115);
-}
-
-.active4.mySelection {
-  background-color: rgb(51, 91, 135);
-}
-
-.active5.mySelection {
-  background-color: rgb(0, 63, 130);
-}
-
-.active6.mySelection {
-  background-color: rgb(0, 76, 155);
-}
-
-.active7.mySelection {
-  background-color: rgb(0, 89, 180);
-}
-
-.active8.mySelection {
-  background-color: rgb(0, 102, 205);
-}
-
-.active9.mySelection {
-  background-color: rgb(0, 115, 230);
-}
-
-.active10.mySelection {
-  background-color: rgb(0, 128, 255);
-}
 
 .float-left {
   float: left;

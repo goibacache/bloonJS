@@ -204,6 +204,8 @@ const loadCalendar = (debug = false) => {
      */
     let headerColumns = 0;
 
+    let maxAmountOfPlayers = 0;
+
     scheduledTimes = getMatchDetailsJSON();
 
     //Clean calendar
@@ -292,6 +294,11 @@ const loadCalendar = (debug = false) => {
                 const mySelectionsOnTime = mySelections.filter(x => x.DateTime.goto(timezone).isEqual(currentDate.add(indexOfDay, 'days')));
 
                 const activeAmount = scheduleMatchesOnTime.length + mySelectionsOnTime.length > 10 ? 10 : scheduleMatchesOnTime.length + mySelectionsOnTime.length;
+                // Save the most amount of players to deactivate the rest of the filters
+                if (activeAmount > maxAmountOfPlayers){
+                    maxAmountOfPlayers = activeAmount;
+                }
+
                 const cssInactiveClass = $(`.toggleCalendarVisibility.active${activeAmount}`).hasClass('forceInactive') ? 'forceInactive' : '';
 
                 const cssActiveClass = (tab == tabValues.team ? `active${activeAmount} ${cssInactiveClass}` : `active${activeAmount}Small ${cssInactiveClass}`);
@@ -301,7 +308,7 @@ const loadCalendar = (debug = false) => {
 
                 currentTr.innerHTML += `
                     <td class="calendarCell borderH text-center">
-                        <div class="selectableDate ${cssActiveClass} ${selectionClass}" data-time="${currentDate.add(indexOfDay, 'days').unixFmt('dd.MM.yyyy.HH.mm')}" title="${tooltipResume}" data-toggle="tooltip">
+                        <div class="selectableDate ${cssActiveClass} ${selectionClass}" data-time="${currentDate.add(indexOfDay, 'days').unixFmt('dd.MM.yyyy.HH.mm')}" title="${tooltipResume}" data-toggle="tooltip" data-player-amount="${activeAmount}">
                         </div>
                     </td>`;
             }
@@ -310,6 +317,9 @@ const loadCalendar = (debug = false) => {
         currentDate = currentDate.add(15, 'minutes');
         $("#calendar tbody").append(currentTr);
     }
+
+    // Show the max amount of players, rn
+    console.log("maxAmountOfPlayers", maxAmountOfPlayers);
 
     if (debug) {
         console.log('startDate', startDate.format('nice'));
@@ -375,7 +385,7 @@ const changeTab = (element, option) => {
     // TEAM:
     if (option == 1) {
         tab = tabValues.team;
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i <= 10; i++) {
             $(`tbody .active${i}Small`).removeClass(`active${i}Small`).addClass(`active${i}`);
         }
         $(".mySelection").removeClass('mySelection').addClass('mySelectionSmall');
@@ -384,7 +394,7 @@ const changeTab = (element, option) => {
     // ME:
     if (option == 2) {
         tab = tabValues.me;
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i <= 10; i++) {
             $(`tbody .active${i}`).removeClass(`active${i}`).addClass(`active${i}Small`);
         }
         $(".mySelectionSmall").removeClass('mySelectionSmall').addClass('mySelection');
@@ -451,14 +461,14 @@ const handleMarks = () => {
                 action = modeValues.add;
             }
 
-            // Modifies the current class to go up or down with limits
+            // Gets the current player amount and add/subtracts 1
+            const playerAmount = parseInt($(el).attr('data-player-amount')) + (action == modeValues.add ? 1 : -1);
+
             const activeClass = Array.from(el.classList).filter(x => x != "forceInactive" && x.indexOf("active") > -1)[0];
             const isSmall = activeClass.indexOf('Small') > -1;
-            let classNumber = parseInt(activeClass.replace('active', '').replace('Small', '')) + (action == modeValues.add ? 1 : -1);
-            if (isNaN(classNumber)){
-                console.error("NAN error");
-                debugger;
-            }
+
+            let classNumber = playerAmount;
+
             if (classNumber > 10) {
                 classNumber = 10;
             }
@@ -470,6 +480,8 @@ const handleMarks = () => {
             el.classList.remove(activeClass); // remove old class
             const newClass = `active${classNumber}${isSmall ? 'Small' : ''}`;
             el.classList.add(newClass); // adds new class
+
+            $(el).attr('data-player-amount', playerAmount);
 
             // Check if the filter is marked as active/inactive. If it is, add the ForceInactive class, if it isn't, remove it.
             if ($(`.toggleCalendarVisibility.active${classNumber}`).first().hasClass('forceInactive') && !Array.from(el.classList).some(x => x == "forceInactive")){
