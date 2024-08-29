@@ -97,7 +97,7 @@ router.get('/:scheduleId', async (req, res) => {
     ];
 
     res.render('schedule', {
-      title: 'Bloon JS - Schedule',
+      title: 'When2Bloon - Schedule',
       matchInfo: matchInfo,
       teams: JSON.stringify(teamsJson),
       matchDetails: JSON.stringify(otherSelections),

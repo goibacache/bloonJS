@@ -235,6 +235,32 @@ const match_GetExternalUser = async(_userDiscordId) => {
     }
 }
 
+
+/**
+ * Returns a list of all the teams.
+ * @returns 
+ */
+const match_GetAllTeams = async() => {
+    let connection;
+    try{
+        const query = `CALL match_GetAllTeams()`;
+
+        connection = await createConnection();
+
+        const [rows] = await connection.execute(query);
+
+        connection.release();
+
+        return rows[0]; 
+    }catch(error){
+        if (connection != null){
+            connection.release();
+        }
+        console.error("Error in match_GetAllTeams: ", error);
+        return null;
+    }
+}
+
 /**
  * Creates a Match for the users
  * @param {*} Name 
@@ -302,6 +328,35 @@ const match_GetBasicAuthorization = async(Name, PasswordHash) => {
     }
 }
 
+/**
+ * Create a new pending role
+ * @param {*} UserDiscordId 
+ * @param {*} UserDiscordName 
+ * @param {*} UserDiscordAvatar 
+ * @param {*} UserDiscordTeamRoleId 
+ * @returns 
+ */
+const match_ExternalUser_Create = async(UserDiscordId, UserDiscordName, UserDiscordAvatar, UserDiscordTeamRoleId) => {
+    let connection;
+    try{
+        const query = `CALL match_ExternalUser_Create(?, ?, ?, ?)`;
+
+        connection = await createConnection();
+
+        const [rows] = await connection.execute(query, [UserDiscordId, UserDiscordName, UserDiscordAvatar, UserDiscordTeamRoleId]);
+
+        connection.release();
+
+        return rows[0][0]["Res"];
+    }catch(error){
+        if (connection != null){
+            connection.release();
+        }
+        console.error("Error in match_ExternalUser_Create: ", error);
+        return null;
+    }
+}
+
 const createConnection = async () => {
     // Create global pool object to avoid reconnecting to the MySQL instance multiple times
     if (global.poolObject === undefined) {
@@ -342,6 +397,8 @@ module.exports = {
     match_GetAllMatches,
     match_UpdateMyTimes,
     match_GetExternalUser,
+    match_GetAllTeams,
     match_CreateMatch,
-    match_GetBasicAuthorization
+    match_GetBasicAuthorization,
+    match_ExternalUser_Create
 }

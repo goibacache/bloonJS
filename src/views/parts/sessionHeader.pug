@@ -27,6 +27,8 @@ div.d-flex.align-items-center.sessionContainer.p-0
         button.btn.br.me-1.d-none.d-sm-inline-block(style="width: 30px; height: 20px;" onClick="changeLanguage('pg')")
         button.btn.es.me-5.d-none.d-sm-inline-block(style="width: 30px; height: 20px;" onClick="changeLanguage('es')")
         if session != null
+            if (session.leagueOfficial)
+                button.btn.sbg-primary.ms-auto.d-none.d-sm-inline-block.me-4#CreateMatchButton(type="button" onClick="goto('/createMatch')") Create match    
             button.btn.sbg-danger.ms-auto.d-none.d-sm-inline-block#LogoutButton(type="button" onClick="logOut()") Logout
 
     button.navbar-toggler.me-3.d-block.d-sm-none(type="button" onclick="openMenu()" data-bs-toggle="collapse" data-bs-target="#navBar" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation")
@@ -41,6 +43,8 @@ div.d-flex.align-items-center.sessionContainer.p-0
                 button.btn.br.mt-5.ms-4(style="width: 50px; height: 40px; align-self: center;" onClick="changeLanguage('pg')")
                 button.btn.es.mt-5.ms-4(style="width: 50px; height: 40px; align-self: center;" onClick="changeLanguage('es')")
             if session != null
+                if (session.leagueOfficial)
+                    button.btn.sbg-primary.mt-5.col-6#CreateMatchButtonMenu(type="button" onClick="goto('/createMatch')" style="align-self: center") Create match    
                 button.btn.sbg-danger.mt-5.col-6#LogoutButtonMenu(type="button" onClick="logOut()" style="align-self: center") Logout
 
     

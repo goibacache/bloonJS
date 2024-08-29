@@ -1,0 +1,40 @@
+extends layout
+
+block content
+    noscript You need to enable JavaScript to run this app.
+
+    //- Language
+    script(src="/lang/lang.js", defer=true)
+    script(src="/js/translator.js", defer=true)
+    script(src="/jsLibraries/moment.js")
+    script(src="/jsLibraries/moment-timezone.js")
+    script(src="/jsLibraries/spacetime.min.js")
+
+    //- Scripts
+    script(src="/js/joinTeam.js", defer=true)
+
+    //- Session
+    include parts/sessionHeader.pug
+
+    //- Page
+    div.container       
+        div.row.p-0.mt-5(data-bs-theme="dark" style="height: calc(100vh - 207px)")
+            //- Match creation content
+            div.col-12
+                //- Header
+                div.p-1.ps-2.sbg-identification.unselectable#CreateMatchTitles > Join team
+                //- Panel
+                div.col-xs-12.p-0.sb-border.panelBg
+                    div.row.p-4.pt-2.pb-2
+                        form#formRequestException.form-group.mb-1.col-12.p-0.pe-2(name="formRequestException")
+
+                            p Hello, I'm #{session.name} and I would like to join the following team as shown in the Official Superboss Server ICL team list
+                            select.form-control#team(name="team" placeholder="Team name")
+                                if teams != null
+                                    option(value="0" data-shortName="NoTeam") SELECT TEAM
+                                    for team in teams.filter(x => x.TeamRoleId != 0)
+                                        option(value=team.TeamRoleId, data-shortName=team.ShortName) #{team.ShortName} - #{team.Name}
+
+                            button.btn.sbg-primary.mt-2.mb-2.w-100#requestExceptionbtn(type="button" onclick="requestException()") Request an exception
+
+    include parts/footer.pug

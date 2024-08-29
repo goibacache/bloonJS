@@ -530,12 +530,30 @@ const getTextAndAttachmentsFromMessage = (message) => {
  * @param {String} accessToken 
  * @returns 
  */
-const discordApiRequest = async (discordApiEndpoint, tokenType, accessToken) => {
+const discordApiRequest = async (discordApiEndpoint, tokenType, accessToken, body = null, method = "GET") => {
+
+    let bodyContent = null;
+    if (method != "GET"){
+        bodyContent = JSON.stringify(body);
+    }
+
     return await fetch(`https://discord.com/api/${discordApiEndpoint}`, {
+        method: method,
+        body: bodyContent,
         headers: {
-            authorization: `${tokenType} ${accessToken}`,
+            "authorization": `${tokenType} ${accessToken}`,
+            "content-type": 'application/json'
         },
-    }).then(result => result.json())
+    }).then(result => {
+        if (result.body){
+            return result.json();
+        }else{
+            return { 
+                res: true,
+                code: result.status
+             }
+        }
+    })
     .catch(error => {
         console.error(error);
         return null;
@@ -568,18 +586,18 @@ const getAvatarUrl = (userId, avatarId, size = 32) => {
  * @param {String} leagueOfficialRoles The league official roles arrays. Generally HiddenManager and LeagueOfficial
  * @returns 
  */
-const getSessionFromTokenContent = (jwtToken, leagueOfficialRoles = []) => {
+const getSessionFromTokenContent = (jwtToken, leagueOfficialRoles = [], avatarSize = 32) => {
     try {
         // Check if it has the hidden manager or league official role.
         let leagueOfficial = false;
-        if (jwtToken.roles.some(x => leagueOfficialRoles.indexOf(x) > -1)) {
+        if (jwtToken.roles != null && jwtToken.roles != undefined && jwtToken.roles.some(x => leagueOfficialRoles.indexOf(x) > -1)) {
             leagueOfficial = true;
         }
 
         return {
             id: jwtToken.id,
             name: jwtToken.name,
-            avatarUrl: getAvatarUrl(jwtToken.id, jwtToken.avatar, 32),
+            avatarUrl: getAvatarUrl(jwtToken.id, jwtToken.avatar, avatarSize),
             leagueOfficial: leagueOfficial
         }
 

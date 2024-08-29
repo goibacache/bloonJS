@@ -60,5 +60,6 @@ module.exports = {
 	oAutClientId:					"your-discord-bot-client-id",
 	oAutClientSecret:				"your-discord-bot-client-secret",
 	oAuthReturnUrl:					"your-discord-bot-oauth-return-url",
-	oAuthTokenSecret:						"your-discord-bot-auth-token-to-sign-jwts"
+	oAuthTokenSecret:				"your-discord-bot-auth-token-to-sign-jwts",
+	ICLWebHookToAddToTeam:			"your-discord-webhook-url-so-people-can-tell-you-they-want-to-join-a-team-but-are-banned-discord.com/api-is-pre-appended"	
 }

@@ -17,7 +17,6 @@ router.get('/', async(req, res) => {
     let session = null;
 
     // Check if token is valid, if it is, it's logged, send him to the main page
-    
     if (jwtToken == undefined || jwtToken == null || jwtToken.length == null) {
         // Clear process cookies
         const cookieOptions = { SameSite: "none", secure: true };
@@ -30,9 +29,7 @@ router.get('/', async(req, res) => {
     if (jwtToken != undefined && jwtToken != null) {
         try {
             tokenContent = jwt.verify(jwtToken, config.oAuthTokenSecret);
-            if (tokenContent.roles != null || tokenContent.roles.length > 0){
-                session = bloonUtils.getSessionFromTokenContent(tokenContent, [config.role_LeagueOfficial, config.role_HiddenManager]);
-            }
+            session = bloonUtils.getSessionFromTokenContent(tokenContent, [config.role_LeagueOfficial, config.role_HiddenManager]);
         } catch (error) {
             res.clearCookie('jwt');
             res.redirect('/');
@@ -42,6 +39,12 @@ router.get('/', async(req, res) => {
     }
 
     const matches = await match_GetAllMatches(session.leagueOfficial ? null : tokenContent.roles.toString());
+
+    if (matches == null){
+        res.render('error', { message: `Sorry, couldn't load match list`, error: { status: 'error', stack: '-' } });
+        res.end();
+        return;
+    }
 
     // Parse matches and add them as DateTime to sort them in the main view
     matches.forEach(match => {
@@ -54,7 +57,7 @@ router.get('/', async(req, res) => {
         { url: '/scheduleList', name: 'Schedule List' }
     ];
 
-    res.render('scheduleList', { title: `Bloon JS - Your team's schedules`, matches: matches, session: session, breadCrumbs: breadCrumbs });
+    res.render('scheduleList', { title: `When2Bloon - Your team's schedules`, matches: matches, session: session, breadCrumbs: breadCrumbs });
 });
 
 

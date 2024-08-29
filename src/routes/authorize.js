@@ -11,7 +11,7 @@ const ICLDiscordServerId = config.ICLServerId;
 
 /* GET authorize */
 router.get('/', (req, res) => {
-  res.render('authorize', { title: 'Bloon JS - Authorize' });
+  res.render('authorize', { title: 'When2Bloon - Authorize' });
 });
 
 
@@ -44,11 +44,30 @@ router.post('/', async (req, res) => {
 
       // If user doesn't exists in external database, sorry.
       if (externalUser == null || externalUser.length == 0){
-        return res.end(JSON.stringify({ res: false, msg: `Sorry ${userData.global_name}, you don't appear to be in the Superboss' Discord server. To ask for an exclusion contact @Xixo.` }));
+
+        // Create self-signed JWT token to save in localStorage
+        const externalUserData = jwt.sign({
+          id: userData.id,
+          name: userData.global_name,
+          avatar: userData.avatar ?? 'NULL',
+          iat: Math.floor(Date.now() / 1000),
+          exp: Math.floor(Date.now() / 1000) + (expiresIn * 60),
+        }, config.oAuthTokenSecret);
+
+        // Set cookies!
+        const cookieOptions = {
+          SameSite: "Strict", // Only on the same site
+          httpOnly: true, // The cookie only accessible by the web server
+          Secure: true
+        }
+
+        res.cookie('externalUserData', externalUserData, cookieOptions);
+
+        return res.end(JSON.stringify({ res: false, msg: `Sorry ${userData.global_name}, you don't appear to be in the Superboss' Discord server.<br/>To ask for an exclusion fill <a href="/jointeam">this form.</a>` }));
       }
 
       if (externalUser[0].UserDiscordTeamRoleId == null || externalUser[0].UserDiscordTeamRoleId.length == 0){
-        return res.end(JSON.stringify({ res: false, msg: `Sorry ${userData.global_name}, There's no roles associated to your account.` }));
+        return res.end(JSON.stringify({ res: false, msg: `Sorry ${userData.global_name}, There are no roles associated to your account.` }));
       }
 
       discordServerProfile = {
@@ -63,7 +82,8 @@ router.post('/', async (req, res) => {
       }
     }
 
-
+    // At this point, all was ok, so it's time to delete the external user data used for the form if it exists.
+    res.clearCookie("externalUserData");
 
     // Create self-signed JWT token to save in localStorage
     const signedJwt = jwt.sign({
@@ -172,6 +192,7 @@ router.delete('/', async (req, res) => {
   try {
     res.setHeader('Content-Type', 'application/json');
     res.clearCookie('jwt');
+    res.clearCookie('externalUserData');
 
     return res.end(
       JSON.stringify(

@@ -28,7 +28,7 @@ router.get('/', (req, res) => {
   const oAutClientId = config.oAutClientId
   const oAuthReturnUrl = config.oAuthReturnUrl
 
-  res.render('index', { title: 'Bloon JS', oAutClientId: oAutClientId, oAuthReturnUrl: oAuthReturnUrl });
+  res.render('index', { title: 'When2Bloon', oAutClientId: oAutClientId, oAuthReturnUrl: oAuthReturnUrl });
 });
 
 

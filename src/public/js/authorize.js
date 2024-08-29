@@ -100,7 +100,7 @@ const redirectOrSendToList = (playerName) => {
 
 const changeStatus = async (text) => {
     await $("#displayText").fadeOut(100).promise();
-    $("#displayText").text(text);
+    $("#displayText").html(text);
     await $("#displayText").fadeIn(100).promise();
 }
 
