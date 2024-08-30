@@ -273,14 +273,14 @@ const match_GetAllTeams = async() => {
  * @param {*} DateTimeZone 
  * @returns 
  */
-const match_CreateMatch = async(Name, Team1Name, Team2Name, Team1RoleId, Team2RoleId, StartDate, EndDate, DateTimeZone) => {
+const match_CreateMatch = async(Name, Team1Name, Team2Name, Team1RoleId, Team2RoleId, StartDate, EndDate, DateTimeZone, User = "Internal") => {
     let connection;
     try{
-        const query = `CALL match_CreateMatch(?, ?, ?, ?, ?, ?, ?, ?)`;
+        const query = `CALL match_CreateMatch(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
         connection = await createConnection();
 
-        const [rows] = await connection.execute(query, [Name, Team1Name, Team2Name, Team1RoleId, Team2RoleId, StartDate, EndDate, DateTimeZone]);
+        const [rows] = await connection.execute(query, [Name, Team1Name, Team2Name, Team1RoleId, Team2RoleId, StartDate, EndDate, DateTimeZone, User]);
 
         connection.release();
 

@@ -19,7 +19,7 @@ block content
 
       //- Title
       .row
-        div.p-0.mt-5
+        div.p-0.mt-2
           div
             div.col-xs-12.p-0
               if session.leagueOfficial
@@ -27,14 +27,33 @@ block content
               else
                 div.p-1.ps-2.sbg-identification.unselectable#ScheduleTitle > YOUR TEAM'S SCHEDULES
 
-            div.col-xs-12.p-0.sb-border.panelBg.mt-4
-              ul.mt-3.mb-3
-                if matches == null || matches.length == 0
-                  li
-                    a.link There's no matches for your team.
-                each match in matches
-                  li
-                    p.badge.ms-0.mt-0.mr-0.mb-1 #{match.JSDateTime.toLocaleDateString()}
-                    a.link(href='schedule/' + match.Name.replaceAll(" ", "-")+'-'+match.Id) #{match.Name}
+            div.col-xs-12.sb-border.panelBg.mt-4.p-2
+              table#matchTable
+                thead 
+                  tr
+                    th.desktop.tablet-l.tablet-p.mobile-l.mobile-p Match name 
+                    th.desktop Team 1
+                    th.desktop Team 2
+                    th.desktop Start
+                    th.desktop End
+                    th.desktop Match time
+                    th.desktop.tablet-l.tablet-p.mobile-l.mobile-p Link
+                tbody
+                  tr
+                    td name
+                    td t1
+                    td t2
+                    td start
+                    td end
+                    td mt
+                    td link
+            //- ul.mt-3.mb-3
+            //-   if matches == null || matches.length == 0
+            //-     li
+            //-       a.link There's no matches for your team.
+            //-   each match in matches
+            //-     li
+            //-       p.badge.ms-0.mt-0.mr-0.mb-1 #{match.JSDateTime.toLocaleDateString()}
+            //-       a.link(href='schedule/' + match.Name.replaceAll(" ", "-")+'-'+match.Id) #{match.Name}
 
   include parts/footer.pug

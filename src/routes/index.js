@@ -17,9 +17,7 @@ router.get('/', (req, res) => {
   if (jwtToken != undefined && jwtToken != null){
     try{
       jwt.verify(jwtToken, config.oAuthTokenSecret);
-      res.redirect('/scheduleList');
-      res.end();
-      return;
+      return res.redirect('/scheduleList');
     }catch(error){
       res.clearCookie('jwt');
     }

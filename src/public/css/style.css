@@ -293,13 +293,15 @@ ul.breadcrumb li+li:before {
 }
 
 ul.breadcrumb li a {
-  color: #0275d8;
+  /* color: #0275d8; */
+  color: #daa520;;
   text-decoration: none;
 }
 
 ul.breadcrumb li a:hover {
-  color: #01447e;
-  text-decoration: underline;
+  /* color: #01447e; */
+  color: #a37d1f;
+  text-decoration: none;
 }
 
 /* SESSION */
@@ -308,6 +310,11 @@ ul.breadcrumb li a:hover {
   /* background-color: black; */
   /* background-color: #2d252b; */
   background-color: #11161c;
+}
+
+.breadCrumbContainer {
+  height: 30px !important;
+  background-color: #1e2e3c;
 }
 
 .badge {
@@ -426,4 +433,16 @@ td{
 
 .transition{
   transition: 0.25s;
+}
+
+.smallFlag {
+  width: 30px;
+  height: 20px; 
+  align-self: center;
+}
+
+.mediumFlag{
+  width: 50px;
+  height: 40px; 
+  align-self: center;
 }

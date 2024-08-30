@@ -21,9 +21,7 @@ router.get('/', async (req, res) => {
         // Clear process cookies
         const cookieOptions = { SameSite: "none", secure: true };
         res.clearCookie('jwt', cookieOptions);
-        res.redirect('/');
-        res.end();
-        return;
+        return res.redirect('/');
     }
 
     if (jwtToken != undefined && jwtToken != null) {
@@ -32,15 +30,11 @@ router.get('/', async (req, res) => {
             session = bloonUtils.getSessionFromTokenContent(tokenContent, [config.role_LeagueOfficial, config.role_HiddenManager]);
 
             if (session == null || !session.leagueOfficial) {
-                res.redirect('/scheduleList');
-                res.end();
-                return;
+                return res.redirect('/scheduleList');
             }
         } catch (error) {
             res.clearCookie('jwt');
-            res.redirect('/');
-            res.end();
-            return;
+            return res.redirect('/');
         }
     }
 
@@ -59,6 +53,49 @@ router.post('/', async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     try {
 
+        // Check if user have token in cookies
+        let tokenContent, session;
+        const jwtToken = req.cookies["jwt"];
+
+        // Check if token is valid, if it is, it's logged, send him to the main page
+        if (jwtToken == undefined || jwtToken == null || jwtToken.length == null) {
+            return res.end(
+                JSON.stringify(
+                    {
+                        res: false,
+                        msg: "You don't have the necessary permissions to create a match."
+                    }
+                )
+            );
+        }
+
+        if (jwtToken != undefined && jwtToken != null) {
+            try {
+                tokenContent = jwt.verify(jwtToken, config.oAuthTokenSecret);
+                session = bloonUtils.getSessionFromTokenContent(tokenContent, [config.role_LeagueOfficial, config.role_HiddenManager]);
+
+                if (session == null || !session.leagueOfficial) {
+                    return res.end(
+                        JSON.stringify(
+                            {
+                                res: false,
+                                msg: "You don't have the necessary permissions to create a match."
+                            }
+                        )
+                    );
+                }
+            } catch (error) {
+                return res.end(
+                    JSON.stringify(
+                        {
+                            res: false,
+                            msg: "You don't have the necessary permissions to create a match. Please log in again."
+                        }
+                    )
+                );
+            }
+        }
+
         if (req.body == null || req.body.matches == null || req.body.matches.length == 0) {
             return res.end(
                 JSON.stringify(
@@ -74,6 +111,8 @@ router.post('/', async (req, res) => {
         const startDate = formatDate(req.body.startDate);
         const endDate = formatDate(req.body.endDate);
         const timeZone = req.body.timezone;
+
+        // TODO: Validations
 
         const promises = [];
 

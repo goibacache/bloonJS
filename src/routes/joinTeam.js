@@ -22,9 +22,7 @@ router.get('/', async (req, res) => {
         // Clear process cookies
         res.clearCookie('jwt', cookieOptions);
         res.clearCookie('externalUserData', cookieOptions);
-        res.redirect('/');
-        res.end();
-        return;
+        return res.redirect('/');
     }
 
     if (externalUserData != undefined && externalUserData != null) {
