@@ -20,8 +20,19 @@ const loadTable = () => {
         layout: {
             topStart: () => {
                 return `
-                    <input id="rdbFuture"   type="radio" name="futurePastSelector" class="ms-3" checked  onclick="seeFuture()"></input><p class="p-0 m-0 ms-1 me-2">Future</p>
-                    <input id="rdbPast"     type="radio" name="futurePastSelector" class="ms-1"          onclick="seePast()"></input><p class="p-0 m-0 ms-1">Past</p>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="futurePastSelector" id="futurePastSelector" checked onclick="seeFuture()">
+                        <label id="UpcomingText" class="form-check-label" for="futurePastSelector">
+                            Upcoming
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="futurePastSelector" id="futurePastSelector" onclick="seePast()">
+                        <label id="PreviousText" class="form-check-label" for="futurePastSelector">
+                            Previous
+                        </label>
+                    </div>
+                    
                 `
             },
             // topEnd: null,
@@ -32,7 +43,9 @@ const loadTable = () => {
         order: [], // use data order
         columnDefs: [
             { visible: false, targets: 5 },
-            { className: 'p-0', targets: "_all" }
+            { className: 'p-0', targets: "_all" },
+            { className: 'text-end', targets: [3, 4] },
+            { className: 'text-center', targets: 6 }
             // { responsivePriority: 1, targets: [0, 6] },
         ],
         columns: [
@@ -51,7 +64,8 @@ const loadTable = () => {
             },
             { data: 'MatchTime' },
             { data: 'Name', render: (data, type, row) => {
-                    return `<button type="button" class="btn btn-primary" style="height: 26px; padding-top: 0;" onclick="goto('/schedule/${row.Name.replace(/ /g, '-')}-${row.Id}')">Schedule</a>`;
+                    const buttonClass = row.MatchTime == "Past" ? "btn-secondary" : "btn-primary";
+                    return `<button type="button" class="btn ${buttonClass}" style="height: 26px; padding-top: 0;" onclick="goto('/schedule/${row.Name.replace(/ /g, '-')}-${row.Id}')">Schedule</a>`;
                 } 
             },
         ]

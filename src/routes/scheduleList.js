@@ -52,14 +52,7 @@ router.get('/matches', async (req, res) => {
 
         // Check if token is valid, if it is, it's logged, send him to the main page
         if (jwtToken == undefined || jwtToken == null || jwtToken.length == null) {
-            return res.end(
-                JSON.stringify(
-                    {
-                        res: false,
-                        msg: `Couldn't identify your`
-                    }
-                )
-            );
+            return res.end(bloonUtils.match_createJsonResError("Couldn't identify your account, please log in again."));
         }
 
         if (jwtToken != undefined && jwtToken != null) {
@@ -67,35 +60,15 @@ router.get('/matches', async (req, res) => {
                 tokenContent = jwt.verify(jwtToken, config.oAuthTokenSecret);
                 session = bloonUtils.getSessionFromTokenContent(tokenContent, [config.role_LeagueOfficial, config.role_HiddenManager]);
             } catch (error) {
-                return res.end(
-                    JSON.stringify(
-                        {
-                            res: false,
-                            msg: `Couldn't identify your user`
-                        }
-                    )
-                );
+                return res.end(bloonUtils.match_createJsonResError("Your session has expired, please log in again."));
             }
         }
 
         const matches = await match_GetAllMatches(session.leagueOfficial ? null : tokenContent.roles.toString());
 
         if (matches == null) {
-            return res.end(
-                JSON.stringify(
-                    {
-                        res: false,
-                        msg: `Couldn't load matches`
-                    }
-                )
-            );
+            return res.end(bloonUtils.match_createJsonResError("Couldn't load matches, please try again."));
         }
-
-        // Parse matches and add them as DateTime to sort them in the main view
-        // matches.forEach(match => {
-        //     const dateParts = match.StartDate.split('.');
-        //     match.JSDateTime = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
-        // });
 
         return res.end(
             JSON.stringify(
@@ -107,14 +80,7 @@ router.get('/matches', async (req, res) => {
         );
 
     } catch (error) {
-        return res.end(
-            JSON.stringify(
-                {
-                    res: false,
-                    msg: error
-                }
-            )
-        );
+        return res.end(bloonUtils.match_createJsonResError(error));
     }
 
 

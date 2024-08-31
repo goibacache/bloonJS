@@ -137,14 +137,7 @@ router.put('/:scheduleId', async (req, res) => {
       // Clear process cookies
       res.clearCookie('jwt');
 
-      return res.end(
-        JSON.stringify(
-          {
-            res: false,
-            msg: 'No JWT token found.'
-          }
-        )
-      );
+      return res.end(bloonUtils.match_createJsonResError("Couldn't identify the user."));
     }
 
     // Verify token & get contents
@@ -157,76 +150,34 @@ router.put('/:scheduleId', async (req, res) => {
       // Clear process cookies
       res.clearCookie('jwt');
 
-      return res.end(
-        JSON.stringify(
-          {
-            res: false,
-            msg: 'invalid session'
-          }
-        )
-      );
+      return res.end(bloonUtils.match_createJsonResError("Your session has expired, please log in again."));
     }
 
     if (session.leagueOfficial) {
-      return res.end(
-        JSON.stringify(
-          {
-            res: false,
-            msg: `Sorry, can't modify a schedule as a league official`
-          }
-        )
-      );
+      return res.end(bloonUtils.match_createJsonResError("Sorry, can't modify a schedule while logged in as a league official"));
     }
 
     // Get match info:
     const scheduleIdInt = getMatchInfoId(scheduleId);
     if (scheduleIdInt == null || isNaN(scheduleIdInt) || !isFinite(scheduleIdInt)) {
-      return res.end(
-        JSON.stringify(
-          {
-            res: false,
-            msg: `Sorry, couldn't get schedule id`
-          }
-        )
-      );
+      return res.end(bloonUtils.match_createJsonResError("Couldn't get schedule id."));
     }
 
     const matchInfo = await match_GetInfo(scheduleIdInt);
     if (matchInfo == null) {
-      return res.end(
-        JSON.stringify(
-          {
-            res: false,
-            msg: `Sorry, couldn't load match info`
-          }
-        )
-      );
+      return res.end(bloonUtils.match_createJsonResError("Couldn't load match info, please try again."));
     }
 
     // Check against player roles!
     const teamRole = tokenContent.roles.find(x => x == matchInfo.Team1RoleId || x == matchInfo.Team2RoleId);
     if (teamRole == null) {
-      return res.end(
-        JSON.stringify(
-          {
-            res: false,
-            msg: `Bloon couldn't find you on the team roles`
-          }
-        )
-      );
+      return res.end(bloonUtils.match_createJsonResError("You're not on the team roster, can't modify the schedule."));
     }
 
     const update = await match_UpdateMyTimes(scheduleIdInt, tokenContent.id, tokenContent.name, tokenContent.avatar, req.body, teamRole);
 
     if (update == null) {
-      return res.end(
-        JSON.stringify(
-          {
-            res: false,
-            msg: `Sorry, there was a problem saving your times!`
-          }
-        )
-      );
+      return res.end(bloonUtils.match_createJsonResError("Sorry, there was a problem saving your times, please try again."));
     }
 
     // Check for the specific server and get roles
@@ -239,14 +190,7 @@ router.put('/:scheduleId', async (req, res) => {
       )
     );
   } catch (error) {
-    return res.end(
-      JSON.stringify(
-        {
-          res: false,
-          msg: error
-        }
-      )
-    );
+    return res.end(bloonUtils.match_createJsonResError(error));
   }
 });
 

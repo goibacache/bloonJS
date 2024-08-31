@@ -26,13 +26,13 @@ router.post('/', async (req, res) => {
 
     const userData = await bloonUtils.discordApiRequest('users/@me', tokenType, accessToken);
     if (userData === null) {
-      return res.end(JSON.stringify({ res: false, msg: `Couldn't get your discord profile information.` }));
+      return res.end(bloonUtils.match_createJsonResError("Couldn't get your discord profile information."));
     }
 
     // Load all servers
     const userServers = await bloonUtils.discordApiRequest('users/@me/guilds', tokenType, accessToken);
     if (userServers === null) {
-      return res.end(JSON.stringify({ res: false, msg: `There was a problem getting your server list from Discord.` }));
+      return res.end(bloonUtils.match_createJsonResError("There was a problem getting your server list from Discord."));
     }
 
     let discordServerProfile;
@@ -63,11 +63,11 @@ router.post('/', async (req, res) => {
 
         res.cookie('externalUserData', externalUserData, cookieOptions);
 
-        return res.end(JSON.stringify({ res: false, msg: `Sorry ${userData.global_name}, you don't appear to be in the Superboss' Discord server.<br/>To ask for an exclusion fill <a href="/jointeam">this form.</a>` }));
+        return res.end(bloonUtils.match_createJsonResError(`Sorry ${userData.global_name}, you don't appear to be in the Superboss' Discord server.<br/>To ask for an exclusion fill <a href="/jointeam">this form.</a>`));
       }
 
       if (externalUser[0].UserDiscordTeamRoleId == null || externalUser[0].UserDiscordTeamRoleId.length == 0){
-        return res.end(JSON.stringify({ res: false, msg: `Sorry ${userData.global_name}, There are no roles associated to your account.` }));
+        return res.end(bloonUtils.match_createJsonResError(`Sorry ${userData.global_name}, There are no roles in the ICL server associated to your account.`));
       }
 
       discordServerProfile = {
@@ -78,7 +78,7 @@ router.post('/', async (req, res) => {
       // Get info from the ICL server
       discordServerProfile = await bloonUtils.discordApiRequest(`users/@me/guilds/${ICLDiscordServerId}/member`, tokenType, accessToken);
       if (discordServerProfile === null || discordServerProfile.code === 0) {
-        return res.end(JSON.stringify({ res: false, msg: `Sorry ${userData.global_name}, You're in the ICL server, but I can get your information right now.` }));
+        return res.end(bloonUtils.match_createJsonResError(`Sorry ${userData.global_name}, You're in the ICL server, but I can get your information right now.`));
       }
     }
 
@@ -121,13 +121,7 @@ router.post('/', async (req, res) => {
       )
     );
   } catch (error) {
-    return res.end(
-      JSON.stringify(
-        { res: false, 
-          msg: error.toString() 
-        }
-      )
-    );
+    return res.end(bloonUtils.match_createJsonResError(error));
   }
 });
 
@@ -144,7 +138,7 @@ router.post('/noLeagueOfficial/', async (req, res) => {
 
     if (jwtToken == undefined || jwtToken == null) {
       // Clear process cookies
-      res.end(JSON.parse({ res: false, msg: `Couldn't find token.` }));
+      return res.end(bloonUtils.match_createJsonResError("Couldn't identify your session"));
     }
 
     const tokenContent = jwt.verify(jwtToken, config.oAuthTokenSecret);
@@ -176,11 +170,7 @@ router.post('/noLeagueOfficial/', async (req, res) => {
       )
     );
   } catch (error) {
-    return res.end(
-      JSON.stringify(
-        { res: false, msg: error }
-      )
-    );
+    return res.end(bloonUtils.match_createJsonResError(error));
   }
 
 });
@@ -200,11 +190,7 @@ router.delete('/', async (req, res) => {
       )
     );
   } catch (error) {
-    return res.end(
-      JSON.stringify(
-        { res: false, msg: error }
-      )
-    );
+    return res.end(bloonUtils.match_createJsonResError(error));
   }
 })
 

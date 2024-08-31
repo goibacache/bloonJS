@@ -59,14 +59,7 @@ router.post('/', async (req, res) => {
 
         // Check if token is valid, if it is, it's logged, send him to the main page
         if (jwtToken == undefined || jwtToken == null || jwtToken.length == null) {
-            return res.end(
-                JSON.stringify(
-                    {
-                        res: false,
-                        msg: "You don't have the necessary permissions to create a match."
-                    }
-                )
-            );
+            return res.end(bloonUtils.match_createJsonResError("You don't have the necessary permissions to create a match."));
         }
 
         if (jwtToken != undefined && jwtToken != null) {
@@ -75,36 +68,15 @@ router.post('/', async (req, res) => {
                 session = bloonUtils.getSessionFromTokenContent(tokenContent, [config.role_LeagueOfficial, config.role_HiddenManager]);
 
                 if (session == null || !session.leagueOfficial) {
-                    return res.end(
-                        JSON.stringify(
-                            {
-                                res: false,
-                                msg: "You don't have the necessary permissions to create a match."
-                            }
-                        )
-                    );
+                    return res.end(bloonUtils.match_createJsonResError("You don't have the necessary permissions to create a match."));
                 }
             } catch (error) {
-                return res.end(
-                    JSON.stringify(
-                        {
-                            res: false,
-                            msg: "You don't have the necessary permissions to create a match. Please log in again."
-                        }
-                    )
-                );
+                return res.end(bloonUtils.match_createJsonResError("You don't have the necessary permissions to create a match, please log in again."));
             }
         }
 
         if (req.body == null || req.body.matches == null || req.body.matches.length == 0) {
-            return res.end(
-                JSON.stringify(
-                    {
-                        res: false,
-                        msg: "No match data found"
-                    }
-                )
-            );
+            return res.end(bloonUtils.match_createJsonResError("No match data found."));
         }
 
         const matches = JSON.parse(req.body.matches);
@@ -112,9 +84,42 @@ router.post('/', async (req, res) => {
         const endDate = formatDate(req.body.endDate);
         const timeZone = req.body.timezone;
 
-        // TODO: Validations
-
         const promises = [];
+
+        // Validate every match...
+        for (const match of matches) {
+            if (match.matchName == null || match.matchName == undefined || match.matchName.length == 0) {
+                return res.end(bloonUtils.match_createJsonResError("Match name can't be empty"));
+            }
+
+            if (match.team1Name == null || match.team1Name == undefined || match.team1Name.length == 0) {
+                return res.end(bloonUtils.match_createJsonResError("Team 1 name can't be empty"));
+            }
+
+            if (match.team2Name == null || match.team2Name == undefined || match.team2Name.length == 0) {
+                return res.end(bloonUtils.match_createJsonResError("Team 1 name can't be empty"));
+            }
+
+            if (match.team1Id == null || match.team1Id == undefined || match.team1Id.length == 0) {
+                return res.end(bloonUtils.match_createJsonResError("Team 1 Id name can't be null or empty"));
+            }
+
+            if (match.team2Id == null || match.team2Id == undefined || match.team2Id.length == 0) {
+                return res.end(bloonUtils.match_createJsonResError("Team 2 Id name can't be null or empty"));
+            }
+
+            if (match.startDate == null || match.startDate == undefined || match.startDate.length == 0 || !bloonUtils.match_isCustomDateFormatOK(match.startDate)) {
+                return res.end(bloonUtils.match_createJsonResError("Start date has an invalid format."));
+            }
+
+            if (match.endDate == null || match.endDate == undefined || match.endDate.length == 0 || !bloonUtils.match_isCustomDateFormatOK(match.endDate)) {
+                return res.end(bloonUtils.match_createJsonResError("Start date has an invalid format."));
+            }
+
+            if (match.timeZone == null || match.timeZone == undefined || match.timeZone.length == 0) {
+                return res.end(bloonUtils.match_createJsonResError("Timezone seems to be invalid."));
+            }
+        }
 
         for (const match of matches) {
             promises.push(match_CreateMatch(match.matchName, match.team1Name, match.team2Name, match.team1Id, match.team2Id, startDate, endDate, timeZone));
@@ -128,17 +133,12 @@ router.post('/', async (req, res) => {
             )
         );
     } catch (error) {
-        return res.end(
-            JSON.stringify(
-                {
-                    res: false,
-                    msg: error
-                }
-            )
-        );
+        return res.end(bloonUtils.match_createJsonResError(error));
     }
 
 });
+
+
 
 /**
  * Expects a date in the YYYY-MM-DD format and transforms it into DD.MM.YYYY.00.00

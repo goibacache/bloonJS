@@ -10,6 +10,7 @@ const scheduleRouter      = require('./routes/schedule.js');
 const scheduleListRouter  = require('./routes/scheduleList.js');
 const createMatchRouter   = require('./routes/createMatch.js');
 const joinTeamRouter      = require('./routes/joinTeam.js');
+const apiRouter           = require('./routes/api.js');
 
 var app = express();
 
@@ -37,6 +38,7 @@ app.use('/schedule', scheduleRouter);
 app.use('/scheduleList', scheduleListRouter);
 app.use('/createMatch', createMatchRouter);
 app.use('/joinTeam', joinTeamRouter);
+app.use('/api', apiRouter);
 
 
 // catch 404 and forward to error handler

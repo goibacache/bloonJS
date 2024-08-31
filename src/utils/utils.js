@@ -607,6 +607,40 @@ const getSessionFromTokenContent = (jwtToken, leagueOfficialRoles = [], avatarSi
 }
 
 
+const match_createJsonResError = (errorText) => {
+    return JSON.stringify(
+        {
+            res: false,
+            msg: errorText
+        }
+    );
+}
+
+const match_isCustomDateFormatOK = (date) => {
+    // Date part has 4 points "DD.MM.YYYY.HH.mm"
+    if (date.match(/\./g).length != 4){
+        return false;
+    }
+
+    const dateParts = date.split('.');
+
+    for (let i = 0; i < dateParts.length; i++) {
+        const parsedPart = parseInt(dateParts[i]);
+        // Datepart is not a number
+        if (isNaN(parsedPart)){
+            return false;
+        }
+
+        // Date part is below 2000.
+        if (i == 2 && parsedPart < 2000){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
 module.exports = {
     moderationActions,
     getHTTPResult,
@@ -633,4 +667,6 @@ module.exports = {
     discordApiRequest,
     getAvatarUrl,
     getSessionFromTokenContent,
+    match_createJsonResError,
+    match_isCustomDateFormatOK
 }

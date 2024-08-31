@@ -67,98 +67,48 @@ router.post('/', async (req, res) => {
             // Clear process cookies
             res.clearCookie('jwt', cookieOptions);
             res.clearCookie('externalUserData', cookieOptions);
-            return res.end(
-                JSON.stringify(
-                    {
-                        res: false,
-                        msg: "Sorry, we couldn't load your session data, please log out and log in again."
-                    }
-                )
-            );
+            return res.end(bloonUtils.match_createJsonResError("Sorry, we couldn't load your session data, please log out and log in again."));
         }
 
         if (externalUserData != undefined && externalUserData != null) {
             try {
                 tokenContent = jwt.verify(externalUserData, config.oAuthTokenSecret);
             } catch (error) {
-                console.log("Error in JoinTeam View:", error);
                 res.clearCookie('jwt', cookieOptions);
                 res.clearCookie('externalUserData', cookieOptions);
 
-                return res.end(
-                    JSON.stringify(
-                        {
-                            res: false,
-                            msg: "Sorry, couldn't load your profile, please log in again"
-                        }
-                    )
-                );
+                return res.end(bloonUtils.match_createJsonResError("Sorry, couldn't load your profile, please log in again"));
             }
         }
 
         // Check the body for the selected team
         if (!req.body) {
-            return res.end(
-                JSON.stringify(
-                    {
-                        res: false,
-                        msg: "You need to select a team"
-                    }
-                )
-            );
+            return res.end(bloonUtils.match_createJsonResError("You need to select a team."));
         }
 
         const selectedTeamBody = req.body.team;
 
         if (selectedTeamBody == undefined || selectedTeamBody == null || selectedTeamBody == "0") {
-            return res.end(
-                JSON.stringify(
-                    {
-                        res: false,
-                        msg: "Please select a valid team"
-                    }
-                )
-            );
+            return res.end(bloonUtils.match_createJsonResError("Please select a valid team."));
         }
 
         // Get all teams
         const teams = await match_GetAllTeams();
 
         if (teams == null) {
-            return res.end(
-                JSON.stringify(
-                    {
-                        res: false,
-                        msg: "Couldn't load teams, please try again."
-                    }
-                )
-            );
+            return res.end(bloonUtils.match_createJsonResError("Couldn't load teams, please try again."));
         }
 
         const selectedTeam = teams.find(x => x.TeamRoleId == selectedTeamBody);
 
         if (selectedTeam == null) {
-            return res.end(
-                JSON.stringify(
-                    {
-                        res: false,
-                        msg: "Couldn't find the selected team."
-                    }
-                )
-            );
+            return res.end(bloonUtils.match_createJsonResError("Couldn't find the selected team in the internal team list."));
         }
 
         const createOnDatabaseResult = await match_ExternalUser_Create(tokenContent.id, tokenContent.name, tokenContent.avatar, selectedTeam.TeamRoleId);
 
         if (createOnDatabaseResult != ""){
-            return res.end(
-                JSON.stringify(
-                    {
-                        res: false,
-                        msg: "You already have a pending exception."
-                    }
-                )
-            );
+            return res.end(bloonUtils.match_createJsonResError("You already have a pending exception."));
         }
 
         const body = {
@@ -170,14 +120,7 @@ router.post('/', async (req, res) => {
         const discordResponse = await bloonUtils.discordApiRequest(config.ICLWebHookToAddToTeam, null, null, body, 'POST');
 
         if (discordResponse == null || discordResponse.code != 204) {
-            return res.end(
-                JSON.stringify(
-                    {
-                        res: false,
-                        msg: "There was a problem sending the message, please try again."
-                    }
-                )
-            );
+            return res.end(bloonUtils.match_createJsonResError("You request was saved but there was a problem alerting the When2Bloon admins, sorry."));
         }
 
         // Won't need it anymore
@@ -189,11 +132,7 @@ router.post('/', async (req, res) => {
             )
         );
     } catch (error) {
-        return res.end(
-            JSON.stringify(
-                { res: false, msg: error }
-            )
-        );
+        return res.end(bloonUtils.match_createJsonResError(error));
     }
 
 });

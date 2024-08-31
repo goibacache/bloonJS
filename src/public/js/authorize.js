@@ -63,7 +63,6 @@ const loginAsPlayer = async () => {
         url: '/authorize/noLeagueOfficial',
         success: (res) => res,
         onerror: (error) => {
-            console.error('ERROR!: ' + error);
             return { res: false, msg: error };
         }
     });
