@@ -42,7 +42,7 @@ router.get('/', async (req, res) => {
     res.render('scheduleList', { title: `When2Bloon - Schedule List`, session: session, breadCrumbs: breadCrumbs });
 });
 
-router.get('/matches', async (req, res) => {
+router.post('/listMatches', async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     try {
         // Check if user have token in cookies
@@ -64,7 +64,11 @@ router.get('/matches', async (req, res) => {
             }
         }
 
-        const matches = await match_GetAllMatches(session.leagueOfficial ? null : tokenContent.roles.toString());
+        if (req.body.FutureOrPast == null || req.body.FutureOrPast == undefined || req.body.FutureOrPast.length == 0 || (req.body.FutureOrPast != "Future" && req.body.FutureOrPast != "Past")){
+            return res.end(bloonUtils.match_createJsonResError("Please select if you want to see upcoming or past matches."));
+        }
+
+        const matches = await match_GetAllMatches(session.leagueOfficial ? null : tokenContent.roles.toString(), req.body.FutureOrPast);
 
         if (matches == null) {
             return res.end(bloonUtils.match_createJsonResError("Couldn't load matches, please try again."));

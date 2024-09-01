@@ -446,3 +446,10 @@ td{
   height: 40px; 
   align-self: center;
 }
+
+/* Tooltip! */
+
+.tooltip-inner {
+  background: black !important;
+  color: white !important;
+}

@@ -18,12 +18,12 @@ div.d-flex.align-items-center.sessionContainer.p-0
 
             button.btn.sbg-primary.dropdown-toggle.ms-auto.d-none.d-sm-inline-block.me-4#optionBtn(type="button" data-bs-toggle="dropdown" aria-expanded="false") Options
             ul.dropdown-menu  
-                li
-                    a.dropdown-item#GotoTitle(href="#" style="font-weight: bolder") Go to         
-                li
-                    a.dropdown-item#ScheduleListButton(type="button" onClick="goto('/scheduleList')" style="border-left: 5px solid #5c5027") Schedule list
                 //- League official buttons
                 if session != null && session.leagueOfficial  
+                    li
+                        a.dropdown-item#GotoTitle(href="#" style="font-weight: bolder") Go to         
+                    li
+                        a.dropdown-item#ScheduleListButton(type="button" onClick="goto('/scheduleList')" style="border-left: 5px solid #5c5027") Schedule list
                     li
                         a.dropdown-item#CreateMatchButton(type="button" onClick="goto('/createMatch')" style="border-left: 5px solid #5c5027") Create match
                 li

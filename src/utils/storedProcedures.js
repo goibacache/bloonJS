@@ -165,14 +165,14 @@ const match_GetDetails = async(_matchId, _role) => {
  * 
  * @param {string} _roles Role list coma separated (,) [IK, IK...]
  */
-const match_GetAllMatches = async(_roles) => {
+const match_GetAllMatches = async(_roles, FutureOrPast) => {
     let connection;
     try{
-        const query = `CALL match_GetAllMatches(?)`;
+        const query = `CALL match_GetAllMatches(?, ?)`;
 
         connection = await createConnection();
 
-        const [rows] = await connection.execute(query, [_roles]);
+        const [rows] = await connection.execute(query, [_roles, FutureOrPast]);
 
         connection.release();
 

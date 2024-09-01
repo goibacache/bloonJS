@@ -4,7 +4,6 @@ const changeLanguage = (language) => {
 }
 
 const translate = () => {
-    console.log("TRANSLATE D:<");
     let language = localStorage.getItem('language');
     if (language == null){
         localStorage.setItem('language','en');
@@ -24,7 +23,7 @@ const translate = () => {
         langKeys.forEach(key => {
             if (key != "SpaceTime"){
                 $(`${key}`).html(languageForPage.strings[key][language]);
-                console.log(`translating ${key} with ${languageForPage.strings[key][language]}`)
+                //console.log(`translating ${key} with ${languageForPage.strings[key][language]}`)
             }
         });
     }
@@ -39,7 +38,7 @@ const translate = () => {
         generalKeys.forEach(key => {
             if (key != "SpaceTime"){
                 $(`${key}`).html(generalLanguage.strings[key][language], );
-                console.log(`translating general ${key} with ${generalLanguage.strings[key][language]}`)
+                //console.log(`translating general ${key} with ${generalLanguage.strings[key][language]}`)
             }
         });
     }

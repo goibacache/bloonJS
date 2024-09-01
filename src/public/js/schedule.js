@@ -376,6 +376,10 @@ const handleMarks = () => {
         return;
     }
 
+    if (selection != null){
+        selection.destroy();
+    }
+
     /* CONFIG VISELECT */
     selection = new SelectionArea({
         selectables: ['.selectableDate'],

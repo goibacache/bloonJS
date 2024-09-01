@@ -108,21 +108,21 @@ router.post('/', async (req, res) => {
                 return res.end(bloonUtils.match_createJsonResError("Team 2 Id name can't be null or empty"));
             }
 
-            if (match.startDate == null || match.startDate == undefined || match.startDate.length == 0 || !bloonUtils.match_isCustomDateFormatOK(match.startDate)) {
+            if (startDate == null || startDate == undefined || startDate.length == 0 || !bloonUtils.match_isCustomDateFormatOK(startDate)) {
                 return res.end(bloonUtils.match_createJsonResError("Start date has an invalid format."));
             }
 
-            if (match.endDate == null || match.endDate == undefined || match.endDate.length == 0 || !bloonUtils.match_isCustomDateFormatOK(match.endDate)) {
+            if (endDate == null || endDate == undefined || endDate.length == 0 || !bloonUtils.match_isCustomDateFormatOK(endDate)) {
                 return res.end(bloonUtils.match_createJsonResError("Start date has an invalid format."));
             }
 
-            if (match.timeZone == null || match.timeZone == undefined || match.timeZone.length == 0) {
+            if (timeZone == null || timeZone == undefined || timeZone.length == 0) {
                 return res.end(bloonUtils.match_createJsonResError("Timezone seems to be invalid."));
             }
         }
 
         for (const match of matches) {
-            promises.push(match_CreateMatch(match.matchName, match.team1Name, match.team2Name, match.team1Id, match.team2Id, startDate, endDate, timeZone));
+            promises.push(match_CreateMatch(match.matchName, match.team1Name, match.team2Name, match.team1Id, match.team2Id, startDate, endDate, timeZone, `${session.name} (${session.id})`));
         }
 
         await Promise.all(promises);
