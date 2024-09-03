@@ -169,9 +169,9 @@ const languageDefinition = [
                 'pg': 'Você pode apoiar o desenvolvimento do bloon em <a href="https://ko-fi.com/bloon"> ko-fi.com</a>'
             },
             '#Footer4': {
-                'en': `Special thanks to Cross, CoolTurtle, Mancuba, PBEgood & MattBatt56`,
-                'es': 'Agradecimientos especiales a Cross, CoolTurtle, Mancuba, PBEgood y MattBatt56',
-                'pg': 'Agradecimentos especiais a Cross, CoolTurtle, Mancuba, PBEgood e MattBatt56'
+                'en': `Special thanks to Cross, CoolTurtle, Mancuba, PBEgood, Polybius, Thisisnotatag & Mattbatt56`,
+                'es': 'Agradecimientos especiales a Cross, CoolTurtle, Mancuba, PBEgood Polybius, Thisisnotatag y Mattbatt56',
+                'pg': 'Agradecimentos especiais a Cross, CoolTurtle, Mancuba, PBEgood, Polybius, Thisisnotatag e Mattbatt56'
             },
             // Library used to parse and draw days
             SpaceTime: {
