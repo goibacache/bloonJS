@@ -70,7 +70,7 @@ const loadTable = () => {
             {
                 data: 'Name', render: (data, type, row) => {
                     const buttonClass = row.MatchTime == "Past" ? "btn-secondary" : "btn-primary";
-                    return `<button type="button" class="btn ${buttonClass}" style="height: 26px; padding-top: 0;" onclick="goto('/schedule/${row.Name.replace(/ /g, '-')}-${row.Id}')">Schedule</a>`;
+                    return `<a type="button" class="btn ${buttonClass}" style="height: 26px; padding-top: 0;" href="/schedule/${row.Name.replace(/ /g, '-')}-${row.Id}">Schedule</a>`;
                 }
             },
         ]
