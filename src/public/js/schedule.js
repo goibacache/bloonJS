@@ -307,7 +307,11 @@ const loadCalendar = (debug = false) => {
 const buildDayArray = (startDate, localStartDate, endDate, localEndDate) => {
     const days = [];
 
-    const amountOfDays = localStartDate.diff(localEndDate.add(1, 'days'), 'days');
+    let amountOfDays = localStartDate.diff(localEndDate.add(1, 'days'), 'days');
+
+    if (localEndDate.diff(endDate, 'hours') > 0){
+        amountOfDays++;
+    }
 
     const language = localStorage.getItem('language') ?? "en";
 
