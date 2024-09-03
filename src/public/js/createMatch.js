@@ -107,6 +107,19 @@ const processMatches = async () => {
         return;    
     }
 
+    const startDate = new Date($("#startDate").val());
+    const endDate = new Date($("#endDate").val());
+
+    if (endDate < startDate){
+        toastr.info("End date can't be lower than the start date.");
+        return;
+    }
+
+    if (startDate > endDate){
+        toastr.info("Start date can't be higher than the end date.");
+        return;
+    }
+
     const createMatches = await $.ajax({
         type: 'POST',
         url: '/createMatch',
