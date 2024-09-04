@@ -125,11 +125,25 @@ router.post('/', async (req, res) => {
             promises.push(match_CreateMatch(match.matchName, match.team1Name, match.team2Name, match.team1Id, match.team2Id, startDate, endDate, timeZone, `${session.name} (${session.id})`));
         }
 
-        await Promise.all(promises);
+        const allPromises = await Promise.all(promises);
+
+        // If all of them failed x_x
+        if (allPromises.filter(x => x != null).length == 0){
+            return res.end(bloonUtils.match_createJsonResError(`Couldn't save the matches, please try again.`));
+        }
+
+        const urls = [];
+
+        allPromises.forEach(element => {
+            urls.push(`${config.WEB_Host}/schedule/${element}`);
+        });
 
         return res.end(
             JSON.stringify(
-                { res: true }
+                { 
+                    res: true,
+                    matchUrls: urls
+                 }
             )
         );
     } catch (error) {

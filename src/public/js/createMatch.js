@@ -26,8 +26,6 @@ const clearForm = () => {
     $("#team1Select").val("0");
     $("#team2Select").val("0");
     $("#name").val("");
-    // $("#startDate").val("");
-    // $("#endDate").val("");
 }
 
 const addMatchToList = () => {
@@ -88,7 +86,7 @@ const addMatchToList = () => {
     </tr>
 `;
 
-    $("tbody").append(tr);
+    $("#preparedMatches>tbody").append(tr);
 
     toastr.info("Match added to temp list");
 
@@ -96,6 +94,11 @@ const addMatchToList = () => {
 }
 
 const processMatches = async () => {
+
+    if (matches.length == 0){
+        toastr.info("Please add matches to schedule.");
+        return;    
+    }
     
     if ($("#startDate").val() == ""){
         toastr.info("Please select start date");
@@ -120,6 +123,9 @@ const processMatches = async () => {
         return;
     }
 
+    $("#btnAddMatchToList").attr('disabled', true);
+    $("#btnProcessMatches").attr('disabled', true);
+
     const createMatches = await $.ajax({
         type: 'POST',
         url: '/createMatch',
@@ -132,10 +138,26 @@ const processMatches = async () => {
     });
 
     if (createMatches.res){
+
+        $("#btnAddMatchToList").attr('disabled', false);
+        $("#btnProcessMatches").attr('disabled', false);
+
         toastr.success("Matches created successfully!");
-        $("tbody>tr:not(#empty)").remove();
+        // Memory
+        matches.splice(0, matches.length); // Empty matches array :x
+
+        // Remove dynamic tr on #preparedMatches and show the "Empty" one
+        $("#preparedMatches>tbody>tr:not(#empty)").remove();
         $("#empty").show();
+
+        // Show URLs
+        $("#UrlsEmpty").hide();
+        createMatches.matchUrls.forEach(e => {
+            $("#matchesUrl>tbody").append(`<tr><td>${e}</td></tr>`);
+        });
     }else{
+        $("#btnAddMatchToList").attr('disabled', false);
+        $("#btnProcessMatches").attr('disabled', false);
         toastr.error(createMatches.msg);
     }
 }
