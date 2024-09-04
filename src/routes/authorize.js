@@ -50,6 +50,7 @@ router.post('/', async (req, res) => {
           id: userData.id,
           name: userData.global_name,
           avatar: userData.avatar ?? 'NULL',
+          username: userData.username,
           iat: Math.floor(Date.now() / 1000),
           exp: Math.floor(Date.now() / 1000) + (expiresIn * 60),
         }, config.oAuthTokenSecret);

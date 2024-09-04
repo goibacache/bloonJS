@@ -105,12 +105,12 @@ router.post('/', async (req, res) => {
         const createOnDatabaseResult = await match_ExternalUser_Create(tokenContent.id, tokenContent.name, tokenContent.avatar, selectedTeam.TeamRoleId);
 
         if (createOnDatabaseResult != ""){
-            return res.end(bloonUtils.match_createJsonResError("You already have a pending exception."));
+            return res.end(bloonUtils.match_createJsonResError(createOnDatabaseResult));
         }
 
         const body = {
             "username": tokenContent.name,
-            "content": `\`\`\`${tokenContent.name} (${tokenContent.id}) would like to be allowed to see ${selectedTeam.Name} (${selectedTeam.TeamRoleId}) matches.\nUsername: ${tokenContent.name}\nDiscord Id: ${tokenContent.id}\nAvatar: ${tokenContent.avatar}\nTeam name: ${selectedTeam.Name}\nTeam Id: ${selectedTeam.TeamRoleId}\`\`\``,
+            "content":  `\`\`\`${tokenContent.name} (${tokenContent.id}) would like to be allowed to see ${selectedTeam.Name} (${selectedTeam.TeamRoleId}) matches.\nUsername: ${tokenContent.name}\nTag: ${tokenContent.username}\nDiscord Id: ${tokenContent.id}\nAvatar: ${tokenContent.avatar}\nTeam name: ${selectedTeam.Name}\nTeam Id: ${selectedTeam.TeamRoleId}\`\`\``,
             "avatar_url": bloonUtils.getAvatarUrl(tokenContent.id, tokenContent.avatar, 80)
         }
 
