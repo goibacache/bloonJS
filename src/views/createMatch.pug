@@ -49,7 +49,7 @@ block content
                                     label(for="matchNameInput") Match name
                                     input.form-control#name(type="text" placeholder="Match name")
 
-                                button.btn.sbg-primary.mt-2.mb-2(type="button" onclick="addMatchToList()") Add to match list
+                                button#btnAddMatchToList.btn.sbg-primary.mt-2.mb-2(type="button" onclick="addMatchToList()") Add to match list
 
                     //- Match creation table
                     div.col-12.mt-2
@@ -74,7 +74,7 @@ block content
                             div.row.p-4.pt-1.pb-1
                                 div.mb-3.p-0#tableContainer(style="height: 298px; overflow-y: scroll; scroll-behavior: smooth;")
                                     table.unselectable.bc-separate#preparedMatches.col-12.p-0
-                                        thead.stickyC(style="--sticky-top: 0px")
+                                        thead
                                             tr 
                                                 th Name
                                                 th(style="width: 100px") Team 1
@@ -84,6 +84,20 @@ block content
                                             tr#empty
                                                 td.text-center(colspan="4") There's no matches to schedule
 
-                                button.btn.sbg-success.w-100.mb-2(type="button" onclick="processMatches()") Schedule matches
+                                button#btnProcessMatches.btn.sbg-success.w-100.mb-2(type="button" onclick="processMatches()") Schedule matches
+
+                    //- Match creation table
+                    div.col-12.mt-2
+                        //- Header
+                        div.p-1.ps-2.sbg-identification.unselectable#createdMatchURLS > MATCH URLS
+
+                        //- Panel
+                        div.col-xs-12.p-0.sb-border.panelBg
+                            div.row.p-4.pt-1.pb-1
+                                div.mb-3.p-0#UrlTableContainer
+                                    table.bc-separate#matchesUrl.col-12.p-0
+                                        tbody 
+                                            tr#UrlsEmpty
+                                                td.text-center(colspan="4") There's no matches URLs
 
     include parts/footer.pug
