@@ -311,7 +311,7 @@ const buildDayArray = (startDate, localStartDate, endDate, localEndDate) => {
 
     const dateDiff = parseInt(localEndDate.diff(endDate, 'hours'));
     if (dateDiff > 0){
-        amountOfDays = Math.ceil(dateDiff/24);
+        amountOfDays += Math.ceil(dateDiff/24);
     }
 
     const language = localStorage.getItem('language') ?? "en";
