@@ -33,20 +33,17 @@ router.get('/', async (req, res) => {
             console.log("Error in JoinTeam View:", error);
             res.clearCookie('jwt', cookieOptions);
             res.clearCookie('externalUserData', cookieOptions);
-            res.render('error', { message: `Sorry, couldn't load your profile, please log in again`, error: { status: 'error', stack: '-' } });
-            res.end();
+            return res.render('error', { message: `Sorry, couldn't load your profile, please log in again`, error: { status: 'error', stack: '-' } });
         }
     }
 
     const teams = await match_GetAllTeams();
 
     if (teams == null) {
-        res.render('error', { message: `Sorry, couldn't load the team list`, error: { status: 'error', stack: '-' } });
-        res.end();
-        return;
+        return res.render('error', { message: `Sorry, couldn't load the team list`, error: { status: 'error', stack: '-' } });
     }
 
-    res.render('joinTeam', { title: 'When2Bloon - Join a team', session: session, teams: teams });
+    return res.render('joinTeam', { title: 'When2Bloon - Join a team', session: session, teams: teams });
 });
 
 /**

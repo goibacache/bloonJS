@@ -41,12 +41,10 @@ router.get('/', async (req, res) => {
     const teams = await match_GetAllTeams();
 
     if (teams == null) {
-        res.render('error', { message: `Sorry, couldn't load the team list`, error: { status: 'error', stack: '-' } });
-        res.end();
-        return;
+        return res.render('error', { message: `Sorry, couldn't load the team list`, error: { status: 'error', stack: '-' } });
     }
 
-    res.render('createMatch', { title: 'When2Bloon - Create match', session: session, teams: teams });
+    return res.render('createMatch', { title: 'When2Bloon - Create match', session: session, teams: teams });
 });
 
 router.post('/', async (req, res) => {

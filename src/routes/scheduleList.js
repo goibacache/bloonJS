@@ -39,7 +39,7 @@ router.get('/', async (req, res) => {
         { url: '/scheduleList', name: 'Schedule List' }
     ];
 
-    res.render('scheduleList', { title: `When2Bloon - Schedule List`, session: session, breadCrumbs: breadCrumbs });
+    return res.render('scheduleList', { title: `When2Bloon - Schedule List`, session: session, breadCrumbs: breadCrumbs });
 });
 
 router.post('/listMatches', async (req, res) => {

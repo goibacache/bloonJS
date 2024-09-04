@@ -49,8 +49,7 @@ router.get('/:scheduleId', async (req, res) => {
 
     const matchInfo = await match_GetInfo(scheduleIdInt);
     if (matchInfo == null) {
-      res.render('error', { message: `Sorry, couldn't load match info`, error: { status: 'error', stack: '-' } });
-      return;
+      return res.render('error', { message: `Sorry, couldn't load match info`, error: { status: 'error', stack: '-' } });
     }
 
     if (scheduleId != `${matchInfo.Name.replaceAll(" ", "-")}-${matchInfo.Id}`) {
@@ -74,8 +73,7 @@ router.get('/:scheduleId', async (req, res) => {
 
     const matchDetails = await match_GetDetails(scheduleIdInt, session.leagueOfficial ? null : teamRole);
     if (matchDetails == null) {
-      res.render('error', { message: `Sorry, couldn't load match details`, error: { status: 'error', stack: '-' } });
-      return;
+      return res.render('error', { message: `Sorry, couldn't load match details`, error: { status: 'error', stack: '-' } });
     }
 
     let mySelections, otherSelections;
@@ -92,7 +90,7 @@ router.get('/:scheduleId', async (req, res) => {
       { url: '/schedule', name: 'Schedule' },
     ];
 
-    res.render('schedule', {
+    return res.render('schedule', {
       title: 'When2Bloon - Schedule',
       matchInfo: matchInfo,
       teams: JSON.stringify(teamsJson),
@@ -104,7 +102,7 @@ router.get('/:scheduleId', async (req, res) => {
       breadCrumbs: breadCrumbs
     });
   } catch (error) {
-    res.render('error', {
+    return res.render('error', {
       message: error,
       status: 500,
       stack: error
