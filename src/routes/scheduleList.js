@@ -68,6 +68,7 @@ router.post('/listMatches', async (req, res) => {
             return res.end(bloonUtils.match_createJsonResError("Please select if you want to see upcoming or past matches."));
         }
 
+        console.log(`${session.name} (${session.id}) is using match_GetAllMatches`);
         const matches = await match_GetAllMatches(session.leagueOfficial ? null : tokenContent.roles.toString(), req.body.FutureOrPast);
 
         if (matches == null) {
