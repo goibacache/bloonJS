@@ -143,6 +143,8 @@ const match_GetInfo = async(_matchId) => {
 const match_GetDetails = async(_matchId, _role) => {
     let connection;
     try{
+        console.log("match_GetDetails", _matchId, _role);
+
         const query = `CALL match_GetDetails(?, ?)`;
 
         connection = await createConnection();
@@ -168,6 +170,8 @@ const match_GetDetails = async(_matchId, _role) => {
 const match_GetAllMatches = async(_roles, FutureOrPast) => {
     let connection;
     try{
+        console.log("match_GetAllMatches", _roles, FutureOrPast);
+
         const query = `CALL match_GetAllMatches(?, ?)`;
 
         connection = await createConnection();
