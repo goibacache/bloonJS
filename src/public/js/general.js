@@ -1,3 +1,5 @@
+isLoading = true;
+
 const logOut = async () => {
     if (confirm("Do you really want to log out?")){
         await $.ajax({
@@ -12,3 +14,14 @@ const logOut = async () => {
         });
     }
 }
+
+const makeOptionsDoNothing = () => {
+    $('.dropdown-menu a').on('click', function(e) {
+        e.stopPropagation();
+    });
+}
+
+$(() => {
+    makeOptionsDoNothing();
+    isLoading = false;
+});
