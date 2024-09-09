@@ -1,5 +1,3 @@
-script(src="/js/general.js", defer=true)
-
 //- Session
 div.d-flex.align-items-center.sessionContainer.p-0
     if session != null
@@ -21,19 +19,19 @@ div.d-flex.align-items-center.sessionContainer.p-0
                 //- League official buttons
                 if session != null && session.leagueOfficial  
                     li
-                        a.dropdown-item#GotoTitle(href="#" style="font-weight: bolder") Go to         
+                        a.dropdown-item.doNothing#GotoTitle(href="#" style="font-weight: bolder") Go to         
                     li
                         a.dropdown-item#ScheduleListButton(type="button" onClick="goto('/scheduleList')" style="border-left: 5px solid #5c5027") Schedule list
                     li
                         a.dropdown-item#CreateMatchButton(type="button" onClick="goto('/createMatch')" style="border-left: 5px solid #5c5027") Create match
                 li
-                    a.dropdown-item#LanguageTitle(href="#" style="font-weight: bolder") Language
+                    a.dropdown-item.doNothing#LanguageTitle(href="#" style="font-weight: bolder") Language
                 li
                     a.dropdown-item(href="#" onclick="changeLanguage('en')" style="border-left: 5px solid #5c5027") 
                         div.smallFlag.btn.gb.me-1.d-inline-block
                         p.p-0.m-0.d-inline-block English
                 li
-                    a.dropdown-item(href="#" onclick="changeLanguage('pg')" style="border-left: 5px solid #5c5027") 
+                    a.dropdown-item(href="#" onclick="changeLanguage('pt-br')" style="border-left: 5px solid #5c5027") 
                         div.smallFlag.btn.br.me-1.d-inline-block
                         p.p-0.m-0.d-inline-block Português
                 li
@@ -59,7 +57,7 @@ div.d-flex.align-items-center.sessionContainer.p-0
             h2#LanguageMenu(style="align-self: center;") Language
             div.row(style="align-self: center;")
                 button.btn.gb.mt-5.mediumFlag.p-0(onClick="changeLanguage('en')")
-                button.btn.br.mt-5.mediumFlag(onClick="changeLanguage('pg')")
+                button.btn.br.mt-5.mediumFlag(onClick="changeLanguage('pt-br')")
                 button.btn.es.mt-5.mediumFlag(onClick="changeLanguage('es')")
             if session != null
                 button.btn.sbg-primary.mt-5.col-6#ScheduleListButtonMenu(type="button" onClick="goto('/scheduleList')" style="align-self: center") Schedule list

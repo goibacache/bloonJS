@@ -3,13 +3,6 @@ extends layout
 block content
   noscript You need to enable JavaScript to run this app.
 
-  //- Language
-  script(src="/lang/lang.js", defer=true)
-  script(src="/js/translator.js", defer=true)
-  script(src="/jsLibraries/moment.js")
-  script(src="/jsLibraries/moment-timezone.js")
-  script(src="/jsLibraries/spacetime.min.js")
-
   //- Scripts
   link(rel="stylesheet", href="/css/calendar.css")
   link(rel="stylesheet", href="/css/switch.css")
@@ -47,11 +40,16 @@ block content
         div.tabSpacer.mb-3
             
         div.p-0.mb-5
-          
-          div.p-1.ps-2.sbg-identification.unselectable#ScheduleTitle > SCHEDULE
-            //- div.sbg-identification.p-1 > SCHEDULE
 
+          //- Current people that filled the schedule
+          div.p-1.ps-2.sbg-identification.unselectable#ParticipantsTitle > PARTICIPANTS
+          div.col-sx-12.p-0.mt-4.panelBg.sb-border.text-center#participantPanel
+            p.m-0.p-0#EmptyParticipantList No one has filled the schedule
+          
+          //- Schedule container
+          div.mt-4.p-1.ps-2.sbg-identification.unselectable#ScheduleTitle > SCHEDULE
           div.col-sx-12.p-0.mt-4.panelBg.sb-border
+
             //- Timezone
             div.row.text-center.pt-3.m-0.unselectable.justify-content-center 
               #TimeZoneText.col-auto Your time zone 
