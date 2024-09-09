@@ -10,26 +10,30 @@ const loadTable = () => {
                 d.FutureOrPast = $("input[type=radio][name=futurePastSelector]:checked").val();
             },
             dataSrc: (data) => {
-                console.log(data);
                 if (data.res) {
                     return data.matches;
                 } else {
                     toastr.error(data.msg);
-                    return null;
+                    return [];
                 }
+            }
+        },
+        language: {
+            emptyTable: () => {
+                return getKeyFromLanguage('schedulelisttable', 'emptyTable');;
             }
         },
         layout: {
             topStart: () => {
                 return `
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="futurePastSelector" id="futurePastSelector" checked value="Future" onclick="reloadTable()">
+                        <input class="form-check-input" type="radio" name="futurePastSelector" id="futurePastSelector" checked value="Future" onchange="reloadTable()">
                         <label id="UpcomingText" class="form-check-label" for="futurePastSelector">
                             Upcoming
                         </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="futurePastSelector" id="futurePastSelector" onclick="reloadTable()" value="Past">
+                        <input class="form-check-input" type="radio" name="futurePastSelector" id="futurePastSelector" onchange="reloadTable()" value="Past">
                         <label id="PreviousText" class="form-check-label" for="futurePastSelector">
                             Previous
                         </label>
@@ -69,8 +73,9 @@ const loadTable = () => {
             { data: 'MatchTime' },
             {
                 data: 'Name', render: (data, type, row) => {
+                    const linkText = getKeyFromLanguage('schedulelisttable', 'goToScheduleButton');
                     const buttonClass = row.MatchTime == "Past" ? "btn-secondary" : "btn-primary";
-                    return `<a type="button" class="btn ${buttonClass}" style="height: 26px; padding-top: 0;" href="/schedule/${row.Name.replace(/ /g, '-')}-${row.Id}">Schedule</a>`;
+                    return `<a type="button" class="goToScheduleButton btn ${buttonClass}" style="height: 26px; padding-top: 0;" href="/schedule/${row.Name.replace(/ /g, '-')}-${row.Id}">${linkText}</a>`;
                 }
             },
         ]
