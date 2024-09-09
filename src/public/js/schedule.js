@@ -44,11 +44,9 @@ const getMatchDetailsJSON = (selectedTimeZone = null) => {
     const originalMatchDetails = JSON.parse(matchDetailsJSON);
 
     originalMatchDetails.forEach(md => {
-        // DD.MM.YYYY.HH:MM
-        const dateTimeParts = md.DateTime.split('.');
 
         matchDetails.push({
-            DateTime: spacetime([dateTimeParts[2], parseInt(dateTimeParts[1]) - 1, dateTimeParts[0], dateTimeParts[3], dateTimeParts[4]], md.TimeZone).goto(selectedTimeZone),
+            DateTime: new moment.tz(md.DateTime, "DD.MM.YYYY.HH.mm", md.TimeZone).tz(selectedTimeZone),
             UserDiscordId: md.UserDiscordId,
             UserDiscordName: md.UserDiscordName,
             userDiscordAvatar: md.userDiscordAvatar,
@@ -75,11 +73,9 @@ const loadMySelections = () => {
     const array = JSON.parse(mySelectionsJSON);
     array.forEach(x => {
 
-        const dateTimeParts = x.DateTime.split('.');
-
         mySelections.push({
             DateTimeStr: x.DateTime,
-            DateTime: spacetime([dateTimeParts[2], parseInt(dateTimeParts[1]) - 1, dateTimeParts[0], dateTimeParts[3], dateTimeParts[4]], x.TimeZone).goto(selectedTimeZone),
+            DateTime: new moment.tz(x.DateTime, "DD.MM.YYYY.HH.mm", x.TimeZone).tz(selectedTimeZone),
             TimeZone: x.TimeZone
         });
     })
@@ -97,11 +93,10 @@ const getCurrentSelectionFromScreen = () => {
     $(".mySelectionSmall").each((i, e) => {
 
         const time = $(e).data('time');
-        const dateTimeParts = time.split('.');
 
         currentSelection.push({
             DateTimeStr: time,
-            DateTime: spacetime([dateTimeParts[2], parseInt(dateTimeParts[1]) - 1, dateTimeParts[0], dateTimeParts[3], dateTimeParts[4]], timeZone),
+            DateTime: new moment.tz(time, 'DD.MM.YYYY.HH:mm', timeZone),
             TimeZone: timeZone
         });
     });
@@ -109,11 +104,10 @@ const getCurrentSelectionFromScreen = () => {
     $(".mySelection").each((i, e) => {
 
         const time = $(e).data('time');
-        const dateTimeParts = time.split('.');
 
         currentSelection.push({
             DateTimeStr: time,
-            DateTime: spacetime([dateTimeParts[2], parseInt(dateTimeParts[1]) - 1, dateTimeParts[0], dateTimeParts[3], dateTimeParts[4]], timeZone),
+            DateTime: new moment.tz(time, 'DD.MM.YYYY.HH:mm', timeZone),
             TimeZone: timeZone
         });
     });
@@ -144,13 +138,13 @@ const drawTooltipResume = (hour, currentScheduledTimes, mySelectionsOnTime) => {
         `;
 
         currentPlayersTip.forEach(player => {
-            text += `<b class='col-auto badge'>${player.UserDiscordName}</b>`;
+            text += `<b class='col-auto badge tooltip-text'>${player.UserDiscordName}</b>`;
         });
 
         // Only if it's the real team...
         if (team.RoleId === myTeam) {
             mySelectionsOnTime.forEach(mySelections => {
-                text += `<b class='col-auto badge'>${myName}</b>`;
+                text += `<b class='col-auto badge tooltip-text'>${myName}</b>`;
             });
         }
 
@@ -161,7 +155,37 @@ const drawTooltipResume = (hour, currentScheduledTimes, mySelectionsOnTime) => {
     return text;
 }
 
+/**
+ * Checks if the current moment object is the same day as one created with the same day and hours and minutes.
+ * Used mainly as a crude check for Daylight Saving Time changes as moment will "jump" to the next real date if that occurs.
+ * @param {moment} currentDay 
+ * @param {*} hours 
+ * @param {*} minutes 
+ */
+const isSameDay = (currentDay, hours, minutes) => {
+    const proposedDateObjectStr = `${currentDay.format('DD-MM-YYYY')} ${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+    if (!(currentDay.format("DD-MM-YYYY HH:mm") == proposedDateObjectStr)){
+        console.log(`${currentDay.format('DD-MM-yyyy HH:mm')} is not the same as ${proposedDateObjectStr}`);
+        return false;
+    }
+    return true;
+}
+
+// Get current Moment
+const getCurrentMomentTimeDate = (currentDay, hours, minutes) => {
+    const proposedDateObjectStr = `${currentDay.format('DD-MM-YYYY')} ${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+    return new moment(proposedDateObjectStr, "DD-MM-YYYY HH:mm");
+}
+
+/**
+ * The main drawing function that creates and shows the giant date table.
+ * @param {*} debug 
+ */
 const loadCalendar = (debug = false) => {
+
+    // Load locale (language) for moment.
+    const selectedLanguage = localStorage.getItem('language') ?? "en";
+    moment.locale(selectedLanguage);
 
     calendar = $('#calendar');
     /**
@@ -191,24 +215,24 @@ const loadCalendar = (debug = false) => {
     /**
      * Start date in the original time zone. yyyy, mm(-1), dd, hh, mm
      */
-    const startDate = spacetime([startDateParts[2], parseInt(startDateParts[1]) - 1, startDateParts[0], startDateParts[3], startDateParts[4]], matchInfoDateTimeZone);
+    const startDate = new moment.tz(matchInfoStartDate, "DD.MM.YYYY.HH.mm", matchInfoDateTimeZone);
 
     /**
      * Start date in the user's time zone (it will start at 00:00 of the first day)
      */
-    const localStartDate = spacetime([startDateParts[2], parseInt(startDateParts[1]) - 1, startDateParts[0], startDateParts[3], startDateParts[4]], matchInfoDateTimeZone).goto(timezone).startOf('day'); // Will start at 00:00
+    const localStartDate = new moment.tz(matchInfoStartDate, "DD.MM.YYYY.HH.mm", timezone).startOf('day');
 
     /**
      * End date in the original time zone. yyyy, mm(-1), dd, hh, mm
      */
-    const endDate = spacetime([endDateParts[2], parseInt(endDateParts[1]) - 1, endDateParts[0], endDateParts[3], endDateParts[4]], matchInfoDateTimeZone);
+    const endDate = new moment.tz(matchInfoEndDate, "DD.MM.YYYY.HH.mm", matchInfoDateTimeZone);
 
     /**
      * End date in the user's time zone (it will start at 00:00 of the first day)
      */
-    const localEndDate = spacetime([endDateParts[2], parseInt(endDateParts[1]) - 1, endDateParts[0], endDateParts[3], endDateParts[4]], matchInfoDateTimeZone).goto(timezone).startOf('day'); // Will start at 00:00
+    const localEndDate = new moment.tz(matchInfoEndDate, "DD.MM.YYYY.HH.mm", timezone).startOf('day');
 
-    let currentDate = localStartDate;
+    let currentDate = localStartDate.clone();
 
     /**
      * Holds an array of days to draw. Adds one more to the daysToDraw variable, 
@@ -228,40 +252,45 @@ const loadCalendar = (debug = false) => {
         );
     });
 
-    for (var i = 0; i < 96; ++i) { // Amount of hours/rows
+    let hours = 0;
+    let minutes = 0;
+    const currentTime = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
 
-        // Create TR
-        const currentTr = document.createElement('tr');
+    const tableColumns = [];
+    tableColumns[0] = []; // Create hours indicator
 
-        // Create first column only on the first iteration
-        if (i % 4 == 0) {
-            currentTr.innerHTML += `
-                <th rowspan="4" class="calendarCell borderH text-center timeText" style="background-color: var(--panel-bg-color-left);">
-                    ${i / 4}:00
-                </th>`;
-        }
+    for (var i = 0; i < 24; ++i) { // Create hours
+        // TODO: Add setting for 24hrs or 12Hrs AM/PM date.
+        tableColumns[0][i] = `${i.toString().padStart(2, "0")}:00`;
+    }
 
-        // For each day, create a TD
-        days.forEach(day => {
+    days.forEach(day => {
+        const currentDayIndex = days.indexOf(day);
+        tableColumns[currentDayIndex+1] = []; // Create array for current column - First row is for dates
+        hours = 0;
+        minutes = 0;
 
-            const indexOfDay = days.indexOf(day);
+        for (var i = 0; i < 96; ++i) { // Amount of hours/rows
+            const currentDateInRow = new moment.tz(`${day.dateObject.format("DD-MM-YYYY")} ${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`, "DD-MM-YYYY HH:mm", timezone);
 
-            // If the last day starts at midnight, skip it 'cause it's the end.
-            if (indexOfDay == days.length - 1 && indexOfDay >= headerColumns) {
-                return;
-            }
+            // Date checks
+            const isSameDayRes = isSameDay(currentDateInRow, hours, minutes); // For DST
+            const isBeforeStart = currentDateInRow.isBefore(startDate);
+            const isAfterEnd = currentDateInRow.isAfter(endDate);
+            const isEqualToEndDate = currentDateInRow.isSame(endDate)
 
-            // If it is before the start date, draw "not available spaces"
-            if (currentDate.add(indexOfDay, 'days').isBefore(startDate) || currentDate.add(indexOfDay, 'days').isAfter(endDate) || currentDate.add(indexOfDay, 'days').isEqual(endDate)) {
-                currentTr.innerHTML += `
+            if (isSameDayRes == false || isBeforeStart == true || isAfterEnd == true || isEqualToEndDate == true){
+                tableColumns[currentDayIndex+1][i] = `
                     <td class="calendarCell borderH text-center">
                         <div class="selectableDateDisabled">
                         </div>
-                    </td>`;
-            } else {
+                    </td>`; // First row is for dates
+            }else{
+                // Draw the whole freaking thing :v
                 // Filter all of the dates that match the current drawn column :^)
-                const scheduleMatchesOnTime = scheduledTimes.filter(x => x.DateTime.isEqual(currentDate.add(indexOfDay, 'days')));
-                const mySelectionsOnTime = mySelections.filter(x => x.DateTime.goto(timezone).isEqual(currentDate.add(indexOfDay, 'days')));
+                const currentDateWithTime = getCurrentMomentTimeDate(day.dateObject, hours, minutes);
+                const scheduleMatchesOnTime = scheduledTimes.filter(x => x.DateTime.isSame(currentDateWithTime));
+                const mySelectionsOnTime = mySelections.filter(x => x.DateTime.tz(timezone).isSame(currentDateWithTime));
 
                 const activeAmount = scheduleMatchesOnTime.length + mySelectionsOnTime.length > 10 ? 10 : scheduleMatchesOnTime.length + mySelectionsOnTime.length;
                 // Save the most amount of players to deactivate the rest of the filters
@@ -272,64 +301,98 @@ const loadCalendar = (debug = false) => {
                 const cssInactiveClass = $(`.toggleCalendarVisibility.active${activeAmount}`).hasClass('forceInactive') ? 'forceInactive' : '';
 
                 const cssActiveClass = (tab == tabValues.team ? `active${activeAmount} ${cssInactiveClass}` : `active${activeAmount}Small ${cssInactiveClass}`);
-                const tooltipTitle = currentDate.add(indexOfDay, 'days').format('time-24');
+                const tooltipTitle = currentDateWithTime.format('HH:mm');
                 const tooltipResume = drawTooltipResume(tooltipTitle, scheduleMatchesOnTime, mySelectionsOnTime);
                 const selectionClass = mySelectionsOnTime.length > 0 ? (tab == tabValues.me ? 'mySelection' : 'mySelectionSmall') : '';
 
-                currentTr.innerHTML += `
-                    <td class="calendarCell borderH text-center">
-                        <div class="selectableDate ${cssActiveClass} ${selectionClass}" data-time="${currentDate.add(indexOfDay, 'days').unixFmt('dd.MM.yyyy.HH.mm')}" title="${tooltipResume}" data-toggle="tooltip" data-player-amount="${activeAmount}">
-                        </div>
-                    </td>`;
+                // ${currentDateWithTime.format('DD MM yyyy HH mm')}
+                tableColumns[currentDayIndex+1][i] = `
+                        <div class="selectableDate ${cssActiveClass} ${selectionClass}" data-time="${currentDateWithTime.format('DD.MM.yyyy.HH.mm')}" title="${tooltipResume}" data-toggle="tooltip" data-player-amount="${activeAmount}">
+                            
+                        </div>`;
             }
-        });
+            
+            // Add 15 minutes and check if it goes over an hour
+            minutes += 15;
+            if (minutes % 60 == 0){
+                minutes = 0;
+                hours++;
+            }
+        }
+    });
 
-        currentDate = currentDate.add(15, 'minutes');
-        $("#calendar tbody").append(currentTr);
+    const tbody = document.createElement("tbody");
+
+    // Draw the table that's in memory.
+    for (var i = 0; i < 96; ++i) {
+        // Create a TR for every row :^)
+        const currentTr = document.createElement('tr');
+        
+        // Create TH with data in the first index of the array 😬
+        if (i % 4 == 0){
+            const th = document.createElement('td');
+
+            th.rowSpan = 4;
+            th.classList = "calendarCell borderH text-center timeText";
+            th.style = "background-color: var(--panel-bg-color-left);"
+            th.innerHTML = tableColumns[0][i/4]; // Load from the time column
+            currentTr.appendChild(th);
+        }
+
+        // For each day add a TD
+        days.forEach(day => {
+            const td = document.createElement('td');
+            const currentDayIndexPlus = days.indexOf(day)+1;
+
+            td.classList = "calendarCell borderH text-center";
+            td.innerHTML = tableColumns[currentDayIndexPlus][i]; // indexOf(day)+1 because the first one is just the headers
+
+            currentTr.appendChild(td);
+        });
+        
+        tbody.appendChild(currentTr);
     }
 
-    // Show the max amount of players, rn
-    console.log("maxAmountOfPlayers", maxAmountOfPlayers);
+    $("tbody").replaceWith(tbody);
 
     if (debug) {
-        console.log('startDate', startDate.format('nice'));
-        console.log('endDate', endDate.format('nice'));
-        console.log('localStartDate', localStartDate.format('nice'));
-        console.log('localEndDate', localEndDate.format('nice'));
+        console.log('startDate', startDate.format('DD-MM-YYYY HH:mm'));
+        console.log('endDate', endDate.format('DD-MM-YYYY HH:mm'));
+        console.log('localStartDate', localStartDate.format('DD-MM-YYYY HH:mm'));
+        console.log('localEndDate', localEndDate.format('DD-MM-YYYY HH:mm'));
         console.log("days:", days);
-        console.log("game date:", startDate.format('time'));
+        console.log("game date:", startDate.format('HH:mm'));
+        console.log("maxAmountOfPlayers", maxAmountOfPlayers);
     }
 
     handleMarks();
     loadTooltips();
+    drawPlayersThatFilledTheSchedule();
 }
 
 const buildDayArray = (startDate, localStartDate, endDate, localEndDate) => {
     const days = [];
 
-    let amountOfDays = localStartDate.diff(localEndDate.add(1, 'days'), 'days');
+    let amountOfDays = localEndDate.clone().add(1, 'days').diff(localStartDate, 'days');
 
-    const dateDiff = parseInt(localEndDate.diff(endDate, 'hours'));
+    // TODO: Check this out, I don't think it's ok.
+    const dateDiff = Math.abs(Math.abs(localEndDate.utcOffset()) - Math.abs(parseInt(endDate.utcOffset()))) / 60;
     if (dateDiff > 0){
         amountOfDays += Math.ceil(dateDiff/24);
     }
 
-    const language = localStorage.getItem('language') ?? "en";
-
-    const generalLanguage = languageDefinition.filter(x => x.page == '*')[0];
-    const languageObj = generalLanguage.strings.SpaceTime[language];
-
     for (let i = 0; i < amountOfDays; i++) {
-        const currentDate = localStartDate.add(i, 'days').i18n(languageObj);
+        const currentDate = localStartDate.clone().add(i, 'days'); // 
 
-        if (currentDate.isAfter(localEndDate) || (currentDate.isEqual(endDate) && endDate.format('time') === '12:00am')) {
+        if (currentDate.isAfter(localEndDate) || (currentDate.isSame(endDate) && endDate.format('HH:mmA') === '00:00AM')) {
             continue;
         }
 
         days.push({
-            monthDay: `${currentDate.format('month-short')} ${currentDate.format('date')}`,
-            nameOfDay: currentDate.format('day'),
-            startTime: currentDate.format('time')
+            monthDay: currentDate.format('MMMM Do'),
+            nameOfDay: currentDate.format('dddd'),
+            startTime: currentDate.format('HH:mmA'),
+            dateObject: currentDate,
         });
     }
 
@@ -496,20 +559,22 @@ const handleMarks = () => {
             if (update.res) {
                 toastr.success(update.msg, { timeout: 1500 });
 
-                // Redraw tooltips!
+                // Redraw players that filled the schedule!
+                drawPlayersThatFilledTheSchedule();
 
                 // Get current time
                 const timeZone = $("#timezone").val();
                 scheduledTimes = getMatchDetailsJSON();
 
                 for (const el of stored) {
-                    const dateTimeParts = $(el).data('time').split('.');
-                    const currentDate = spacetime([dateTimeParts[2], parseInt(dateTimeParts[1]) - 1, dateTimeParts[0], dateTimeParts[3], dateTimeParts[4]], timeZone);
-                    const tooltipTitle = currentDate.format('time-24');
-                    const scheduleMatchesOnTime = scheduledTimes.filter(x => x.DateTime.isEqual(currentDate));
-                    const mySelectionsOnTime = mySelections.filter(x => x.DateTime.goto(timeZone).isEqual(currentDate));
+                    const time = $(el).data('time');
+                    const currentDate = new moment.tz(time, "DD.MM.YYYY.HH:mm", timeZone);
+                    const tooltipTitle = currentDate.format('HH:mm');
+                    const scheduleMatchesOnTime = scheduledTimes.filter(x => x.DateTime.isSame(currentDate));
+                    const mySelectionsOnTime = mySelections.filter(x => x.DateTime.tz(timeZone).isSame(currentDate));
                     const tooltipContent = drawTooltipResume(tooltipTitle, scheduleMatchesOnTime, mySelectionsOnTime);
                     
+                    // Redraw tooltips!
                     // Step 1: Dispose
                     $(el).tooltip('dispose');   
                     // Step 2: Change title
@@ -567,8 +632,62 @@ const areArraysEqual = (currentSelection, oldSelection) => {
     return currentSelection.sort().toString() == oldSelection.sort().toString();
 }
 
+const drawPlayersThatFilledTheSchedule = () => {
+
+    // Clean everything but the empty message
+    $("#participantPanel").children().not("#EmptyParticipantList").remove();
+
+    const matchDetails = getMatchDetailsJSON();
+
+    if(matchDetails.length == 0 && mySelections.length == 0){
+        $("#EmptyParticipantList").show();
+    }else{
+        $("#EmptyParticipantList").hide();
+    }
+
+    const teams = JSON.parse(teamsJSON);
+
+    teams.forEach(team => {
+        const userDiscordIds = matchDetails.filter(x => x.TeamRoleId == team.RoleId).map(x => x.UserDiscordId).filter((value, index, current_value) => current_value.indexOf(value) == index);
+
+        if (userDiscordIds == null && userDiscordIds == undefined){
+            return;
+        }
+
+        if (userDiscordIds.length == 0 && mySelections.length == 0){
+            return;
+        }
+
+        // If I'm not a league official, I only need to see my own team
+        if (!leagueOfficial && team.RoleId != myTeam){
+            return;
+        }
+
+        if (teams.indexOf(team) > 0){
+            $("#participantPanel").append(`<br/>`);    
+        }
+
+        // Add team name
+        $("#participantPanel").append(`<p class="participantTitles m-0 ms-1 me-1">${team.name}</p>`);
+
+        // Check my times, if it is my team.
+        if (team.RoleId == myTeam){
+            if (mySelections.length > 0){
+                $("#participantPanel").append(`<p class="badge m-0 ms-1 me-1">${myName}</p>`);
+            }
+        }
+
+        // Add team's participants
+        userDiscordIds.forEach(userDiscordId => {
+            const player = matchDetails.find(x => x.UserDiscordId == userDiscordId);
+            $("#participantPanel").append(`<p class="badge m-0 ms-1 me-1">${player.UserDiscordName}</p>`);
+        });
+    })
+    
+}
+
 // On start functions
-$(document).ready(() => {
+$(() => {
     leagueOfficial = (leagueOfficial == "true"); // ew
 
     getMatchDetailsJSON();
