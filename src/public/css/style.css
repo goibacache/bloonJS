@@ -453,3 +453,15 @@ td{
   background: black !important;
   color: white !important;
 }
+
+.tooltip-text {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 150px;
+}
+
+.participantTitles {
+  display: inline-block;
+  font-weight: bolder;
+  color: #dfc20d;
+}
