@@ -36,7 +36,7 @@ router.get('/:scheduleId', async (req, res) => {
     } catch (error) {
       // Clear process cookies
       res.clearCookie('jwt');
-
+      // Sends back to login but adds the "Return url" as the same schedule
       const redirectTo = `/?returnUrl=${encodeURIComponent(`/schedule/${scheduleId}`)}&error=${error}`;
       return res.redirect(redirectTo);
     }
@@ -71,6 +71,12 @@ router.get('/:scheduleId', async (req, res) => {
     // Check against player roles!
     const teamRole = tokenContent.roles.find(x => x == matchInfo.Team1RoleId || x == matchInfo.Team2RoleId);
 
+    if (session.leagueOfficial == false && (teamRole == null || teamRole == undefined)){
+      console.log(`${session.name} (${session.id}) is trying to see the ${scheduleId} match info.`)
+      return res.redirect('/scheduleList');
+    }
+
+    console.log(`${session.name} (${session.id}) is using match_GetDetails`);
     const matchDetails = await match_GetDetails(scheduleIdInt, session.leagueOfficial ? null : teamRole);
     if (matchDetails == null) {
       return res.render('error', { message: `Sorry, couldn't load match details`, error: { status: 'error', stack: '-' } });
