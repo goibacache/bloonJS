@@ -196,6 +196,8 @@ const match_UpdateMyTimes = async(_matchId, _userDiscordId, _userDiscordName, _u
         const _formattedDateAndTimeZone = _dateAndTimeZone.map(x => x.DateTimeStr+"|"+x.TimeZone).join(',');
         const query = `CALL match_UpdateMyTimes(?, ?, ?, ?, ?, ?)`;
 
+        console.log(`match_UpdateMyTimes data: ${_matchId, _userDiscordId, _userDiscordName, _userDiscordAvatar, _formattedDateAndTimeZone, _TeamRoleId}`)
+
         connection = await createConnection();
 
         const [rows] = await connection.execute(query, [_matchId, _userDiscordId, _userDiscordName, _userDiscordAvatar, _formattedDateAndTimeZone, _TeamRoleId]);
