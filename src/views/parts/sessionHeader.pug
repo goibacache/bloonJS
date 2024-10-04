@@ -15,7 +15,7 @@ div.d-flex.align-items-center.sessionContainer.p-0
             //- a.btn.btn-secondary.dropdown-toggle(href="#" role="button" id="ddLanguage" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false") Dropdown link
 
             button.btn.sbg-primary.dropdown-toggle.ms-auto.d-none.d-sm-inline-block.me-4#optionBtn(type="button" data-bs-toggle="dropdown" aria-expanded="false") Options
-            ul.dropdown-menu  
+            ul.dropdown-menu.doNothing  
                 //- League official buttons
                 if session != null && session.leagueOfficial  
                     li
@@ -38,6 +38,19 @@ div.d-flex.align-items-center.sessionContainer.p-0
                     a.dropdown-item(href="#" onclick="changeLanguage('es')" style="border-left: 5px solid #5c5027") 
                         div.smallFlag.btn.es.me-1.d-inline-block
                         p.p-0.m-0.d-inline-block Español
+                li
+                    a.dropdown-item.doNothing#TimeFormat(href="#" style="font-weight: bolder") Time format
+                li 
+                    //- div.dt-layout-cell.dt-layout-start.dropdown-item.doNothing
+                    div.dropdown-item.form-check.doNothing(style="border-left: 5px solid #5c5027")
+                        input.form-check-input.doNothing.ms-1(type="radio" name="12or24selector" id="12or24selector12" value="12hrs" onchange="setTimeFormat()")
+                        label.form-check-label.doNothing.ms-1(for="12or24selector12") 12 hrs
+                li
+                    div.dropdown-item.form-check.doNothing(style="border-left: 5px solid #5c5027")
+                        input.form-check-input.doNothing.ms-1(type="radio" name="12or24selector" id="12or24selector24" value="24hrs" onchange="setTimeFormat()")
+                        label.form-check-label.doNothing.ms-1(for="12or24selector24") 24 hrs
+                    
+                
                 //- If there's a session, show the divider and the logout button
                 if session != null
                     li
