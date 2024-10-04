@@ -23,23 +23,23 @@ block content
                         div.col-xs-12.p-0.sb-border.panelBg
                             div.row.p-4.pt-2.pb-2
                                 div.form-group.mb-1.col-6.p-0.pe-2
-                                    label(for="matchNameInput") Team 1
+                                    label#team1Lbl(for="matchNameInput") Team 1
                                     select.form-control#team1Select(placeholder="Team 1", onchange="suggestMatchName()")
                                         if teams != null
-                                            option(value="0", data-shortName="NoTeam") SELECT TEAM
+                                            option.SelectTeamOption(value="0", data-shortName="NoTeam") SELECT TEAM
                                             for team in teams.filter(x => x.TeamRoleId != 0)
                                                 option(value=team.TeamRoleId, data-shortName=team.ShortName) #{team.ShortName} - #{team.Name}
 
                                 div.form-group.mb-1.col-6.p-0
-                                    label(for="matchNameInput") Team 2
+                                    label#team2Lbl(for="matchNameInput") Team 2
                                     select.form-control#team2Select(placeholder="Team 2", onchange="suggestMatchName()")
                                         if teams != null
-                                                option(value="0", data-shortName="NoTeam") SELECT TEAM
+                                                option.SelectTeamOption(value="0", data-shortName="NoTeam") SELECT TEAM
                                                 for team in teams.filter(x => x.TeamRoleId != 0)
                                                     option(value=team.TeamRoleId, data-shortName=team.ShortName) #{team.ShortName} - #{team.Name}
 
                                 div.form-group.mb-1.col-12.p-0
-                                    label(for="matchNameInput") Match name
+                                    label#MatchNameLabel(for="matchNameInput") Match name
                                     input.form-control#name(type="text" placeholder="Match name")
 
                                 button#btnAddMatchToList.btn.sbg-primary.mt-2.mb-2(type="button" onclick="addMatchToList()") Add to match list
@@ -47,21 +47,21 @@ block content
                     //- Match creation table
                     div.col-12.mt-2
                         //- Header
-                        div.p-1.ps-2.sbg-identification.unselectable#CreateMatchTitles > MATCH SCHEDULES
+                        div.p-1.ps-2.sbg-identification.unselectable#MatchListTitles > MATCH SCHEDULES
                         //- Panel
                         form#createMatchForm.col-xs-12.p-0.sb-border.panelBg
                         
                             div.row.p-4.pt-2.pb-0
                                 div.form-group.mb-1.col-6.col-md-4.p-0.pe-2
-                                    label(for="matchNameInput") Start date
+                                    label#StartDateLabel(for="matchNameInput") Start date
                                     input.form-control#startDate(name="startDate" type="date" placeholder="Start date")
 
                                 div.form-group.mb-1.col-6.col-md-4.p-0.pe-2
-                                    label(for="matchNameInput") End date
+                                    label#EndDateLabel(for="matchNameInput") End date
                                     input.form-control#endDate(name="endDate" type="date" placeholder="End date" data-toggle="tooltip" title="If you want your match to go from Friday to the end of Sunday on your timezone select <b>Monday</b> as the end date!")
 
                                 div.form-group.mb-1.col-12.col-md-4.p-0
-                                    label.col-6(for="matchNameInput") Timezone
+                                    label#TimeZoneLabel.col-6(for="matchNameInput") Timezone
                                     select.form-control.col-6#timezone(name="timezone" placeholder="Match name")
                             
                             div.row.p-4.pt-1.pb-1
@@ -69,13 +69,13 @@ block content
                                     table.unselectable.bc-separate#preparedMatches.col-12.p-0
                                         thead
                                             tr 
-                                                th Name
-                                                th(style="width: 100px") Team 1
-                                                th(style="width: 100px") Team 2
-                                                th(style="width: 70px") Actions
+                                                th#tblTitleName Name
+                                                th#tblTitleTeam1(style="width: 100px") Team 1
+                                                th#tblTitleTeam2(style="width: 100px") Team 2
+                                                th#tblTitleActions(style="width: 70px") Actions
                                         tbody 
                                             tr#empty
-                                                td.text-center(colspan="4") There's no matches to schedule
+                                                td.text-center#noMatchesToSchedule(colspan="4") There's no matches to schedule
 
                                 button#btnProcessMatches.btn.sbg-success.w-100.mb-2(type="button" onclick="processMatches()") Schedule matches
 
@@ -91,6 +91,6 @@ block content
                                     table.bc-separate#matchesUrl.col-12.p-0
                                         tbody 
                                             tr#UrlsEmpty
-                                                td.text-center(colspan="4") There's no matches URLs
+                                                td.text-center#NoMatchUrlsText(colspan="4") There's no matches URLs
 
     include parts/footer.pug
