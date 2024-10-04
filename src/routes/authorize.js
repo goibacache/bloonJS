@@ -44,8 +44,7 @@ router.post('/', async (req, res) => {
 
       // If user doesn't exists in external database, sorry.
       if (externalUser == null || externalUser.length == 0){
-
-        // Create self-signed JWT token to save in localStorage
+        // Create self-signed JWT token used in the external request page
         const externalUserData = jwt.sign({
           id: userData.id,
           name: userData.global_name,
@@ -53,6 +52,7 @@ router.post('/', async (req, res) => {
           username: userData.username,
           iat: Math.floor(Date.now() / 1000),
           exp: Math.floor(Date.now() / 1000) + (expiresIn * 60),
+          isExternal: true
         }, config.oAuthTokenSecret);
 
         // Set cookies!
@@ -71,10 +71,13 @@ router.post('/', async (req, res) => {
         return res.end(bloonUtils.match_createJsonResError(`Sorry ${userData.global_name}, There are no roles in the ICL server associated to your account.`));
       }
 
+      console.log(`External user (${userData.id}) login in with data:\nName: ${externalUser[0].UserDiscordName}\nRoles: ${externalUser[0].UserDiscordTeamRoleId}`);
+
       discordServerProfile = {
-        name: externalUser[0].UserDiscordName,
+        nick: externalUser[0].UserDiscordName,
         roles: [externalUser[0].UserDiscordTeamRoleId]
       };
+
     }else{
       // Get info from the ICL server
       discordServerProfile = await bloonUtils.discordApiRequest(`users/@me/guilds/${ICLDiscordServerId}/member`, tokenType, accessToken);
@@ -115,7 +118,7 @@ router.post('/', async (req, res) => {
     return res.end(
       JSON.stringify(
         {
-          name: userData.global_name,
+          name: discordServerProfile.nick || userData.global_name,
           leagueOfficial: leagueOfficial,
           res: true
         }
