@@ -1,4 +1,5 @@
-$(document).ready(() => {
+// On ready options.
+$(() => {
     toastr.options = {
         "closeButton": false,
         "debug": false,
