@@ -144,6 +144,101 @@ const languageDefinition = [
         }
     },
     {
+        page: 'creatematch',
+        strings: {
+            '#CreateMatchTitles': {
+                'en': `> CREATE NEW MATCHES`,
+                'es': '> CREAR NUEVOS HORARIOS',
+                'pt-br': 'CRIAR NOVOS HORÁRIOS'
+            },
+            '#team1Lbl': {
+                'en': `Team 1`,
+                'es': 'Equipo 1',
+                'pt-br': 'Equipe 1'
+            },
+            '#team2Lbl': {
+                'en': `Team 2`,
+                'es': 'Equipo 2',
+                'pt-br': 'Equipe 2'
+            },
+            '#MatchNameLabel': {
+                'en': `Match name`,
+                'es': 'Nombre de horario',
+                'pt-br': 'Nome da horario'
+            },
+            '.SelectTeamOption': {
+                'en': `SELECT TEAM`,
+                'es': 'SELECCIONE EQUIPO',
+                'pt-br': 'SELECIONAR EQUIPE'
+            },
+            '#btnAddMatchToList': {
+                'en': `Add to match list`,
+                'es': 'Agregar a lista de horarios',
+                'pt-br': 'Adicionar à lista de horários'
+            },
+            '#MatchListTitles': {
+                'en': `> MATCH SCHEDULES`,
+                'es': '> LISTA DE HORARIOS',
+                'pt-br': '> LISTA DE HORÁRIOS'
+            },
+            '#StartDateLabel': {
+                'en': `Start date`,
+                'es': 'Fecha inicial',
+                'pt-br': 'Data de início'
+            },
+            '#EndDateLabel': {
+                'en': `End date`,
+                'es': 'Fecha final',
+                'pt-br': 'Data de término'
+            },
+            '#TimeZoneLabel': {
+                'en': `Time zone`,
+                'es': 'Zona horaria',
+                'pt-br': 'Fuso horário'
+            },
+            '#tblTitleName': {
+                'en': `Name`,
+                'es': 'Nombre',
+                'pt-br': 'Nome'
+            },
+            '#tblTitleTeam1': {
+                'en': `Team 1`,
+                'es': 'Equipo 1',
+                'pt-br': 'Equipe 1'
+            },
+            '#tblTitleTeam2': {
+                'en': `Team 2`,
+                'es': 'Equipo 2',
+                'pt-br': 'Equipe 2'
+            },
+            '#tblTitleActions': {
+                'en': `Actions`,
+                'es': 'Acciones',
+                'pt-br': 'Ações'
+            },
+            '#noMatchesToSchedule': {
+                'en': `There's no matches to schedule`,
+                'es': `No hay horarios que programar`,
+                'pt-br': `Não há horários para agendar`
+            },
+            '#btnProcessMatches': {
+                'en': `Schedule matches`,
+                'es': `Programar horarios`,
+                'pt-br': `Agendar horários`
+            },
+            '#createdMatchURLS': {
+                'en': `> MATCH URLS`,
+                'es': `> URLS DE HORARIOS`,
+                'pt-br': `URLS DE HORÁRIOS`
+            },
+            '#NoMatchUrlsText': {
+                'en': `There's no matches URLs`,
+                'es': `No hay URLs de horarios`,
+                'pt-br': `Não há URLs de horários`
+            }
+        }
+    },
+    {
         page: '*',
         changeLanguageCallback: () => {},
         strings: {
@@ -179,8 +274,8 @@ const languageDefinition = [
             },
             '#CreateMatchButton': {
                 'en': `Create match`,
-                'es': 'Crear partida',
-                'pt-br': 'Criar partida'
+                'es': 'Crear horario',
+                'pt-br': 'Criar horário'
             },
             '#LanguageTitle': {
                 'en': `Language`,
