@@ -27,6 +27,9 @@ router.get('/', async (req, res) => {
     if (jwtToken != undefined && jwtToken != null) {
         try {
             tokenContent = jwt.verify(jwtToken, config.oAuthTokenSecret);
+            if (tokenContent.isExternal){
+                throw "External user in internal context.";
+            }
             session = bloonUtils.getSessionFromTokenContent(tokenContent, [config.role_LeagueOfficial, config.role_HiddenManager]);
 
             if (session == null || !session.leagueOfficial) {
@@ -63,6 +66,9 @@ router.post('/', async (req, res) => {
         if (jwtToken != undefined && jwtToken != null) {
             try {
                 tokenContent = jwt.verify(jwtToken, config.oAuthTokenSecret);
+                if (tokenContent.isExternal){
+                    throw "External user in internal context.";
+                }
                 session = bloonUtils.getSessionFromTokenContent(tokenContent, [config.role_LeagueOfficial, config.role_HiddenManager]);
 
                 if (session == null || !session.leagueOfficial) {

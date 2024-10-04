@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const crypto = require('crypto');
 
 // Custom
 const bloonUtils = require('../utils/utils.js');
@@ -32,12 +31,15 @@ router.get('/:scheduleId', async (req, res) => {
     let session;
     try {
       tokenContent = jwt.verify(jwtToken, config.oAuthTokenSecret);
+      if (tokenContent.isExternal){
+        throw "External user in internal context.";
+      }
       session = bloonUtils.getSessionFromTokenContent(tokenContent, [config.role_LeagueOfficial, config.role_HiddenManager]);
     } catch (error) {
       // Clear process cookies
       res.clearCookie('jwt');
       // Sends back to login but adds the "Return url" as the same schedule
-      const redirectTo = `/?returnUrl=${encodeURIComponent(`/schedule/${scheduleId}`)}&error=${error}`;
+      const redirectTo = `/?returnUrl=${encodeURIComponent(`/schedule/${scheduleId}`)}`;
       return res.redirect(redirectTo);
     }
 
@@ -149,6 +151,9 @@ router.put('/:scheduleId', async (req, res) => {
     let session;
     try {
       tokenContent = jwt.verify(jwtToken, config.oAuthTokenSecret);
+      if (tokenContent.isExternal){
+        throw "External user in internal context.";
+      }
       session = bloonUtils.getSessionFromTokenContent(tokenContent, [config.role_LeagueOfficial, config.role_HiddenManager]);
     } catch (error) {
       // Clear process cookies

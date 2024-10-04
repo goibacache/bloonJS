@@ -16,7 +16,10 @@ router.get('/', (req, res) => {
   // Check if token is valid, if it is, it's logged, send him to scheduleList
   if (jwtToken != undefined && jwtToken != null){
     try{
-      jwt.verify(jwtToken, config.oAuthTokenSecret);
+      const tokenContent = jwt.verify(jwtToken, config.oAuthTokenSecret);
+      if (tokenContent.isExternal){
+        throw "External user in internal context.";
+      }
       return res.redirect('/scheduleList');
     }catch(error){
       res.clearCookie('jwt');
