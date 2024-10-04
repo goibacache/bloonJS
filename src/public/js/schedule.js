@@ -208,10 +208,6 @@ const loadCalendar = (debug = false) => {
     $("#calendar thead").append("<tr></tr>");
     calendar.append('<tbody></tbody>');
 
-
-    const startDateParts = matchInfoStartDate.split('.');
-    const endDateParts = matchInfoEndDate.split('.');
-
     /**
      * Start date in the original time zone. yyyy, mm(-1), dd, hh, mm
      */
@@ -231,8 +227,6 @@ const loadCalendar = (debug = false) => {
      * End date in the user's time zone (it will start at 00:00 of the first day)
      */
     const localEndDate = new moment.tz(matchInfoEndDate, "DD.MM.YYYY.HH.mm", timezone).startOf('day');
-
-    let currentDate = localStartDate.clone();
 
     /**
      * Holds an array of days to draw. Adds one more to the daysToDraw variable, 
@@ -260,8 +254,9 @@ const loadCalendar = (debug = false) => {
     tableColumns[0] = []; // Create hours indicator
 
     for (var i = 0; i < 24; ++i) { // Create hours
-        // TODO: Add setting for 24hrs or 12Hrs AM/PM date.
-        tableColumns[0][i] = `${i.toString().padStart(2, "0")}:00`;
+        const dateFormat = loadTimeFormat() == "12hrs" ? "h A" : "HH:mm";
+        const date = new moment(`${i.toString().padStart(2, "0")}:00`, "HH:mm").format(dateFormat);
+        tableColumns[0][i] = date;
     }
 
     days.forEach(day => {
@@ -301,7 +296,9 @@ const loadCalendar = (debug = false) => {
                 const cssInactiveClass = $(`.toggleCalendarVisibility.active${activeAmount}`).hasClass('forceInactive') ? 'forceInactive' : '';
 
                 const cssActiveClass = (tab == tabValues.team ? `active${activeAmount} ${cssInactiveClass}` : `active${activeAmount}Small ${cssInactiveClass}`);
-                const tooltipTitle = currentDateWithTime.format('HH:mm');
+                const dateFormat = loadTimeFormat() == "12hrs" ? "h A" : "HH:mm";
+                const tooltipTitle = currentDateWithTime.format(dateFormat);
+
                 const tooltipResume = drawTooltipResume(tooltipTitle, scheduleMatchesOnTime, mySelectionsOnTime);
                 const selectionClass = mySelectionsOnTime.length > 0 ? (tab == tabValues.me ? 'mySelection' : 'mySelectionSmall') : '';
 
@@ -569,7 +566,10 @@ const handleMarks = () => {
                 for (const el of stored) {
                     const time = $(el).data('time');
                     const currentDate = new moment.tz(time, "DD.MM.YYYY.HH:mm", timeZone);
-                    const tooltipTitle = currentDate.format('HH:mm');
+
+                    const dateFormat = loadTimeFormat() == "12hrs" ? "h A" : "HH:mm";
+                    const tooltipTitle = currentDate.format(dateFormat);
+
                     const scheduleMatchesOnTime = scheduledTimes.filter(x => x.DateTime.isSame(currentDate));
                     const mySelectionsOnTime = mySelections.filter(x => x.DateTime.tz(timeZone).isSame(currentDate));
                     const tooltipContent = drawTooltipResume(tooltipTitle, scheduleMatchesOnTime, mySelectionsOnTime);
@@ -646,7 +646,7 @@ const drawPlayersThatFilledTheSchedule = () => {
     }
 
     const teams = JSON.parse(teamsJSON);
-
+    let drawn = 0;
     teams.forEach(team => {
         const userDiscordIds = matchDetails.filter(x => x.TeamRoleId == team.RoleId).map(x => x.UserDiscordId).filter((value, index, current_value) => current_value.indexOf(value) == index);
 
@@ -663,7 +663,7 @@ const drawPlayersThatFilledTheSchedule = () => {
             return;
         }
 
-        if (teams.indexOf(team) > 0){
+        if (drawn > 0){
             $("#participantPanel").append(`<br/>`);    
         }
 
@@ -682,6 +682,8 @@ const drawPlayersThatFilledTheSchedule = () => {
             const player = matchDetails.find(x => x.UserDiscordId == userDiscordId);
             $("#participantPanel").append(`<p class="badge m-0 ms-1 me-1">${player.UserDiscordName}</p>`);
         });
+
+        drawn++;
     })
     
 }
