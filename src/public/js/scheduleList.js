@@ -50,25 +50,27 @@ const loadTable = () => {
         columnDefs: [
             { visible: false, targets: 5 },
             { className: 'p-0', targets: "_all" },
-            { className: 'text-end', targets: [3, 4] },
-            { className: 'text-center', targets: 6 }
+            // { className: 'text-end', targets: [3, 4] },
+            { className: 'text-center', targets: [1, 2, 3, 4, 5, 6] },
             // { responsivePriority: 1, targets: [0, 6] },
         ],
         columns: [
             { data: 'Name' },
-            { data: 'Team1Name' },
-            { data: 'Team2Name' },
+            { data: 'Team1Name', width: "90px" },
+            { data: 'Team2Name', width: "90px" },
             {
                 data: 'StartDate', render: (data) => {
                     const dateParts = data.split('.');
                     return `${dateParts[1]}/${dateParts[0]}/${dateParts[2]}`;
-                }
+                },
+                width: "110px"
             },
             {
                 data: 'EndDate', render: (data) => {
                     const dateParts = data.split('.');
                     return `${dateParts[1]}/${dateParts[0]}/${dateParts[2]}`;
-                }
+                },
+                width: "110px"
             },
             { data: 'MatchTime' },
             {
@@ -76,7 +78,8 @@ const loadTable = () => {
                     const linkText = getKeyFromLanguage('schedulelisttable', 'goToScheduleButton');
                     const buttonClass = row.MatchTime == "Past" ? "btn-secondary" : "btn-primary";
                     return `<a type="button" class="goToScheduleButton btn ${buttonClass}" style="height: 26px; padding-top: 0;" href="/schedule/${row.Name.replace(/ /g, '-')}-${row.Id}">${linkText}</a>`;
-                }
+                },
+                width: "150px"
             },
         ]
     });
