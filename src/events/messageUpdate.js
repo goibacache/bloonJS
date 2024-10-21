@@ -37,7 +37,7 @@ const evnt = {
 				oldAttachments += `_Old message attachments_:\n`;
 			}
 			oldMessage.attachments.forEach((attachment) => {
-				oldAttachments += `[${attachment.name}](<${attachment.url}>)	`
+				oldAttachments += `[${attachment.name}](<${attachment.proxyURL}>)	`
 			});
 			if (oldMessage.attachments.size > 0){
 				oldAttachments += "\n";
@@ -48,7 +48,7 @@ const evnt = {
 				newAttachments += `_New message attachments_:\n`;
 			}
 			newMessage.attachments.forEach((attachment) => {
-				newAttachments += `[${attachment.name}](<${attachment.url}>)	`
+				newAttachments += `[${attachment.name}](<${attachment.proxyURL}>)	`
 			});
 			if (newMessage.attachments.size > 0){
 				newAttachments += "\n";
