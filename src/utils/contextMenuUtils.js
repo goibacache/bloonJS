@@ -100,6 +100,36 @@ const createTimeoutModal = (interaction, defaultTime = '10') => {
  * @param {MessageContextMenuCommandInteraction | UserContextMenuCommandInteraction} interaction
  * @returns ModalBuilder
  */
+const createReplyAsBloonModal = (interaction) => {
+    const { guild, channel } = getGuildChannelMessageAndTarget(interaction);
+
+    // Create modal:
+    const modal = new ModalBuilder()
+        .setCustomId(`replyAsBloon/${guild}/${channel}`)
+        .setTitle('Reply as bloon');
+
+    // Create the text input components
+    const note = new TextInputBuilder()
+        .setCustomId('reply')
+        .setLabel('Reply') // The label is the prompt the user sees for this input
+        .setStyle(TextInputStyle.Paragraph) // Short means only a single line of text
+        .setValue('')
+        .setRequired(true)
+        .setPlaceholder('The text bloon will post.');
+
+    const noteActionRow = new ActionRowBuilder().addComponents(note);
+
+    // Add inputs to the modal
+    modal.addComponents(noteActionRow);
+
+    return modal;
+}
+
+/**
+ * 
+ * @param {MessageContextMenuCommandInteraction | UserContextMenuCommandInteraction} interaction
+ * @returns ModalBuilder
+ */
 const createWarnModal = (interaction) => {
 
     const { guild, channel, messageId, selectedUserId } = getGuildChannelMessageAndTarget(interaction);
@@ -296,5 +326,6 @@ module.exports = {
     createKickModal,
     createBanModal,
     createUnbanModal,
-    getGuildChannelMessageAndTarget
+    getGuildChannelMessageAndTarget,
+    createReplyAsBloonModal
 };
