@@ -18,6 +18,8 @@ block content
     var matchInfoDateTimeZone = '#{matchInfo.DateTimeZone}';
     var daysToSchedule = '#{matchInfo.DaysToSchedule}';
     var myName = '#{myName}';
+    var myAvatar = '#{myAvatar}';
+    var UserDiscordId = '#{UserDiscordId}';
     var myTeam = '#{myTeam}';
     var leagueOfficial = '#{session.leagueOfficial}'
 
@@ -43,7 +45,7 @@ block content
 
           //- Current people that filled the schedule
           div.p-1.ps-2.sbg-identification.unselectable#ParticipantsTitle > PARTICIPANTS
-          div.col-sx-12.p-0.mt-4.panelBg.sb-border.text-center#participantPanel
+          div.col-sx-12.p-0.mt-4.panelBg.sb-border.text-left.ps-2.pe-2#participantPanel
             p.m-0.p-0#EmptyParticipantList No one has filled the schedule
           
           //- Schedule container

@@ -74,7 +74,7 @@ router.get('/:scheduleId', async (req, res) => {
     const teamRole = tokenContent.roles.find(x => x == matchInfo.Team1RoleId || x == matchInfo.Team2RoleId);
 
     if (session.leagueOfficial == false && (teamRole == null || teamRole == undefined)){
-      console.log(`${session.name} (${session.id}) is trying to see the ${scheduleId} match info.`)
+      console.log(`${session.name} (${session.id}) [${req.ip}] is trying to see the ${scheduleId} match info.`)
       return res.redirect('/scheduleList');
     }
 
@@ -105,6 +105,8 @@ router.get('/:scheduleId', async (req, res) => {
       matchDetails: JSON.stringify(otherSelections),
       mySelections: JSON.stringify(mySelections),
       myName: session.name,
+      myAvatar: session.avatarUrl,
+      UserDiscordId: session.id,
       myTeam: teamRole,
       session: session,
       breadCrumbs: breadCrumbs

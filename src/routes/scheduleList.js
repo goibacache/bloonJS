@@ -76,6 +76,7 @@ router.post('/listMatches', async (req, res) => {
 
         console.log(`${session.name} (${session.id}) is using match_GetAllMatches`);
         const matches = await match_GetAllMatches(session.leagueOfficial ? null : tokenContent.roles.toString(), req.body.FutureOrPast);
+        console.log(`${session.name} (${session.id}) sees ${matches.length} matches.`)
 
         if (matches == null) {
             return res.end(bloonUtils.match_createJsonResError("Couldn't load matches, please try again."));

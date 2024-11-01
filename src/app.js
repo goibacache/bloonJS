@@ -18,6 +18,7 @@ var app = express();
 //app.engine('pug', require('pug').__express)
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
+app.set('trust proxy', true); // Because we're behind a reverse proxy
 
 // Enable/disable logger based on env argv length
 if (process.argv.length <= 2){ // Two means it's dev
@@ -47,6 +48,7 @@ app.use((req, res, next) => {
 });
 
 // error handler
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   // set locals, only providing error in development
   res.locals.message = err.message;

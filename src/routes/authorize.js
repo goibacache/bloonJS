@@ -94,6 +94,7 @@ router.post('/', async (req, res) => {
       id: userData.id,
       name: discordServerProfile.nick || userData.global_name,
       avatar: userData.avatar ?? 'NULL',
+      username: userData.username,
       roles: discordServerProfile.roles,
       iat: Math.floor(Date.now() / 1000),
       exp: Math.floor(Date.now() / 1000) + (expiresIn * 60),
@@ -154,6 +155,7 @@ router.post('/noLeagueOfficial/', async (req, res) => {
       id: tokenContent.id,
       name: tokenContent.name,
       avatar: tokenContent.avatar,
+      username: tokenContent.username,
       roles: tokenContent.roles.filter(x => x !== config.role_HiddenManager && x !== config.role_LeagueOfficial),
       iat: tokenContent.iat,
       exp: tokenContent.exp

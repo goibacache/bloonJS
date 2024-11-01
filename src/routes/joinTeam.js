@@ -29,6 +29,7 @@ router.get('/', async (req, res) => {
         try {
             tokenContent = jwt.verify(externalUserData, config.oAuthTokenSecret);
             session = bloonUtils.getSessionFromTokenContent(tokenContent, []);
+            console.log(`Join team login for user ${tokenContent.name} (${tokenContent.id}) [${tokenContent.username}] from ip ${req.ip}`)
         } catch (error) {
             console.log("Error in JoinTeam View:", error);
             res.clearCookie('jwt', cookieOptions);
@@ -99,7 +100,7 @@ router.post('/', async (req, res) => {
         const selectedTeam = teams.find(x => x.TeamRoleId == selectedTeamBody);
 
         if (selectedTeam == null) {
-            return res.end(bloonUtils.match_createJsonResError("Couldn't find the selected team in the internal team list."));
+            return res.end(bloonUtils.match_createJsonResError("Couldn't find the selected team in the team list."));
         }
 
         const createOnDatabaseResult = await match_ExternalUser_Create(tokenContent.id, tokenContent.name, tokenContent.avatar, selectedTeam.TeamRoleId);

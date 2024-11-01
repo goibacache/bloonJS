@@ -181,6 +181,38 @@ const deleteRow  = (rowId) => {
     }
 }
 
+
+/**
+ * Uses moment-timezones to load all of the timezones in the the time zone select
+ */
+const addMomentTimezones = () => {
+    const extraNames = moment.tz.names().filter((value, index, array) => array.indexOf(value) === index);
+  
+    extraNames.forEach(e => {
+        $("#timezone").append(`<option value="${e}">${e.replace('_', ' ')}</option>`);
+    });
+  }
+  
+  /**
+  * Get current user time zone
+  * @returns string
+  */
+  const getUserTimezone = () => {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  }
+  
+  /**
+  * Changes the #timezone select to the user's timezone
+  */
+  const selectUserTimeZone = (triggerChange = false) => {
+    const currentTimeZone = getUserTimezone();
+    if (triggerChange) {
+        $(`#timezone`).val(currentTimeZone).trigger('change'); // triggers onChange();
+    } else {
+        $(`#timezone`).val(currentTimeZone); // Doesn't trigger onChange();
+    }
+  }
+
 // On start functions
 $(document).ready(() => {
     addMomentTimezones();

@@ -5,20 +5,22 @@ const runArgs = bloonUtils.getRunArgs();
 
 const moderationAction_Insert = async(moderationAction, banedUserDiscordId, banReason, handledByDiscordId, fullMessage = '') => {
     let connection;
+    const query = `CALL moderationAction_Insert(?, ?, ?, ?, ?)`;
     try{
-        const query = `CALL moderationAction_Insert(?, ?, ?, ?, ?)`;
-    
         connection = await createConnection();
 
         const [rows] = await connection.execute(query, [moderationAction.id, banedUserDiscordId, banReason, handledByDiscordId, fullMessage]);
 
-        connection.release();
+        await connection.unprepare(query);
+
+        await connection.release();
 
         return parseInt(rows[0][0]['res']); 
 
     }catch(error){
         if (connection != null){
-            connection.release();
+            await connection.unprepare(query);
+            await connection.release();
         }
         console.error("Error in sp_banInsert: ", error);
         return 0;
@@ -27,19 +29,21 @@ const moderationAction_Insert = async(moderationAction, banedUserDiscordId, banR
 
 const moderationAction_GetNewId = async(moderationAction) => {
     let connection;
+    const query = `CALL moderationAction_GetNewId(?)`;
     try{
-        const query = `CALL moderationAction_GetNewId(?)`;
-
         connection = await createConnection();
     
         const [rows] = await connection.execute(query, [moderationAction.id]);
 
-        connection.release();
+        await connection.unprepare(query);
+
+        await connection.release();
     
         return parseInt(rows[0][0]['res']); 
     }catch(error){
         if (connection != null){
-            connection.release();
+            await connection.unprepare(query);
+            await connection.release();
         }
         console.error("Error in moderationAction_GetNewId: ", error);
         return 0;
@@ -48,19 +52,21 @@ const moderationAction_GetNewId = async(moderationAction) => {
 
 const kofi_GetKofiPhrase = async(_userName) => {
     let connection;
+    const query = `CALL kofiphrase_get(?)`;
     try{
-        const query = `CALL kofiphrase_get(?)`;
-
         const connection = await createConnection();
 
         const [rows] = await connection.execute(query, [_userName]);
+        
+        await connection.unprepare(query);
 
-        connection.release();
+        await connection.release();
 
         return rows[0]; 
     }catch(error){
         if (connection != null){
-            connection.release();
+            await connection.unprepare(query);
+            await connection.release();
         }
         console.error("Error in kofiphrase_get: ", error);
         return null;
@@ -69,19 +75,21 @@ const kofi_GetKofiPhrase = async(_userName) => {
 
 const moderationAction_Profile = async(_userId) => {
     let connection;
+    const query = `CALL moderationAction_Profile(?)`;
     try{
-        const query = `CALL moderationAction_Profile(?)`;
-
         const connection = await createConnection();
 
         const [rows] = await connection.execute(query, [_userId]);
 
-        connection.release();
+        await connection.unprepare(query);
+
+        await connection.release();
 
         return rows[0]; 
     }catch(error){
         if (connection != null){
-            connection.release();
+            await connection.unprepare(query);
+            await connection.release();
         }
         console.error("Error in moderationAction_Profile: ", error);
         return null;
@@ -96,19 +104,21 @@ const moderationAction_Profile = async(_userId) => {
  */
 const kofi_InsertOrUpdate = async(_userName, _phrase = '', _renewal = null) => {
     let connection;
+    const query = `CALL kofiphrase_InsertOrUpdate(?, ?, ?)`;
     try{
-        const query = `CALL kofiphrase_InsertOrUpdate(?, ?, ?)`;
-
         connection = await createConnection();
 
         const [rows] = await connection.execute(query, [_userName, _phrase, _renewal ?? 0]);
 
-        connection.release();
+        await connection.unprepare(query);
+
+        await connection.release();
 
         return rows[0]; 
     }catch(error){
         if (connection != null){
-            connection.release();
+            await connection.unprepare(query);
+            await connection.release();
         }
         console.error("Error in kofiphrase_InsertOrUpdate: ", error);
         return null;
@@ -121,19 +131,21 @@ const kofi_InsertOrUpdate = async(_userName, _phrase = '', _renewal = null) => {
  */
 const match_GetInfo = async(_matchId) => {
     let connection;
+    const query = `CALL match_GetInfo(?)`;
     try{
-        const query = `CALL match_GetInfo(?)`;
-
         connection = await createConnection();
 
         const [rows] = await connection.execute(query, [_matchId]);
 
-        connection.release();
+        await connection.unprepare(query);
+
+        await connection.release();
 
         return rows[0][0]; // Get first result only.
     }catch(error){
         if (connection != null){
-            connection.release();
+            await connection.unprepare(query);
+            await connection.release();
         }
         console.error("Error in match_GetInfo: ", error);
         return null;
@@ -142,21 +154,23 @@ const match_GetInfo = async(_matchId) => {
 
 const match_GetDetails = async(_matchId, _role) => {
     let connection;
+    const query = `CALL match_GetDetails(?, ?)`;
     try{
         console.log("match_GetDetails", _matchId, _role);
-
-        const query = `CALL match_GetDetails(?, ?)`;
 
         connection = await createConnection();
 
         const [rows] = await connection.execute(query, [_matchId, _role]);
 
-        connection.release();
+        await connection.unprepare(query);
+
+        await connection.release();
 
         return rows[0]; 
     }catch(error){
         if (connection != null){
-            connection.release();
+            await connection.unprepare(query);
+            await connection.release();
         }
         console.error("Error in match_GetDetails: ", error);
         return null;
@@ -169,21 +183,23 @@ const match_GetDetails = async(_matchId, _role) => {
  */
 const match_GetAllMatches = async(_roles, FutureOrPast) => {
     let connection;
+    const query = `CALL match_GetAllMatches(?, ?)`;
     try{
         console.log("match_GetAllMatches", _roles, FutureOrPast);
-
-        const query = `CALL match_GetAllMatches(?, ?)`;
 
         connection = await createConnection();
 
         const [rows] = await connection.execute(query, [_roles, FutureOrPast]);
 
-        connection.release();
+        await connection.unprepare(query);
+
+        await connection.release();
 
         return rows[0]; 
     }catch(error){
         if (connection != null){
-            connection.release();
+            await connection.unprepare(query);
+            await connection.release();
         }
         console.error("Error in match_GetAllMatches: ", error);
         return null;
@@ -192,22 +208,27 @@ const match_GetAllMatches = async(_roles, FutureOrPast) => {
 
 const match_UpdateMyTimes = async(_matchId, _userDiscordId, _userDiscordName, _userDiscordAvatar, _dateAndTimeZone, _TeamRoleId) => {
     let connection;
+    const query = `CALL match_UpdateMyTimes(?, ?, ?, ?, ?, ?)`;
     try{        
-        const _formattedDateAndTimeZone = _dateAndTimeZone.map(x => x.DateTimeStr+"|"+x.TimeZone).join(',');
-        const query = `CALL match_UpdateMyTimes(?, ?, ?, ?, ?, ?)`;
+        const _UnixTimeStamps = _dateAndTimeZone.map(x => x.Unix).join(',');
+        //const _formattedDateAndTimeZone = _dateAndTimeZone.map(x => x.DateTimeStr+"|"+x.TimeZone).join(',');
 
-        console.log(`match_UpdateMyTimes data: ${_matchId, _userDiscordId, _userDiscordName, _userDiscordAvatar, _formattedDateAndTimeZone, _TeamRoleId}`)
+        console.log(`match_UpdateMyTimes data: ${_matchId}, ${_userDiscordName} (${_userDiscordId}) for team ${_TeamRoleId}`)
 
         connection = await createConnection();
 
-        const [rows] = await connection.execute(query, [_matchId, _userDiscordId, _userDiscordName, _userDiscordAvatar, _formattedDateAndTimeZone, _TeamRoleId]);
+        //const [rows] = await connection.execute(query, [_matchId, _userDiscordId, _userDiscordName, _userDiscordAvatar, _formattedDateAndTimeZone, _TeamRoleId]);
+        const [rows] = await connection.execute(query, [_matchId, _userDiscordId, _userDiscordName, _userDiscordAvatar, _UnixTimeStamps, _TeamRoleId]);
 
-        connection.release();
+        await connection.unprepare(query);
 
-        return rows[0];
+        await connection.release();
+
+        return rows.affectedRows;
     }catch(error){
         if (connection != null){
-            connection.release();
+            await connection.unprepare(query);
+            await connection.release();
         }
         console.error("Error in match_UpdateMyTimes: ", error);
         return null;
@@ -222,19 +243,21 @@ const match_UpdateMyTimes = async(_matchId, _userDiscordId, _userDiscordName, _u
  */
 const match_GetExternalUser = async(_userDiscordId) => {
     let connection;
+    const query = `CALL match_GetExternalUser(?)`;
     try{
-        const query = `CALL match_GetExternalUser(?)`;
-
         connection = await createConnection();
 
         const [rows] = await connection.execute(query, [_userDiscordId]);
 
-        connection.release();
+        await connection.unprepare(query);
+
+        await connection.release();
 
         return rows[0]; 
     }catch(error){
         if (connection != null){
-            connection.release();
+            await connection.unprepare(query);
+            await connection.release();
         }
         console.error("Error in match_GetAllMatches: ", error);
         return null;
@@ -248,19 +271,21 @@ const match_GetExternalUser = async(_userDiscordId) => {
  */
 const match_GetAllTeams = async() => {
     let connection;
+    const query = `CALL match_GetAllTeams()`;
     try{
-        const query = `CALL match_GetAllTeams()`;
-
         connection = await createConnection();
 
         const [rows] = await connection.execute(query);
 
-        connection.release();
+        await connection.unprepare(query);
+
+        await connection.release();
 
         return rows[0]; 
     }catch(error){
         if (connection != null){
-            connection.release();
+            await connection.unprepare(query);
+            await connection.release();
         }
         console.error("Error in match_GetAllTeams: ", error);
         return null;
@@ -281,19 +306,21 @@ const match_GetAllTeams = async() => {
  */
 const match_CreateMatch = async(Name, Team1Name, Team2Name, Team1RoleId, Team2RoleId, StartDate, EndDate, DateTimeZone, User = "Internal") => {
     let connection;
+    const query = `CALL match_CreateMatch(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     try{
-        const query = `CALL match_CreateMatch(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
         connection = await createConnection();
 
         const [rows] = await connection.execute(query, [Name, Team1Name, Team2Name, Team1RoleId, Team2RoleId, StartDate, EndDate, DateTimeZone, User]);
 
-        connection.release();
+        await connection.unprepare(query);
+
+        await connection.release();
 
         return rows[0][0]["matchUrl"];
     }catch(error){
         if (connection != null){
-            connection.release();
+            await connection.unprepare(query);
+            await connection.release();
         }
         console.error("Error in match_CreateMatch: ", error);
         return null;
@@ -315,19 +342,21 @@ const match_CreateMatch = async(Name, Team1Name, Team2Name, Team1RoleId, Team2Ro
  */
 const match_GetBasicAuthorization = async(Name, PasswordHash) => {
     let connection;
+    const query = `CALL match_GetBasicAuthorization(?, ?)`;
     try{
-        const query = `CALL match_GetBasicAuthorization(?, ?)`;
-
         connection = await createConnection();
 
         const [rows] = await connection.execute(query, [Name, PasswordHash]);
 
-        connection.release();
+        await connection.unprepare(query);
+
+        await connection.release();
 
         return rows[0];
     }catch(error){
         if (connection != null){
-            connection.release();
+            await connection.unprepare(query);
+            await connection.release();
         }
         console.error("Error in match_GetBasicAuthorization: ", error);
         return null;
@@ -344,19 +373,21 @@ const match_GetBasicAuthorization = async(Name, PasswordHash) => {
  */
 const match_ExternalUser_Create = async(UserDiscordId, UserDiscordName, UserDiscordAvatar, UserDiscordTeamRoleId) => {
     let connection;
+    const query = `CALL match_ExternalUser_Create(?, ?, ?, ?)`;
     try{
-        const query = `CALL match_ExternalUser_Create(?, ?, ?, ?)`;
-
         connection = await createConnection();
 
         const [rows] = await connection.execute(query, [UserDiscordId, UserDiscordName, UserDiscordAvatar, UserDiscordTeamRoleId]);
 
-        connection.release();
+        await connection.unprepare(query);
+
+        await connection.release();
 
         return rows[0][0]["Res"];
     }catch(error){
         if (connection != null){
-            connection.release();
+            await connection.unprepare(query);
+            await connection.release();
         }
         console.error("Error in match_ExternalUser_Create: ", error);
         return null;

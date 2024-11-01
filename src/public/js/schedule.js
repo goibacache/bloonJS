@@ -38,6 +38,11 @@ let scheduledTimes = null;
 const getMatchDetailsJSON = (selectedTimeZone = null) => {
     if (selectedTimeZone == null) {
         selectedTimeZone = $(`#timezone`).val();
+
+        if (selectedTimeZone == null) {
+            console.error("no timezone?");
+            return;
+        }
     }
 
     const matchDetails = [];
@@ -45,8 +50,11 @@ const getMatchDetailsJSON = (selectedTimeZone = null) => {
 
     originalMatchDetails.forEach(md => {
 
+        const date = new moment.unix(md.UnixTime).tz(selectedTimeZone);
+
         matchDetails.push({
-            DateTime: new moment.tz(md.DateTime, "DD.MM.YYYY.HH.mm", md.TimeZone).tz(selectedTimeZone),
+            DateTime: date,
+            Unix: date.unix(),
             UserDiscordId: md.UserDiscordId,
             UserDiscordName: md.UserDiscordName,
             userDiscordAvatar: md.userDiscordAvatar,
@@ -58,25 +66,23 @@ const getMatchDetailsJSON = (selectedTimeZone = null) => {
 }
 
 /**
- * Loads my selections into the "mySelections" array when first loading the page.
+ * Loads my selections into the "mySelections" array
  */
 const loadMySelections = () => {
-
     if (leagueOfficial) {
         return;
     }
 
-    mySelections.slice(mySelections.length); // Empty they array
+    mySelections = []; // Empty they array
     const selectedTimeZone = $(`#timezone`).val();
 
     // Get array from page and iterate over it.
     const array = JSON.parse(mySelectionsJSON);
     array.forEach(x => {
-
+        const date = new moment.unix(x.UnixTime).tz(selectedTimeZone);
         mySelections.push({
-            DateTimeStr: x.DateTime,
-            DateTime: new moment.tz(x.DateTime, "DD.MM.YYYY.HH.mm", x.TimeZone).tz(selectedTimeZone),
-            TimeZone: x.TimeZone
+            DateTime: date,
+            Unix: date.unix()
         });
     })
 }
@@ -93,22 +99,26 @@ const getCurrentSelectionFromScreen = () => {
     $(".mySelectionSmall").each((i, e) => {
 
         const time = $(e).data('time');
+        const date = new moment.tz(time, 'DD.MM.YYYY.HH:mm', timeZone);
+
+        /*
+        [{"UserDiscordId":171450453068873730,"UserDiscordName":"Xixo","userDiscordAvatar":"b32ff4c65f027e4e1db5ed5e727cf80c","UnixTime":1728104400,"TeamRoleId":"1272395921954705499"}]'
+        */
 
         currentSelection.push({
-            DateTimeStr: time,
-            DateTime: new moment.tz(time, 'DD.MM.YYYY.HH:mm', timeZone),
-            TimeZone: timeZone
+            DateTime: date,
+            Unix: date.unix()
         });
     });
 
     $(".mySelection").each((i, e) => {
 
         const time = $(e).data('time');
+        const date = new moment.tz(time, 'DD.MM.YYYY.HH:mm', timeZone);
 
         currentSelection.push({
-            DateTimeStr: time,
-            DateTime: new moment.tz(time, 'DD.MM.YYYY.HH:mm', timeZone),
-            TimeZone: timeZone
+            DateTime: date,
+            Unix: date.unix()
         });
     });
 
@@ -137,9 +147,19 @@ const drawTooltipResume = (hour, currentScheduledTimes, mySelectionsOnTime) => {
             <div class='col-12 text-center'>
         `;
 
-        currentPlayersTip.forEach(player => {
-            text += `<b class='col-auto badge tooltip-text'>${player.UserDiscordName}</b>`;
-        });
+        // If it's not a league official and it's not "my team", draw the total number
+        if (leagueOfficial == false && team.RoleId != myTeam){
+            // Draw the resume, if there's enemy players scheduled
+            if (currentPlayersTip.length > 0){
+                text += `<b class='col-auto badge tooltip-text'>${currentPlayersTip.length} players</b>`;
+            }
+        }else{
+            // Draw all players
+            currentPlayersTip.forEach(player => {
+                text += `<b class='col-auto badge tooltip-text'>${player.UserDiscordName}</b>`;
+            });
+        }
+        
 
         // Only if it's the real team...
         if (team.RoleId === myTeam) {
@@ -165,16 +185,24 @@ const drawTooltipResume = (hour, currentScheduledTimes, mySelectionsOnTime) => {
 const isSameDay = (currentDay, hours, minutes) => {
     const proposedDateObjectStr = `${currentDay.format('DD-MM-YYYY')} ${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
     if (!(currentDay.format("DD-MM-YYYY HH:mm") == proposedDateObjectStr)){
-        console.log(`${currentDay.format('DD-MM-yyyy HH:mm')} is not the same as ${proposedDateObjectStr}`);
+        //console.log(`${currentDay.format('DD-MM-yyyy HH:mm')} is not the same as ${proposedDateObjectStr}`);
         return false;
     }
     return true;
 }
 
-// Get current Moment
+/**
+ * Returns a new moment object based on the day, hours and minutes given
+ * @param {*} currentDay 
+ * @param {*} hours 
+ * @param {*} minutes 
+ * @returns 
+ */
 const getCurrentMomentTimeDate = (currentDay, hours, minutes) => {
+    const timeZone = $("#timezone").val();
     const proposedDateObjectStr = `${currentDay.format('DD-MM-YYYY')} ${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
-    return new moment(proposedDateObjectStr, "DD-MM-YYYY HH:mm");
+    //return new moment(proposedDateObjectStr, "DD-MM-YYYY HH:mm", matchInfoDateTimeZone);
+    return new moment.tz(proposedDateObjectStr, "DD-MM-YYYY HH:mm", timeZone);
 }
 
 /**
@@ -192,21 +220,22 @@ const loadCalendar = (debug = false) => {
      * Current select timezone
      */
     const timezone = $(`#timezone`).val();
-    /**
-     * Amount of header columns drawn in the th.
-     * Used to NOT draw extra columns in the body and avoiding to do the check twice
-     */
-    let headerColumns = 0;
-
-    let maxAmountOfPlayers = 0;
+    if (timezone == null){
+        console.error("Cant load calendar with no timezone");
+        return;
+    }
 
     scheduledTimes = getMatchDetailsJSON();
+    loadMySelections(); // So it modifies the timezone
+
 
     //Clean calendar
     calendar.children().remove();
     calendar.append('<thead class="stickyC" style="--sticky-top: 0px;"></thead>');
     $("#calendar thead").append("<tr></tr>");
     calendar.append('<tbody></tbody>');
+
+    let maxAmountOfPlayers = 0;
 
     /**
      * Start date in the original time zone. yyyy, mm(-1), dd, hh, mm
@@ -248,7 +277,6 @@ const loadCalendar = (debug = false) => {
 
     let hours = 0;
     let minutes = 0;
-    const currentTime = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
 
     const tableColumns = [];
     tableColumns[0] = []; // Create hours indicator
@@ -284,8 +312,12 @@ const loadCalendar = (debug = false) => {
                 // Draw the whole freaking thing :v
                 // Filter all of the dates that match the current drawn column :^)
                 const currentDateWithTime = getCurrentMomentTimeDate(day.dateObject, hours, minutes);
-                const scheduleMatchesOnTime = scheduledTimes.filter(x => x.DateTime.isSame(currentDateWithTime));
-                const mySelectionsOnTime = mySelections.filter(x => x.DateTime.tz(timezone).isSame(currentDateWithTime));
+                const scheduleMatchesOnTime = scheduledTimes.filter(x => x.Unix == currentDateWithTime.unix());
+                const mySelectionsOnTime = mySelections.filter(x => x.Unix == currentDateWithTime.unix());
+
+                // console.log("currentDateWithTime", currentDateWithTime.unix());
+                // console.log("scheduledTimes", scheduledTimes[0].Unix.unix());
+                // console.log("mySelections", mySelections[0].Unix.unix());
 
                 const activeAmount = scheduleMatchesOnTime.length + mySelectionsOnTime.length > 10 ? 10 : scheduleMatchesOnTime.length + mySelectionsOnTime.length;
                 // Save the most amount of players to deactivate the rest of the filters
@@ -556,6 +588,9 @@ const handleMarks = () => {
             if (update.res) {
                 toastr.success(update.msg, { timeout: 1500 });
 
+                // Save on mySelectionsJSON
+                mySelectionsJSON = JSON.stringify(currentSelection);
+
                 // Redraw players that filled the schedule!
                 drawPlayersThatFilledTheSchedule();
 
@@ -650,18 +685,18 @@ const drawPlayersThatFilledTheSchedule = () => {
     teams.forEach(team => {
         const userDiscordIds = matchDetails.filter(x => x.TeamRoleId == team.RoleId).map(x => x.UserDiscordId).filter((value, index, current_value) => current_value.indexOf(value) == index);
 
-        if (userDiscordIds == null && userDiscordIds == undefined){
-            return;
-        }
+        // if (userDiscordIds == null && userDiscordIds == undefined){
+        //     return;
+        // }
 
-        if (userDiscordIds.length == 0 && mySelections.length == 0){
-            return;
-        }
+        // if (userDiscordIds.length == 0 && mySelections.length == 0){
+        //     return;
+        // }
 
         // If I'm not a league official, I only need to see my own team
-        if (!leagueOfficial && team.RoleId != myTeam){
-            return;
-        }
+        // if (!leagueOfficial && team.RoleId != myTeam){
+        //     return;
+        // }
 
         if (drawn > 0){
             $("#participantPanel").append(`<br/>`);    
@@ -688,16 +723,50 @@ const drawPlayersThatFilledTheSchedule = () => {
     
 }
 
+
+/**
+ * Uses moment-timezones to load all of the timezones in the the time zone select
+ */
+const addMomentTimezones = () => {
+    const extraNames = moment.tz.names().filter((value, index, array) => array.indexOf(value) === index);
+  
+    extraNames.forEach(e => {
+        $("#timezone").append(`<option value="${e}">${e.replace('_', ' ')}</option>`);
+    });
+}
+  
+  /**
+  * Get current user time zone
+  * @returns string
+  */
+const getUserTimezone = () => {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+  
+  /**
+  * Changes the #timezone select to the user's timezone
+  */
+const selectUserTimeZone = (triggerChange = false) => {
+    const currentTimeZone = getUserTimezone();
+    if (triggerChange) {
+        $(`#timezone`).val(currentTimeZone).trigger('change'); // triggers onChange();
+    } else {
+        $(`#timezone`).val(currentTimeZone); // Doesn't trigger onChange();
+    }
+}
+
 // On start functions
 $(() => {
+//$(document).ready(() => {
     leagueOfficial = (leagueOfficial == "true"); // ew
 
-    getMatchDetailsJSON();
+    // getMatchDetailsJSON();
     addMomentTimezones();
     selectUserTimeZone();
     handleVisibilityButtons();
-    loadMySelections();
-
     loadCalendar();
     $("#schedule").fadeIn(100);
 });
+// $(() => {
+    
+// });
