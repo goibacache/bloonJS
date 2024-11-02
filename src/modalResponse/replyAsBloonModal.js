@@ -24,7 +24,7 @@ module.exports = {
             const   guildId             = interactionParts[1];
             const   channelId           = interactionParts[2];
             const   messageId           = interactionParts[3];
-            const   replyDirectly       = interactionParts[4];
+            const   replyDirectly       = interactionParts[4] == "true";
 
             console.log(`Modal submit ${customId}.\nGuild: ${guildId}. Channel: ${channelId}.\nBy user ${interaction.user.tag}`);
 
