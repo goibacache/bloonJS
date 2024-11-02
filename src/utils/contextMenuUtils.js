@@ -10,7 +10,7 @@ const bloonUtils = require('./utils.js');
  * @typedef {import('discord.js').ModalBuilder} ModalBuilder
  * @typedef {import('discord.js').TextInputBuilder} TextInputBuilder
  * @typedef {import('discord.js').MessageContextMenuCommandInteraction} MessageContextMenuCommandInteraction
- * * @typedef {import('discord.js').UserContextMenuCommandInteraction} UserContextMenuCommandInteraction
+ * @typedef {import('discord.js').UserContextMenuCommandInteraction} UserContextMenuCommandInteraction
  */
 
 /**
@@ -96,16 +96,17 @@ const createTimeoutModal = (interaction, defaultTime = '10') => {
 }
 
 /**
- * 
+ * Creates the reply as bloon modal, the second
  * @param {MessageContextMenuCommandInteraction | UserContextMenuCommandInteraction} interaction
+ * @param {boolean} replyDirectly indicates if it will reply to the message or create a new one
  * @returns ModalBuilder
  */
-const createReplyAsBloonModal = (interaction) => {
-    const { guild, channel } = getGuildChannelMessageAndTarget(interaction);
+const createReplyAsBloonModal = (interaction, replyDirectly) => {
+    const { guild, channel, messageId } = getGuildChannelMessageAndTarget(interaction);
 
     // Create modal:
     const modal = new ModalBuilder()
-        .setCustomId(`replyAsBloon/${guild}/${channel}`)
+        .setCustomId(`replyAsBloon/${guild}/${channel}/${messageId}/${replyDirectly}`)
         .setTitle('Reply as bloon');
 
     // Create the text input components
@@ -115,7 +116,7 @@ const createReplyAsBloonModal = (interaction) => {
         .setStyle(TextInputStyle.Paragraph) // Short means only a single line of text
         .setValue('')
         .setRequired(true)
-        .setPlaceholder('The text bloon will post.');
+        .setPlaceholder(`The text bloon will post ${replyDirectly ? 'replying to the selected message.' : 'as a new text post.'}`);
 
     const noteActionRow = new ActionRowBuilder().addComponents(note);
 
@@ -229,12 +230,22 @@ const createBanModal = (interaction) => {
         .setRequired(true)
         .setPlaceholder('The amount of hours of messages to delete');
 
+    const warningForMods = new TextInputBuilder()
+        .setCustomId('warning')
+        .setLabel('⚡ ATTENTION ⚡')
+        .setStyle(TextInputStyle.Paragraph)
+        .setValue(`DON'T DO THIS WITHOUT WARNINGS UNLESS IT'S REALLY REALLY NECESSARY!\n\nIf sure, ignore this text.`)
+        .setRequired(false)
+        .setPlaceholder(`DON'T DO THIS WITHOUT WARNINGS UNLESS IT'S REALLY REALLY NECESSARY!\n\nIf sure, ignore this text.`);
+
     const banTextActionRow                  = new ActionRowBuilder().addComponents(banText);
     const hoursOfMessagesToDeleteActionRow  = new ActionRowBuilder().addComponents(hoursOfMessagesToDelete);
+    const warningForModsActionRow           = new ActionRowBuilder().addComponents(warningForMods);
 
     // Add inputs to the modal
     modal.addComponents(banTextActionRow);
     modal.addComponents(hoursOfMessagesToDeleteActionRow);
+    modal.addComponents(warningForModsActionRow);
 
     return modal;
 }

@@ -5,9 +5,9 @@ const { createReplyAsBloonModal } 	= require('../utils/contextMenuUtils.js');
  * Creates a modal with the custom id "noteModal"
  */
 module.exports = {
-	contextMenuId: 'moderationReplyAsBloon',
+	contextMenuId: 'moderationReplyHereAsBloon',
 	data: new ContextMenuCommandBuilder()
-		.setName('Message: Reply as bloon')
+		.setName('Message: Reply here as bloon')
 		.setType(ApplicationCommandType.Message)
 		.setDMPermission(false)
 		.setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
@@ -20,7 +20,7 @@ module.exports = {
 			// Log for admin
 			console.log(`Reply as bloon: '${this.data.name}' by ${interaction.member.user.tag} (${interaction.member.user.id})`);
 
-            const modal = createReplyAsBloonModal(interaction, true);
+            const modal = createReplyAsBloonModal(interaction, false);
             await interaction.showModal(modal);
             return;
 

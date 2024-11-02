@@ -23,8 +23,8 @@ module.exports = {
 
             const   guildId             = interactionParts[1];
             const   channelId           = interactionParts[2];
-            // const   messageId           = interactionParts[3];
-            // const   selectedUserId      = interactionParts[4];
+            const   messageId           = interactionParts[3];
+            const   replyDirectly       = interactionParts[4];
 
             console.log(`Modal submit ${customId}.\nGuild: ${guildId}. Channel: ${channelId}.\nBy user ${interaction.user.tag}`);
 
@@ -33,8 +33,16 @@ module.exports = {
 
             const guild = await interaction.client.guilds.fetch(guildId);
 			const channel = await guild.channels.fetch(channelId);
-			console.log("sending text: " + reply.replace(/"/g, ""));
-			await channel.send(reply.replace(/"/g, ""));
+
+            console.log("sending text: " + reply.replace(/"/g, ""));
+
+            // If it replies directly, takes the message and replies to it. If not, then it just creates a new message.
+            if (replyDirectly){
+                const message = await channel.messages.fetch(messageId);
+                await message.reply(reply.replace(/"/g, ""));
+            }else{
+                await channel.send(reply.replace(/"/g, ""));
+            }
 
             await interaction.deleteReply();
             

@@ -288,10 +288,13 @@ const createRulesAndInfoEmbed = () => {
         `3. Spamming or text abusing.\n` +
         `4. Over messaging/mentioning staff.\n` +
         `5. Posting in the incorrect channels.\n` +
-        `6. Chatting in languages other than English.\n` +
+        `6. Chatting in languages other than English. 
+         *  Using another language is only allowed in https://discord.com/channels/103933666417217536/305788366467760131 to convey scheduling and game information to players who do not speak english.\n` +
         `7. Advertising non-Intruder content.\n` +
-        `8. Disrespecting the staff and not following instructions. Mods are doing their best to make a friendly environment, spamming memes or trolling is not an acceptable form of rebuttal to any mod actions.\n` +
-        `9. Discussing moderation actions in game-related channels. The public [community-moderation](https://discord.com/channels/103933666417217536/1225148786532290580) forum has been made for these discussions so you can go there for transparency and clarity.\n\n` +
+        `8. Disrespecting the staff and not following instructions. 
+         *  Mods are doing their best to make a friendly environment, spamming memes or trolling is not an acceptable form of rebuttal to any mod actions.\n` +
+        `9. Discussing moderation actions in game-related channels. 
+         *  The public [Community-Moderation Forum](https://discord.com/channels/103933666417217536/1225148786532290580) and the [General moderation Discussion channel](https://discord.com/channels/103933666417217536/1269493719909007400) has been made for these discussions so you can go there for transparency and clarity.\n\n` +
         `🧨 **Serious Offenses (Bans)**:\n` +
         `10. Posting or having a profile that includes NSFW/shocking/pornographic/graphic content or that has a political nature.\n` +
         `11. Using alternate accounts to dodge moderation actions.\n` +
