@@ -26,7 +26,7 @@ const { kofi_InsertOrUpdate } = require('./utils/storedProcedures.js');
 // Load initial config
 
 const modalResponses 		= {};
-const client 				= new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessageReactions], partials: [Partials.Channel, Partials.Reaction, Partials.Message] }); // Create a new client instance
+const client 				= new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildInvites], partials: [Partials.Channel, Partials.Reaction, Partials.Message] }); // Create a new client instance
 client.events 				= new Collection(); // Events handler list
 client.commands 			= new Collection(); // Command handler list
 client.contexMenuCommands	= new Collection(); // Command handler list
@@ -185,6 +185,9 @@ client.once(Events.ClientReady, async c => {
 	wikieditInterval = setInterval(() => {
 		client.emit("wikiedit", client);
 	}, (wikiCheckInterval * 60) * 1000);
+
+	// Save the invites to database
+	client.emit("invitesUpdate", client);
 
 	// Giant loop to allow input
 	// eslint-disable-next-line no-constant-condition

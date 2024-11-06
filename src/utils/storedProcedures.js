@@ -22,7 +22,7 @@ const moderationAction_Insert = async(moderationAction, banedUserDiscordId, banR
             await connection.unprepare(query);
             await connection.release();
         }
-        console.error("Error in sp_banInsert: ", error);
+        console.error("Error in moderationAction_Insert: ", error);
         return 0;
     }
 }
@@ -394,6 +394,52 @@ const match_ExternalUser_Create = async(UserDiscordId, UserDiscordName, UserDisc
     }
 }
 
+const invite_Insert = async(code, guildId, inviterDiscordId, inviterDiscordName, channelId, expiresAt, maxUses) => {
+    let connection;
+    const query = `CALL invite_insert(?, ?, ?, ?, ?, ?, ?)`;
+    try{
+        connection = await createConnection();
+
+        const [rows] = await connection.execute(query, [code, guildId, inviterDiscordId, inviterDiscordName, channelId, expiresAt, maxUses]);
+
+        await connection.unprepare(query);
+
+        await connection.release();
+
+        return rows[0];
+    }catch(error){
+        if (connection != null){
+            await connection.unprepare(query);
+            await connection.release();
+        }
+        console.error("Error in invite_insert: ", error);
+        return null;
+    }
+}
+
+const invite_Get = async(code) => {
+    let connection;
+    const query = `CALL invite_get(?)`;
+    try{
+        connection = await createConnection();
+
+        const [rows] = await connection.execute(query, [code]);
+
+        await connection.unprepare(query);
+
+        await connection.release();
+
+        return rows[0];
+    }catch(error){
+        if (connection != null){
+            await connection.unprepare(query);
+            await connection.release();
+        }
+        console.error("Error in invite_get: ", error);
+        return null;
+    }
+}
+
 const createConnection = async () => {
     // Create global pool object to avoid reconnecting to the MySQL instance multiple times
     if (global.poolObject === undefined) {
@@ -437,5 +483,7 @@ module.exports = {
     match_GetAllTeams,
     match_CreateMatch,
     match_GetBasicAuthorization,
-    match_ExternalUser_Create
+    match_ExternalUser_Create,
+    invite_Insert,
+    invite_Get
 }
