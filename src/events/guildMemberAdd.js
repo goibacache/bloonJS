@@ -52,10 +52,12 @@ const evnt = {
 
 			// Sends the embed into the General channel.
 			console.log(`GuildMemberAdd ${member.user.id}: Sending welcome message...`);
-			const generalChannel = member.guild.channels.cache.get(config.intruderGeneralChannel) || member.guild.channels.fetch(config.intruderGeneralChannel);
-			generalChannel.send({ embeds: [newUserEmbed] });
+			const generalChannel = await member.guild.channels.cache.get(config.intruderGeneralChannel) || member.guild.channels.fetch(config.intruderGeneralChannel);
+			const generalMessageChannel = await generalChannel.send({ embeds: [newUserEmbed] });
 
 			console.log(`GuildMemberAdd ${member.user.id}: Welcome message sent to general.`);
+
+			await generalMessageChannel.react("🐴");
 
 			const bloonsideChannel = member.guild.channels.cache.get(config.bloonsideChannel) || member.guild.channels.fetch(config.bloonsideChannel);
 			await bloonsideChannel.send({ embeds: [newUserEmbed] });
