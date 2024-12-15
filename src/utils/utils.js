@@ -331,14 +331,14 @@ const createRulesAndInfoEmbed = () => {
     return rulesAndInfoEmbed;
 }
 
-const createModerationActionEmbed = (moderationAction, actedUponMember, caseId, reason, handledBy, attachmentUrl, DMsent = false) => {
+const createModerationActionEmbed = (moderationAction, actedUponMember, caseId, reason, handledBy, attachmentUrl, DMsent = null) => {
     const banEmbed = new EmbedBuilder()
         .setColor(moderationAction.color)
         .setTitle(`${moderationAction.name}: Case #${caseId}`)
         .setTimestamp();
 
     if (attachmentUrl != null && attachmentUrl.length > 0) {
-        banEmbed.setImage(attachmentUrl)
+        banEmbed.setImage(attachmentUrl);
     }
 
     banEmbed.addFields(
@@ -348,9 +348,13 @@ const createModerationActionEmbed = (moderationAction, actedUponMember, caseId, 
     );
 
     // Add attachments one by one.
+    let DMSentText = '';
+    if (DMsent == null)     DMSentText = 'No DM';
+    if (DMsent == true)     DMSentText = 'Delivered';
+    if (DMsent == false)    DMSentText = 'Couldn\'t be delivered.';
 
     banEmbed.addFields(
-        { name: 'Direct message:', value: DMsent ? `Delivered.` : `Couldn't be delivered.`, inline: true },
+        { name: 'Direct message:', value: DMSentText, inline: true },
     );
 
 
@@ -527,6 +531,22 @@ const getTextAndAttachmentsFromMessage = (message) => {
 }
 
 /**
+ * From a given URL it will get the filename and download it locally (in memory)
+ * @param {*} attachmentOnlineUrl 
+ */
+const downloadAndAttachFile = async(attachmentOnlineUrl) => {
+    if (attachmentOnlineUrl == null || attachmentOnlineUrl.length == 0){
+        return null;
+    }
+
+    const regex = /(?<=\/)[^/?#]+(?=[^/]*$)/g;
+    const filename = attachmentOnlineUrl.match(regex)[0];
+    console.log("filename: " + filename);
+    const basePath = `./assets/attachments/${filename}`;
+    console.log("basepath: " + basePath);
+}
+
+/**
  * Creates a request towars the discord API.
  * @param {String} discordApiEndpoint 
  * @param {String} tokenType 
@@ -646,6 +666,7 @@ const match_isCustomDateFormatOK = (date) => {
 
 module.exports = {
     moderationActions,
+    downloadAndAttachFile,
     getHTTPResult,
     timePlayedToHours,
     getQuotedText,
