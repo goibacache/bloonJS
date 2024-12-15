@@ -102,9 +102,7 @@ const evnt = {
                 }
             }
 
-            // After SPAM check:
-            
-            // On first message and no AGENT role, assign it.
+            //#region On first message and no AGENT role, assign it.            
             const member = message.member;
 
             // Check if the user already has the "Agent" role, if it doesn't add it.
@@ -112,7 +110,9 @@ const evnt = {
                 console.log(`${member.user.tag}'s first message! Adding agent role`);
                 await member.roles.add(agentRole);      // Add
             }
+            //#endregion
 
+            // #whoIs Question checks
             // Regex to split the question.
             const messageSplit = message.content.toLowerCase().split(regWhoIs);
 
