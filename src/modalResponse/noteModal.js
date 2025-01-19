@@ -47,7 +47,6 @@ module.exports = {
 
             // Get data from the text field
             const noteText = interaction.fields.getTextInputValue('noteText');
-            const attachmentUrl = interaction.fields.getTextInputValue('attachmentUrl');
 
             // Store in database and create the embed
             const action                    = bloonUtils.moderationActions.Note;
@@ -63,7 +62,7 @@ module.exports = {
                                                 });
             const caseID                    = await storedProcedures.moderationAction_GetNewId(action);
             const moderationActionChannel   = await interaction.member.guild.channels.fetch(config.moderationActionsChannel);
-            const actionEmbed               = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, noteText, interaction.member, attachmentUrl, DMsent);
+            const actionEmbed               = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, noteText, interaction.member, null, DMsent);
             
             if (caseID == 0) {
                 await interaction.editReply({ content: `Couldn't save ${action.name} in database.`, components: [] });
@@ -93,35 +92,15 @@ module.exports = {
                     return false;
                 });
 
-            const attachment = attachmentUrl == null ? null : 
-                {
-                    attachment: attachmentUrl,
-                    name:"SPOILER_attachment.png"
-                };
-
             // Write the moderation action in the chat to log it in the database
             sentInEvidence = await moderationActionChannel.send({ 
                 content: `Note for <@${userToBeActedUpon.id}> (${userToBeActedUpon.user ? userToBeActedUpon.user.tag : userToBeActedUpon.tag})`,
-                embeds: [actionEmbed],
-                files:[attachment]
+                embeds: [actionEmbed]
             }).then(() => true)
             .catch((error) => {
                 console.log(`Error while sending to the evidence channel: ${error}`);
                 return false;
             });
-
-            // send attachment if any
-            if (attachment != null){
-                await moderationActionChannel.send({ 
-                    content: `This Note had the following attachment: <@${userToBeActedUpon.id}> (${userToBeActedUpon.user ? userToBeActedUpon.user.tag : userToBeActedUpon.tag})`,
-                    embeds: [actionEmbed],
-                    files:[attachment]
-                }).then(() => true)
-                .catch((error) => {
-                    console.log(`Error while sending to the evidence channel: ${error}`);
-                    return false;
-                });
-            }
 
             const line1 = isMessageAction ? messageDeleted ? `\n✅ Message deleted` : `\n❌ Message couldn't be deleted` : '';
             const line2 = sentInEvidence ? `\n✅ Evidence sent` : `\n❌ Couldn't send the evidence`;
