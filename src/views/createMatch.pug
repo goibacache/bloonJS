@@ -1,0 +1,96 @@
+extends layout
+
+block content
+    noscript You need to enable JavaScript to run this app.
+
+    //- Scripts
+    script(src="/js/createMatch.js", defer=true)
+
+    //- Session
+    include parts/sessionHeader.pug
+
+    //- Page
+    div.container
+        div.col-12.col-lg-10.offset-lg-1.mb-5
+            //- Form
+        
+            div.p-0.mt-2
+                    //- Match creation content
+                    div.col-12
+                        //- Header
+                        div.p-1.ps-2.sbg-identification.unselectable#CreateMatchTitles > CREATE NEW MATCHES
+                        //- Panel
+                        div.col-xs-12.p-0.sb-border.panelBg
+                            div.row.p-4.pt-2.pb-2
+                                div.form-group.mb-1.col-6.p-0.pe-2
+                                    label#team1Lbl(for="matchNameInput") Team 1
+                                    select.form-control#team1Select(placeholder="Team 1", onchange="suggestMatchName()")
+                                        if teams != null
+                                            option.SelectTeamOption(value="0", data-shortName="NoTeam") SELECT TEAM
+                                            for team in teams.filter(x => x.TeamRoleId != 0)
+                                                option(value=team.TeamRoleId, data-shortName=team.ShortName) #{team.ShortName} - #{team.Name}
+
+                                div.form-group.mb-1.col-6.p-0
+                                    label#team2Lbl(for="matchNameInput") Team 2
+                                    select.form-control#team2Select(placeholder="Team 2", onchange="suggestMatchName()")
+                                        if teams != null
+                                                option.SelectTeamOption(value="0", data-shortName="NoTeam") SELECT TEAM
+                                                for team in teams.filter(x => x.TeamRoleId != 0)
+                                                    option(value=team.TeamRoleId, data-shortName=team.ShortName) #{team.ShortName} - #{team.Name}
+
+                                div.form-group.mb-1.col-12.p-0
+                                    label#MatchNameLabel(for="matchNameInput") Match name
+                                    input.form-control#name(type="text" placeholder="Match name")
+
+                                button#btnAddMatchToList.btn.sbg-primary.mt-2.mb-2(type="button" onclick="addMatchToList()") Add to match list
+
+                    //- Match creation table
+                    div.col-12.mt-2
+                        //- Header
+                        div.p-1.ps-2.sbg-identification.unselectable#MatchListTitles > MATCH SCHEDULES
+                        //- Panel
+                        form#createMatchForm.col-xs-12.p-0.sb-border.panelBg
+                        
+                            div.row.p-4.pt-2.pb-0
+                                div.form-group.mb-1.col-6.col-md-4.p-0.pe-2
+                                    label#StartDateLabel(for="matchNameInput") Start date
+                                    input.form-control#startDate(name="startDate" type="date" placeholder="Start date")
+
+                                div.form-group.mb-1.col-6.col-md-4.p-0.pe-2
+                                    label#EndDateLabel(for="matchNameInput") End date
+                                    input.form-control#endDate(name="endDate" type="date" placeholder="End date" data-toggle="tooltip" title="If you want your match to go from Friday to the end of Sunday on your timezone select <b>Monday</b> as the end date!")
+
+                                div.form-group.mb-1.col-12.col-md-4.p-0
+                                    label#TimeZoneLabel.col-6(for="matchNameInput") Timezone
+                                    select.form-control.col-6#timezone(name="timezone" placeholder="Match name")
+                            
+                            div.row.p-4.pt-1.pb-1
+                                div.mb-3.p-0#tableContainer(style="height: 298px; overflow-y: scroll; scroll-behavior: smooth;")
+                                    table.unselectable.bc-separate#preparedMatches.col-12.p-0
+                                        thead
+                                            tr 
+                                                th#tblTitleName Name
+                                                th#tblTitleTeam1(style="width: 100px") Team 1
+                                                th#tblTitleTeam2(style="width: 100px") Team 2
+                                                th#tblTitleActions(style="width: 70px") Actions
+                                        tbody 
+                                            tr#empty
+                                                td.text-center#noMatchesToSchedule(colspan="4") There's no matches to schedule
+
+                                button#btnProcessMatches.btn.sbg-success.w-100.mb-2(type="button" onclick="processMatches()") Schedule matches
+
+                    //- Match creation table
+                    div.col-12.mt-2
+                        //- Header
+                        div.p-1.ps-2.sbg-identification.unselectable#createdMatchURLS > MATCH URLS
+
+                        //- Panel
+                        div.col-xs-12.p-0.sb-border.panelBg
+                            div.row.p-4.pt-1.pb-1
+                                div.mb-3.p-0#UrlTableContainer
+                                    table.bc-separate#matchesUrl.col-12.p-0
+                                        tbody 
+                                            tr#UrlsEmpty
+                                                td.text-center#NoMatchUrlsText(colspan="4") There's no matches URLs
+
+    include parts/footer.pug

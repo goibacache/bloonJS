@@ -26,7 +26,7 @@ const { kofi_InsertOrUpdate } = require('./utils/storedProcedures.js');
 // Load initial config
 
 const modalResponses 		= {};
-const client 				= new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessageReactions], partials: [Partials.Channel, Partials.Reaction, Partials.Message] }); // Create a new client instance
+const client 				= new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildInvites], partials: [Partials.Channel, Partials.Reaction, Partials.Message] }); // Create a new client instance
 client.events 				= new Collection(); // Events handler list
 client.commands 			= new Collection(); // Command handler list
 client.contexMenuCommands	= new Collection(); // Command handler list
@@ -185,6 +185,9 @@ client.once(Events.ClientReady, async c => {
 	wikieditInterval = setInterval(() => {
 		client.emit("wikiedit", client);
 	}, (wikiCheckInterval * 60) * 1000);
+
+	// Save the invites to database
+	client.emit("invitesUpdate", client);
 
 	// Giant loop to allow input
 	// eslint-disable-next-line no-constant-condition
@@ -422,4 +425,101 @@ async function handleCommands(command, client) {
 		console.error(`\nError in command: ${error}`);
 	}
 }
+//#endregion
+
+//#region Express Server
+
+//#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('./app.js');
+var debug = require('debug')('src:server');
+var http = require('http');
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(config.WEB_Port || '80');
+console.log("Listening on port " + port);
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
+
+
 //#endregion

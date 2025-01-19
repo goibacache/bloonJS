@@ -116,6 +116,7 @@ const createReplyAsBloonModal = (interaction, replyDirectly) => {
         .setStyle(TextInputStyle.Paragraph) // Short means only a single line of text
         .setValue('')
         .setRequired(true)
+        .setMaxLength(2000)
         .setPlaceholder(`The text bloon will post ${replyDirectly ? 'replying to the selected message.' : 'as a new text post.'}`);
 
     const noteActionRow = new ActionRowBuilder().addComponents(note);

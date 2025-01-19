@@ -31,7 +31,7 @@ module.exports = {
             const   selectedUserId      = interactionParts[4];
 
             // Various returns
-            let DMsent = false; // No DM on notes.
+            let DMsent = null; // No DM on notes.
             let messageDeleted = false;
             let sentInEvidence = false;
             let savedInDatabase = false;
@@ -93,31 +93,17 @@ module.exports = {
                 });
 
             // Write the moderation action in the chat to log it in the database
-            sentInEvidence = await moderationActionChannel.send({ content: `Note for <@${userToBeActedUpon.id}> (${userToBeActedUpon.user ? userToBeActedUpon.user.tag : userToBeActedUpon.tag})`, embeds: [actionEmbed]})
-                .then(() => true)
-                .catch((error) => {
-                    console.log(`Error while sending to the evidence channel: ${error}`);
-                    return false;
-                });
-
-            // Thread
-            /*
-            const thread = await bloonUtils.createOrFindModerationActionThread(interaction.client, `Moderation for User ID: ${selectedUserId}`);
-
-            if (thread){
-                threadCreated = true;
-                // "Loading" message
-                const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\n...` });
-                // Edit the message and mention all of the roles that should be included.
-                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\nSummoning: <@&${config.role_Mod}>...` })
-                // Finally send the message we really want to send...
-                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\n${noteText}`, embeds: [] });
-            }
-            */
+            sentInEvidence = await moderationActionChannel.send({ 
+                content: `Note for <@${userToBeActedUpon.id}> (${userToBeActedUpon.user ? userToBeActedUpon.user.tag : userToBeActedUpon.tag})`,
+                embeds: [actionEmbed]
+            }).then(() => true)
+            .catch((error) => {
+                console.log(`Error while sending to the evidence channel: ${error}`);
+                return false;
+            });
 
             const line1 = isMessageAction ? messageDeleted ? `\n✅ Message deleted` : `\n❌ Message couldn't be deleted` : '';
             const line2 = sentInEvidence ? `\n✅ Evidence sent` : `\n❌ Couldn't send the evidence`;
-            //const line3 = threadCreated ? `\n✅ Evidence sent in Thread` : ` \n❌ Couldn't send evidence to Thread`;
             const line3 = `\n✅ No thread is created/updated for notes`;
             const line4 = savedInDatabase ? `\n✅ Saved in database` : ` \n❌ Couldn't be saved in database`;
 

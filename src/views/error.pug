@@ -1,0 +1,7 @@
+extends layout
+
+block content
+  h1.text-center 🚨 Error:
+  h3.text-center= message
+  h4.text-center= error.status
+  pre.text-center= error.stack

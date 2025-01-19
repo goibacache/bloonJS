@@ -1,0 +1,29 @@
+extends layout
+
+block content
+  noscript You need to enable JavaScript to run this app.
+
+  //- Scripts
+  script(src="/js/index.js", defer=true)
+  
+
+  //- Hiddens
+  input#oAutClientId(type="hidden", value=oAutClientId)
+  input#oAuthReturnUrl(type="hidden", value=oAuthReturnUrl)
+
+  include parts/sessionHeader.pug
+
+  //- Page
+  div#login
+    div.d-flex.align-items-center.justify-content-center.col-10.offset-1.col-sm-10.offset-sm-1.col-md-8.offset-md-2.col-lg-8.offset-lg-2(style="height:calc(100vh - 159px);")
+      div.row
+      
+        div.col-xs-12.p-0
+          div.p-1.ps-2.sbg-identification.unselectable#IdentificationTitle >IDENTIFICATION
+        div.mt-3.mb-3.text-center.sb-border.panelBg.pt-3.pb-3
+          p.col-xs-12.center#PleaseSignIn Please identify yourself using your discord account.
+          button.btn.sbg-primary.row#loginButton(type="button", onClick="authorizeWithDiscord()") Login with Discord
+          
+
+  include parts/footer.pug
+  

@@ -1,0 +1,79 @@
+extends layout
+
+block content
+  noscript You need to enable JavaScript to run this app.
+
+  //- Scripts
+  link(rel="stylesheet", href="/css/calendar.css")
+  link(rel="stylesheet", href="/css/switch.css")
+  script(src="/js/schedule.js", defer=true)
+
+  //- Passed variables
+  script.
+    var teamsJSON = '!{teams}'
+    var matchDetailsJSON = '!{matchDetails}';
+    var mySelectionsJSON = '!{mySelections}';
+    var matchInfoStartDate = '#{matchInfo.StartDate}';
+    var matchInfoEndDate = '#{matchInfo.EndDate}';
+    var matchInfoDateTimeZone = '#{matchInfo.DateTimeZone}';
+    var daysToSchedule = '#{matchInfo.DaysToSchedule}';
+    var myName = '#{myName}';
+    var myAvatar = '#{myAvatar}';
+    var UserDiscordId = '#{UserDiscordId}';
+    var myTeam = '#{myTeam}';
+    var leagueOfficial = '#{session.leagueOfficial}'
+
+  //- Session
+  include parts/sessionHeader.pug
+
+  //- Page
+  div.container-fluid(style="min-height: 2000px;")
+    div.col-10.offset-1.col-sm-8.offset-sm-2.col-md-8.offset-md-2.col-lg-6.offset-lg-3#schedule(style="display:none;")
+
+      //- Title
+      div.row
+        h2.mt-4.mb-4.text-center(style="min-height: 40px")=matchInfo.Name
+
+        div.p-0
+          div.row.p-0.m-0
+            div.offset-2.col-4.unselectable.tab.active.me-3.text-center.p-0#TeamTab(onclick="changeTab(this, 1)") TEAM
+            div.col-4.unselectable.tab.text-center.p-0#MeTab(onclick="changeTab(this, 2)") ME
+          
+        div.tabSpacer.mb-3
+            
+        div.p-0.mb-5
+
+          //- Current people that filled the schedule
+          div.p-1.ps-2.sbg-identification.unselectable#ParticipantsTitle > PARTICIPANTS
+          div.col-sx-12.p-0.mt-4.panelBg.sb-border.text-left.ps-2.pe-2#participantPanel
+            p.m-0.p-0#EmptyParticipantList No one has filled the schedule
+          
+          //- Schedule container
+          div.mt-4.p-1.ps-2.sbg-identification.unselectable#ScheduleTitle > SCHEDULE
+          div.col-sx-12.p-0.mt-4.panelBg.sb-border
+
+            //- Timezone
+            div.row.text-center.pt-3.m-0.unselectable.justify-content-center 
+              #TimeZoneText.col-auto Your time zone 
+              select.col-auto.p-0#timezone(name="timezone", onchange="loadCalendar()")
+
+            //- Display filters and toggles
+            div#filter.row.p-0.pt-4.pb-4.ms-0.me-0.justify-content-center
+              p.col-auto.me-2.mb-0.d-none.d-sm-block.unselectable 0/10+
+              div.sb-border.row.col-auto.p-0
+                div.active0.text-center.unselectable.pointer.p-0(style="width:  25px; height: 25px; background-color: var(--table-bg-color-empty);", data-toggle="1") 0
+                div.active1.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="1") 1
+                div.active2.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="2") 2
+                div.active3.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="3") 3
+                div.active4.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="4") 4
+                div.active5.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="5") 5
+                div.active6.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="6") 6
+                div.active7.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="7") 7
+                div.active8.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="8") 8
+                div.active9.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width:  25px; height: 25px", data-toggle="9") 9
+                div.active10.text-center.unselectable.pointer.toggleCalendarVisibility.p-0(style="width: 25px; height: 25px;", data-toggle="10") 10
+              p.col-auto.ms-2.mb-0.d-none.d-sm-block.unselectable 10+/10+
+
+            table.unselectable.bc-separate#calendar
+
+  include parts/footer.pug

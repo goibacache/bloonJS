@@ -1,0 +1,93 @@
+//- Session
+div.d-flex.align-items-center.sessionContainer.p-0
+    if session != null
+        if session.avatarUrl != null && session.avatarUrl.length > 0
+            a(href="/scheduleList") 
+                img.unselectable.align-middle.ms-2.ms-sm-3(src=session.avatarUrl, style="height: 32px; width: auto")
+        a.link.col-auto.p-0.m-0.align-middle.ms-3(href="/scheduleList")=session.name
+        if session.leagueOfficial
+            p.badge.unselectable.d-none.d-md-inline-block.d-lg-inline-block League Official
+            p.badge.unselectable.d-inline-block.d-xs-inline-block.d-sm-inline-block.d-md-none.d-lg-none LO
+
+    //- Normal menu
+    div.ms-auto.me-2.me-sm-3
+        div.dropdown
+            //- a.btn.btn-secondary.dropdown-toggle(href="#" role="button" id="ddLanguage" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false") Dropdown link
+
+            button.btn.sbg-primary.dropdown-toggle.ms-auto.d-none.d-sm-inline-block.me-4#optionBtn(type="button" data-bs-toggle="dropdown" aria-expanded="false") Options
+            ul.dropdown-menu.doNothing  
+                //- League official buttons
+                if session != null && session.leagueOfficial  
+                    li
+                        a.dropdown-item.doNothing#GotoTitle(href="#" style="font-weight: bolder") Go to         
+                    li
+                        a.dropdown-item#ScheduleListButton(type="button" onClick="goto('/scheduleList')" style="border-left: 5px solid #5c5027") Schedule list
+                    li
+                        a.dropdown-item#CreateMatchButton(type="button" onClick="goto('/createMatch')" style="border-left: 5px solid #5c5027") Create match
+                li
+                    a.dropdown-item.doNothing#LanguageTitle(href="#" style="font-weight: bolder") Language
+                li
+                    a.dropdown-item(href="#" onclick="changeLanguage('en')" style="border-left: 5px solid #5c5027") 
+                        div.smallFlag.btn.gb.me-1.d-inline-block
+                        p.p-0.m-0.d-inline-block English
+                li
+                    a.dropdown-item(href="#" onclick="changeLanguage('pt-br')" style="border-left: 5px solid #5c5027") 
+                        div.smallFlag.btn.br.me-1.d-inline-block
+                        p.p-0.m-0.d-inline-block Português
+                li
+                    a.dropdown-item(href="#" onclick="changeLanguage('es')" style="border-left: 5px solid #5c5027") 
+                        div.smallFlag.btn.es.me-1.d-inline-block
+                        p.p-0.m-0.d-inline-block Español
+                li
+                    a.dropdown-item.doNothing#TimeFormat(href="#" style="font-weight: bolder") Time format
+                li 
+                    //- div.dt-layout-cell.dt-layout-start.dropdown-item.doNothing
+                    div.dropdown-item.form-check.doNothing(style="border-left: 5px solid #5c5027")
+                        input.form-check-input.doNothing.ms-1(type="radio" name="12or24selector" id="12or24selector12" value="12hrs" onchange="setTimeFormat()")
+                        label.form-check-label.doNothing.ms-1(for="12or24selector12") 12 hrs
+                li
+                    div.dropdown-item.form-check.doNothing(style="border-left: 5px solid #5c5027")
+                        input.form-check-input.doNothing.ms-1(type="radio" name="12or24selector" id="12or24selector24" value="24hrs" onchange="setTimeFormat()")
+                        label.form-check-label.doNothing.ms-1(for="12or24selector24") 24 hrs
+                    
+                
+                //- If there's a session, show the divider and the logout button
+                if session != null
+                    li
+                        hr.dropdown-divider
+                    li
+                        a.btn-danger.dropdown-item#LogoutButton(type="button" onClick="logOut()" style="border-left: 5px solid #5c2727") Logout
+        
+        
+
+    button.navbar-toggler.me-3.d-block.d-sm-none(type="button" onclick="openMenu()" data-bs-toggle="collapse" data-bs-target="#navBar" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation")
+      span.navbar-toggler-icon.fakeToggler
+
+    //- Mobile menu
+    div.menuContainer#menu(style="display:none")
+        button.closeMenu(type="button" onclick="closeMenu()") X
+        div.optionsContainer.d-flex.flex-column.justify-content-center
+            h2#LanguageMenu(style="align-self: center;") Language
+            div.row(style="align-self: center;")
+                button.btn.gb.mt-5.mediumFlag.p-0(onClick="changeLanguage('en')")
+                button.btn.br.mt-5.mediumFlag(onClick="changeLanguage('pt-br')")
+                button.btn.es.mt-5.mediumFlag(onClick="changeLanguage('es')")
+            if session != null
+                button.btn.sbg-primary.mt-5.col-6#ScheduleListButtonMenu(type="button" onClick="goto('/scheduleList')" style="align-self: center") Schedule list
+                if (session.leagueOfficial)
+                    button.btn.sbg-primary.mt-5.col-6#CreateMatchButtonMenu(type="button" onClick="goto('/createMatch')" style="align-self: center") Create match    
+                button.btn.sbg-danger.mt-5.col-6#LogoutButtonMenu(type="button" onClick="logOut()" style="align-self: center") Logout
+
+
+//- For bread crumbs
+if breadCrumbs != null
+    //- div.d-flex.align-items-center.p-2.justify-content-center
+    ul.breadcrumb.align-middle.p-1.ps-3.m-0.d-none.d-sm-flex.justify-content-center.mt-1
+        //- Base Li
+        li.unselectable="ICL"
+        each breadCrumb in breadCrumbs
+            if (breadCrumbs.indexOf(breadCrumb) == breadCrumbs.length -1)
+                li.unselectable=breadCrumb.name
+            else 
+                li
+                    a.link(href=breadCrumb.url) #{breadCrumb.name}

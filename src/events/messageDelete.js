@@ -42,7 +42,7 @@ const evnt = {
 				attachments += `_Attachments_:\n`;
 			}
 			message.attachments.forEach((attachment) => {
-				attachments += `[${attachment.name}](<${attachment.url}>)	`
+				attachments += `[${attachment.name}](<${attachment.proxyURL}>)	`
 			});
 
 			const channel = message.guild.channels.cache.get(config.bloonServerLogs);
@@ -63,7 +63,7 @@ const evnt = {
 				});
 			}else{
 				// Send normal message with no splits
-				await channel.send({ content: `🧹 New deletion ${wasItAMod}of message by <@${message.author.id}> (${message.author.username}) in <#${message.channelId}> \n\n_Deleted message_:\n${textDecorator}${msg}${attachments}${textDecorator}`, allowedMentions: { parse: [] }});
+				await channel.send({ content: `🧹 New deletion ${wasItAMod}of message by <@${message.author.id}> (${message.author.username}) in <#${message.channelId}> \n\n_Deleted message_:\n${textDecorator}${msg.length == 0 ? " " : msg}${textDecorator}${attachments}`, allowedMentions: { parse: [] }});
 			}
 		}catch(error){
 			console.error("Error in messageDelete.js: " + error);

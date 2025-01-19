@@ -1,18 +1,26 @@
 {
-  "name": "bloonJS",
+  "name": "bloonjs",
   "version": "1.0.0",
   "description": "A Discord Bot replacement for our fallen comrade.\r Uses DiscordJS to handle the discord interactions and events.",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "eslint": "eslint --ext js"
+    "eslint": "eslint --ext js",
+    "start": "node ./bin/www"
   },
   "dependencies": {
     "@discordjs/core": "^0.6.0",
     "canvas": "^2.11.2",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
     "discord.js": "^14.11.0",
     "dotenv": "^16.3.1",
-    "mysql2": ">=3.9.4"
+    "express": "^4.19.2",
+    "http-errors": "~1.6.3",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "~1.9.1",
+    "mysql2": ">=3.9.4",
+    "pug": "^3.0.3"
   },
   "keywords": [],
   "author": "",

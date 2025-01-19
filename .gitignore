@@ -7,3 +7,4 @@ config.develop.js
 .vscode/settings.json
 src/canvasTest/
 src/localMemory/lastWikiEdit.bak
+src/localMemory/invites.bak
