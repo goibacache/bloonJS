@@ -211,7 +211,6 @@ const match_UpdateMyTimes = async(_matchId, _userDiscordId, _userDiscordName, _u
     const query = `CALL match_UpdateMyTimes(?, ?, ?, ?, ?, ?)`;
     try{        
         const _UnixTimeStamps = _dateAndTimeZone.map(x => x.Unix).join(',');
-        //const _formattedDateAndTimeZone = _dateAndTimeZone.map(x => x.DateTimeStr+"|"+x.TimeZone).join(',');
 
         console.log(`match_UpdateMyTimes data: ${_matchId}, ${_userDiscordName} (${_userDiscordId}) for team ${_TeamRoleId}`)
 
