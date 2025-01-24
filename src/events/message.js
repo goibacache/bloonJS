@@ -19,7 +19,7 @@ const   spamMessages = [
 const regWhoIs = new RegExp(/who('s|.is|.are).(.*)\?/g);
 const regAttch = RegExp(/\[att:.*\]/g);
 const regSpam = /\+(<![[:digit:]])?18(>![[:digit:]])??|\b18\b|\bnude?3?s?5?\b|\bna?4?ke?3?d\b|\bnitro\b|\bfre?3?e?3?\b|\bnft\b|\broblox\b|\bstea?4?m\b|\bdi?l?1?sco?0?rd(?!.com\/channels\/)\b|\ba?4?dul?1?ts?\b|cry?l?i?1?pto?0?\b|\bpro?0?mo?0?\b|\bbtc\b|\bo?0?nly ?fa?4?ns\b|@everyone\b|\bte?3?e?3?ns?\b|\ble?3?a?4?ks?\b|\bgift\b/gi;
-const regUrl = /(https?:\/\/)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)?/gi;
+const regUrl = /(https?:\/\/)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z]{1,6}\b([-a-zA-Z@:%_+.~#?&//=]*)?/gi;
 
 const agentRole = config.role_Agent;
 
