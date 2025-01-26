@@ -22,7 +22,6 @@ module.exports = {
 
             const modal = createTimeoutModal(interaction);
             await interaction.showModal(modal);
-            return;
 
 		}catch(error){
 			const answer = { content: `Error in ${this.data.name}: ${error}`, ephemeral: true };
