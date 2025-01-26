@@ -107,7 +107,7 @@ const createReplyAsBloonModal = (interaction, replyDirectly) => {
     // Create modal:
     const modal = new ModalBuilder()
         .setCustomId(`replyAsBloon/${guild}/${channel}/${messageId}/${replyDirectly}`)
-        .setTitle('Reply as bloon');
+        .setTitle(replyDirectly ? 'Reply as bloon' : 'New bloon message here');
 
     // Create the text input components
     const note = new TextInputBuilder()
@@ -288,6 +288,36 @@ const createUnbanModal = (interaction) => {
 
 
 /**
+ * 
+ * @param {MessageContextMenuCommandInteraction | UserContextMenuCommandInteraction} interaction
+ * @returns { ModalBuilder, interaction }
+ */
+const createByDiscordIdModal = (interaction) => {
+
+    // Create modal:
+    const modal = new ModalBuilder()
+        .setCustomId(`bydiscordid`)
+        .setTitle('Handle an user by its Discord Id');
+
+    // Create the text input components
+    const discordIdText = new TextInputBuilder()
+        .setCustomId('discordid')
+        .setLabel('Discord ID') // The label is the prompt the user sees for this input
+        .setStyle(TextInputStyle.Short) // Short means only a single line of text
+        .setValue("")
+        .setRequired(true)
+        .setPlaceholder('The user\'s Discord Id');
+
+    const discordIdActionRow = new ActionRowBuilder().addComponents(discordIdText);
+
+    // Add inputs to the modal
+    modal.addComponents(discordIdActionRow);
+
+    return { modal, interaction};
+}
+
+
+/**
  * Gets the input text from the selected message. If message is null, it returns empty.
  * @param {MessageContextMenuCommandInteraction | UserContextMenuCommandInteraction} interaction
  * @returns string
@@ -322,7 +352,9 @@ const getInputText = (interaction) => {
  * @param {MessageContextMenuCommandInteraction | UserContextMenuCommandInteraction} interaction 
  * @returns string, string, string, number
  */
-const getGuildChannelMessageAndTarget = (interaction) => {
+const 
+
+getGuildChannelMessageAndTarget = (interaction) => {
     const guild 			= interaction.targetMessage ? interaction.targetMessage.guildId : 0;
     const channel 			= interaction.targetMessage ? interaction.targetMessage.channelId : 0;
     const messageId 		= interaction.targetMessage ? interaction.targetMessage.id : 0;
@@ -339,5 +371,6 @@ module.exports = {
     createBanModal,
     createUnbanModal,
     getGuildChannelMessageAndTarget,
-    createReplyAsBloonModal
+    createReplyAsBloonModal,
+    createByDiscordIdModal
 };
