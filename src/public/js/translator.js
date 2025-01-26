@@ -72,4 +72,6 @@ const getCurrentLanguage = () => {
     return language;
 }
 
-translate();
+window.addEventListener('load', function () {
+    translate();
+})
