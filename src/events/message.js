@@ -41,6 +41,7 @@ const evnt = {
             // All messages should be lower case to be processed
             message.content = message.content.toLowerCase();
 
+            /*
             // Is this message in a moderation thread?
             const channelName = message.channel.name;
             if (channelName.toLowerCase().includes("moderation for user id: ")){
@@ -54,8 +55,7 @@ const evnt = {
                     console.log(`Non allowed person posted on ${channelName}, deleting.`);
                 }
             }
-
-            // Is this message from a mod or the person the thread is for?
+            */
 
             // Check if it's spam or +18 - Instantly delete if it mentions everyone && the user doesn't have the mod/hiddenManager/aug role
             if (message.content.match(regSpam)?.length > 1 && !message.content.includes('tenor.com') || message.mentions.everyone){ // exclude tenor.com to avoid false positives, maybe.
