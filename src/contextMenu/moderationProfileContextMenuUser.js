@@ -27,7 +27,10 @@ module.exports = {
 			// Log for admin
 			console.log(`User context menu action: '${this.data.name}' by ${interaction.member.user.tag} (${interaction.member.user.id})`);
 
-            await interaction.deferReply({ ephemeral: true }); // This makes it so it can take more than 3 seconds to reply.
+            // So it can survive when called from byDiscordId.js
+            if (!interaction.deferred){
+                await interaction.deferReply({ ephemeral: true }); // This makes it so it can take more than 3 seconds to reply.
+            }
 
 			const { selectedUserId } = getGuildChannelMessageAndTarget(interaction);
 
@@ -86,6 +89,13 @@ module.exports = {
             // Get log of actions of a user
             let     currentActionIndex      = 0;
             const   moderationProfile       = await storedProcedures.moderationAction_Profile(selectedUserId);
+
+            // If the moderation profile is not empty, find the account name
+            if (moderationProfile.length > 0){
+                const moderatedAccount = await interaction.client.users.fetch(selectedUserId);
+                moderationProfile[0].username = moderatedAccount.username
+            }
+            
             const   moderationProfileEmbeds = await bloonUtils.loadModerationProfileEmbeds(moderationProfile);
             let     moderationHistoryEmbed  = bloonUtils.getModerationProfileEmbed(0, moderationProfileEmbeds, previousButton, nextButton);
 
