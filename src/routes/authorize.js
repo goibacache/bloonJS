@@ -26,12 +26,17 @@ router.post('/', async (req, res) => {
 
     const userData = await bloonUtils.discordApiRequest('users/@me', tokenType, accessToken);
     if (userData === null) {
+      console.log(`When2Bloon: Couldn't get your discord profile information.`);
       return res.end(bloonUtils.match_createJsonResError("Couldn't get your discord profile information."));
     }
 
     // Load all servers
     const userServers = await bloonUtils.discordApiRequest('users/@me/guilds', tokenType, accessToken);
     if (userServers === null) {
+
+      
+
+      console.log(`When2Bloon: Couldn't load server list from discord. User ${userData.global_name} (${userData.id})`);
       return res.end(bloonUtils.match_createJsonResError("There was a problem getting your server list from Discord."));
     }
 
@@ -39,11 +44,13 @@ router.post('/', async (req, res) => {
     // Check if user in the ICL server
     if (!userServers.some(x => x.id === ICLDiscordServerId)) {
 
+      console.log(`When2Bloon: User not on SBG server, checking external users. User ${userData.global_name} (${userData.id})`);
       // Check on external user database table
       const externalUser = await match_GetExternalUser(userData.id);
 
       // If user doesn't exists in external database, sorry.
       if (externalUser == null || externalUser.length == 0){
+        console.log(`When2Bloon: User is not an external user, can't proceed. User ${userData.global_name} (${userData.id})`);
         // Create self-signed JWT token used in the external request page
         const externalUserData = jwt.sign({
           id: userData.id,
@@ -68,6 +75,7 @@ router.post('/', async (req, res) => {
       }
 
       if (externalUser[0].UserDiscordTeamRoleId == null || externalUser[0].UserDiscordTeamRoleId.length == 0){
+        console.log(`When2Bloon: User doesn't have any roles. User ${userData.global_name} (${userData.id})`);
         return res.end(bloonUtils.match_createJsonResError(`Sorry ${userData.global_name}, There are no roles in the ICL server associated to your account.`));
       }
 
@@ -82,6 +90,7 @@ router.post('/', async (req, res) => {
       // Get info from the ICL server
       discordServerProfile = await bloonUtils.discordApiRequest(`users/@me/guilds/${ICLDiscordServerId}/member`, tokenType, accessToken);
       if (discordServerProfile === null || discordServerProfile.code === 0) {
+        console.log(`When2Bloon: You're on the SBG server, but couldn't get the data. User ${userData.global_name} (${userData.id})`);
         return res.end(bloonUtils.match_createJsonResError(`Sorry ${userData.global_name}, You're in the ICL server, but I can get your information right now.`));
       }
     }
@@ -89,6 +98,7 @@ router.post('/', async (req, res) => {
     // At this point, all was ok, so it's time to delete the external user data used for the form if it exists.
     res.clearCookie("externalUserData");
 
+    console.log(`When2Bloon: Creating cookie. User ${userData.global_name} (${userData.id})`);
     // Create self-signed JWT token to save in localStorage
     const signedJwt = jwt.sign({
       id: userData.id,
@@ -107,11 +117,13 @@ router.post('/', async (req, res) => {
       Secure: true
     }
 
+    console.log(`When2Bloon: Assigning cookie. User ${userData.global_name} (${userData.id})`);
     res.cookie('jwt', signedJwt, cookieOptions);
 
     // Check if it has the hidden manager or league official role.
     let leagueOfficial = false;
     if (discordServerProfile.roles.some(x => x == config.role_HiddenManager || x == config.role_LeagueOfficial)) {
+      console.log(`When2Bloon: User is league official. User ${userData.global_name} (${userData.id})`);
       leagueOfficial = true;
     }
 
@@ -126,6 +138,7 @@ router.post('/', async (req, res) => {
       )
     );
   } catch (error) {
+    console.log(`When2Bloon: Error in authorize: ${error}`);
     return res.end(bloonUtils.match_createJsonResError(error));
   }
 });
