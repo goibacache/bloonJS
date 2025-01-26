@@ -29,7 +29,7 @@ const modalResponses 		= {};
 const client 				= new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildInvites], partials: [Partials.Channel, Partials.Reaction, Partials.Message] }); // Create a new client instance
 client.events 				= new Collection(); // Events handler list
 client.commands 			= new Collection(); // Command handler list
-client.contexMenuCommands	= new Collection(); // Command handler list
+client.contextMenuCommands	= new Collection(); // Command handler list
 client.cooldowns 			= new Collection();
 
 process.noDeprecation = true; // Stops the "ExperimentalWarning"
@@ -58,7 +58,7 @@ for (const file of commandFiles) {
 	const command = require(folderRoute);
 	console.log(`Loading context menu command ${file}`);
 	// Set a new item in the Collection with the key as the command name and the value as the exported module
-	client.contexMenuCommands.set(command.data.name, command);
+	client.contextMenuCommands.set(command.data.name, command);
 }
 
 commandsPath = 'modalResponse';
@@ -124,7 +124,7 @@ client.on(Events.InteractionCreate, async interaction => {
 	if (interaction.isChatInputCommand()){
 		command = interaction.client.commands.get(interaction.commandName);
 	}else{
-		command = interaction.client.contexMenuCommands.get(interaction.commandName);
+		command = interaction.client.contextMenuCommands.get(interaction.commandName);
 	}
 	
 
