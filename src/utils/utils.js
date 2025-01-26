@@ -413,7 +413,7 @@ const loadModerationProfileEmbeds = async (moderationProfile) => {
         moderationProfile.forEach((current, index) => {
             const roomEmbed = new EmbedBuilder()
                 .setColor(0x0099FF)
-                .setTitle(`Moderation profile`)
+                .setTitle(`${moderationProfile[0].username}'s moderation profile`)
                 .setTimestamp();
 
             roomEmbed.addFields({ name: `**Moderation resume**`, value: resume + "\n\n" }); // Header
