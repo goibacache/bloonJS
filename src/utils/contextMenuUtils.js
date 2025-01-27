@@ -297,7 +297,7 @@ const createByDiscordIdModal = (interaction) => {
     // Create modal:
     const modal = new ModalBuilder()
         .setCustomId(`bydiscordid`)
-        .setTitle('Handle an user by its Discord Id');
+        .setTitle('Handle a user by its Discord Id');
 
     // Create the text input components
     const discordIdText = new TextInputBuilder()
