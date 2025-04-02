@@ -1,4 +1,4 @@
-const { EmbedBuilder, ThreadAutoArchiveDuration, ChannelType } = require('discord.js');
+const { EmbedBuilder, ThreadAutoArchiveDuration, ChannelType, ForumChannel, ThreadChannel } = require('discord.js');
 const https = require('https');
 //#region initialization
 
@@ -476,11 +476,21 @@ const createOrFindModerationActionThread = async (client, name) => {
          * @type {ForumChannel}
          */
         const channel = await guild.channels.fetch(config.moderationActionForumChannel);
+
         /**
          * The thread text channel object
          * @type {ThreadChannel}
          */
-        let thread = await channel.threads.cache.find(x => x.name === name);
+        let thread = (await channel.threads.fetchArchived({cache: false})).threads.find(x => x.name === name);
+        if (thread.archived){
+            thread.setArchived(false);
+        }
+
+        // If it doesn't find it, search on the active
+        if (!thread){
+            thread = await (await channel.threads.fetchActive({cache: false})).threads.find(x => x.name === name);
+        }
+        
 
         // If null, create a new thread.
         if (!thread) {
