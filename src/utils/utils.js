@@ -488,7 +488,7 @@ const createOrFindModerationActionThread = async (client, name) => {
 
         // If it doesn't find it, search on the active
         if (!thread){
-            thread = await (await channel.threads.fetchActive({cache: false})).threads.find(x => x.name === name);
+            thread = (await channel.threads.fetchActive({cache: false})).threads.find(x => x.name === name);
         }
         
 
