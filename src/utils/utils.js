@@ -479,18 +479,40 @@ const createOrFindModerationActionThread = async (client, name) => {
 
         /**
          * The thread text channel object
-         * @type {ThreadChannel}
+         * @type {Collection<FetchedThreads>}
          */
-        let thread = (await channel.threads.fetchArchived({cache: false})).threads.find(x => x.name === name);
-        if (thread.archived){
-            thread.setArchived(false);
+        let thread = (await channel.threads.fetchActive({cache: false})).threads?.find(x => x.name === name); // Search actives first
+
+        // If you don't find it in the active ones, find in archived ones
+        if (!thread){
+            /**
+             * @type {import('discord.js').FetchedThreadsMore}
+             */
+            let threads = (await channel.threads.fetchArchived({cache: false, fetchAll: true}));
+            thread = threads.threads?.find(x => x.name === name);
+
+            while(threads.hasMore && !thread){
+                // Get min date from last fetch
+                const beforeDate = threads.threads.map(x => Math.min(x.archiveTimestamp)).reduce(function(prev, curr) {
+                    return prev < curr ? prev : curr;
+                });
+
+                threads = (await channel.threads.fetchArchived({cache: false, fetchAll: true, before: beforeDate}));
+                thread = threads.threads?.find(x => x.name === name);
+            }
         }
 
-        // If it doesn't find it, search on the active
-        if (!thread){
-            thread = (await channel.threads.fetchActive({cache: false})).threads.find(x => x.name === name);
+        if (thread){
+            // Unarchive
+            if (thread.archived){
+                await thread.setArchived(false);
+            }
+
+            // Unlock
+            if (thread.locked){
+                await thread.setLocked(false);
+            }
         }
-        
 
         // If null, create a new thread.
         if (!thread) {
