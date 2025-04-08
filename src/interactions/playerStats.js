@@ -10,6 +10,9 @@ const profileBase   = "./assets/profiles/";
 const width     = 500;
 const height    = 320;
 
+// Valid images (locally) for profile in case the image can't be fetched
+const images = ["Guard.png", "Intruder.png"];
+
 module.exports = {
 	cooldown: 60 * 5,
 	data: new SlashCommandBuilder()
@@ -69,24 +72,23 @@ module.exports = {
             ctx.textAlign = "left";
             ctx.textBaseline = "middle";
 
-            const player = await bloonUtils.getHTTPResult(`https://api.intruderfps.com/agents/${steamId}`);
+            const player = await bloonUtils.getHTTPResult(`https://api.intruderfps.com/agents/${steamId}`).catch(() => null);
 
             if (player == null){
-                await interaction.editReply({ content: 'No user found for that steam ID.', ephemeral: true });
+                await interaction.editReply({ content: 'No user found using the provided steam Id.', ephemeral: true });
                 return;
             }
 
-            const stats = await bloonUtils.getHTTPResult(`https://api.intruderfps.com/agents/${steamId}/stats`);
+            const stats = await bloonUtils.getHTTPResult(`https://api.intruderfps.com/agents/${steamId}/stats`).catch(() => null);
 
             if (stats == null){
-                await interaction.editReply({ content: 'No stats found for that steam ID.', ephemeral: true });
+                await interaction.editReply({ content: 'No stats found for the provided steam Id.', ephemeral: true });
                 return;
             }
             try {
                 await addImage(player.avatarUrl, ctx, 25, 65, 140, 140);    
             } catch (error) {
                 // Backup profile picture
-                const images = ["Guard.png", "Intruder.png"];
                 const imageIndex = Math.floor(Math.random() * images.length);
                 await addImage(`${profileBase}${images[imageIndex]}`, ctx, 25, 65, 140, 140);
             }
