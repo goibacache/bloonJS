@@ -6,11 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "eslint": "eslint --ext js",
-    "start": "node ./bin/www"
+    "start": "node ."
   },
   "dependencies": {
     "@discordjs/core": "^0.6.0",
-    "canvas": "^2.11.2",
+    "canvas": "^3.1.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "discord.js": "^14.11.0",
@@ -20,6 +20,7 @@
     "jsonwebtoken": "^9.0.2",
     "morgan": "~1.9.1",
     "mysql2": ">=3.9.4",
+    "node": "18.20.8",
     "pug": "^3.0.3"
   },
   "keywords": [],
