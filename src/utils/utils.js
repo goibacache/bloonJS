@@ -458,13 +458,14 @@ const resolveButtonState = (currentActionIndex, maxActionIndex, previousButton, 
 }
 
 /**
- * Creates a thread in the moderation action forum
+ * Makes thread only for SBG in the moderation action forum
  * @param {Client} client 
  * @returns {GuildForum}
  */
-const createOrFindModerationActionThread = async (client, name) => {
+const createOrFindModerationActionThread = async (client, userId) => {
 
     try {
+        const name = `Moderation for User ID: ${userId}`;
         const config = getConfig();
         /**
          * The guild object

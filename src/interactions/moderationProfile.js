@@ -20,11 +20,6 @@ module.exports = {
 		try{
 			console.log(`\nmoderationProfile.js: ${interaction.member.id}`);
 
-            // if (interaction.channelId != config.modChatChannel){
-            //     await interaction.reply( { ephemeral: true, content: "This command can only be used in #mod-chat" } );
-            //     return;
-            // }
-
 			await interaction.deferReply({ ephemeral: true }); // This makes it so it can take more than 3 seconds to reply.
 
             const target = interaction.options.getUser('target');

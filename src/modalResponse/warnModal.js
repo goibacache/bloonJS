@@ -72,7 +72,7 @@ module.exports = {
                 });
 
             // Create thread
-            const thread = await bloonUtils.createOrFindModerationActionThread(interaction.client, `Moderation for User ID: ${selectedUserId}`);
+            const thread = await bloonUtils.createOrFindModerationActionThread(interaction.client, selectedUserId);
 
             if (thread){
                 threadCreated = true;

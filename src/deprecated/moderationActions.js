@@ -353,7 +353,7 @@ const command = {
 
                     if (action != bloonUtils.moderationActions.Note){
                         // Thread
-                        const thread = await bloonUtils.createOrFindModerationActionThread(interaction.client, `Moderation for User ID: ${target.id}`);
+                        const thread = await bloonUtils.createOrFindModerationActionThread(interaction.client, target.id);
 
                         if (thread){
                             // "Loading" message

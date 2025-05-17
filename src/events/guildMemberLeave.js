@@ -1,10 +1,15 @@
 const { EmbedBuilder } = require('@discordjs/builders');
-const { Events, AuditLogEvent } = require('discord.js');
+const { Events, AuditLogEvent, GuildMember } = require('discord.js');
 const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 
 const evnt = {
     name: Events.GuildMemberRemove,
+	/**
+	 * 
+	 * @param {GuildMember} member 
+	 * @returns 
+	 */
 	async execute(member) {
 		try{
 			if (member.guild.id != config.bloonGuildId){

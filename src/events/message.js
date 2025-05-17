@@ -18,7 +18,7 @@ const   spamMessages = [
 ];
 const regWhoIs = new RegExp(/who('s|.is|.are).(.*)\?/g);
 const regAttch = RegExp(/\[att:.*\]/g);
-const regSpam = /\+(<![[:digit:]])?18(>![[:digit:]])??|\b18\b|\bnude?3?s?5?\b|\bna?4?ke?3?d\b|\bnitro\b|\bfre?3?e?3?\b|\bnft\b|\broblox\b|\bstea?4?m\b|\bdi?l?1?sco?0?rd(?!.com\/channels\/)\b|\ba?4?dul?1?ts?\b|cry?l?i?1?pto?0?\b|\bpro?0?mo?0?\b|\bbtc\b|\bo?0?nly ?fa?4?ns\b|@everyone\b|\bte?3?e?3?ns?\b|\ble?3?a?4?ks?\b|\bgift\b/gi;
+const regSpam = /\+(<![[:digit:]])?18(>![[:digit:]])??|\b18\b|\bnude?3?s?5?\b|\bna?4?ke?3?d\b|\bnitro\b|\bfre?3?e?3?\b|\bnft\b|\broblox\b|\bstea?4?m\b|\bdi?l?1?sco?0?rd(?!.com\/channels\/)\b|\ba?4?dul?1?ts?\b|cry?l?i?1?pto?0?\b|\bpro?0?mo?0?\b|\bbtc\b|\bo?0?nly ?fa?4?ns\b|@everyone\b|\bte?3?e?3?ns?\b|\ble?3?a?4?ks?\b|\bgift\b|[0-9]\$|\$[0-9]/gi;
 const regUrl = /(https?:\/\/)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z]{1,6}\b([-a-zA-Z@:%_+.~#?&//=]*)?/gi;
 
 const agentRole = config.role_Agent;
@@ -58,11 +58,11 @@ const evnt = {
             */
 
             // Check if it's spam or +18 - Instantly delete if it mentions everyone && the user doesn't have the mod/hiddenManager/aug role
-            if (message.content.match(regSpam)?.length > 1 && !message.content.includes('tenor.com') || message.mentions.everyone){ // exclude tenor.com to avoid false positives, maybe.
-                console.log("SPAM FILTER: Message appears to be spam");
-                // and if it has an URL then kill it
-                if (message.content.match(regUrl)?.length > 0 || message.mentions.everyone){
-                    console.log("SPAM FILTER: Message contains URL or mentions everyone");
+            if (message.content.match(regSpam)?.length > 1){ 
+                //console.log("SPAM FILTER: Message appears to be spam based on the SpamRegex");
+                // and if it has an URL or mentions everyone (and it's not tenor.com)
+                if ((message.content.match(regUrl)?.length > 0 || message.mentions.everyone) && !message.content.includes('tenor.com')){ // exclude tenor.com to avoid false positives
+                    console.log("SPAM FILTER: Message appears to be spam based on the SpamRegex & contains an URL or mentions everyone");
 
                     // Check if it's a mod or a hidden manager
                     /**
@@ -88,11 +88,11 @@ const evnt = {
                         /**
                          * @type { TextChannel }
                          */
-                        const modChatChannel = await message.guild.channels.fetch(config.alertsChannel);
+                        const alertsChannel = await message.guild.channels.fetch(config.alertsChannel);
                         /**
                          * @type { Message }
                          */
-                        await modChatChannel.send({
+                        await alertsChannel.send({
                             content: `🧐 It seems to me that the user <@${userWhoMentionedEveryone.id}> (${userWhoMentionedEveryone.user.tag}) is a compromised account. ${couldDelete ? 'The message was deleted' : 'The message couldn\'t be deleted'} ${couldTimeOut ? 'and the account was timed out for 5 minutes 🔥' : 'but the account couldn\'t be timed out 😭'}  for posting the following: ${messageResume}`,
                             embeds: []
                         });

@@ -8,3 +8,4 @@ config.develop.js
 src/canvasTest/
 src/localMemory/lastWikiEdit.bak
 src/localMemory/invites.bak
+src/localMemory/serversConfigs/*

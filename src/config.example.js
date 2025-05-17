@@ -4,8 +4,8 @@ module.exports = {
 	bloonGuildId: 					"your-guild-id",
 
 	rulesAndInfoChannel:			"your-news-and-info-channel",
-	intruderGeneralChannel:			"your-general-channel-id",
-	intruderHelpChannel:			"your-help-channel-id",
+	intruderGeneralChannel:			"your-general-channel-id", 		// Sends hi! message.
+	intruderHelpChannel:			"your-help-channel-id",			// Uses the /regex to see if it has to reply to msgs?
 	intruderMapmakingChannel:		"your-mapmaking-channel-id",
 	bloonCommandsChannel:			"your-bloon-commands-channel",
 	moderationActionsChannel:		"your-moderation-actions-channel",
@@ -14,7 +14,6 @@ module.exports = {
 	pugChannel:						"your-pug-channel",
 	bloonsideChannel:				"your-bloonside-channel",
 	bloonServerLogs:				"your-bloon-server-log",
-	modChatChannel:					"your-mod-chat-channel",
 	alertsChannel:					"your-alerts-channel",
 	moderationActionForumChannel:	"your-moderation-action-forum",
 

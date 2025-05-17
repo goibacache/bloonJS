@@ -2,6 +2,9 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js')
 const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 
+/**
+ * Only internal SBG use
+ */
 module.exports = {
 	cooldown: 0,
 	data: new SlashCommandBuilder()
