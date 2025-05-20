@@ -1,0 +1,63 @@
+GuildMemberAdd
+	· Role on join												- Boolean
+	· Role to assign on join									- Role
+					
+	· Guild member add welcome message							- Boolean
+	· Guild member add welcome message channel to send			- Channel
+	· Guild member add welcome message channel to save backup 	- Channel
+	
+GuildMemberRemove
+	· Log member leave											- Boolean	
+	· Log member leave channel									- Channel
+					
+GuildMemberUpdate				
+	· Log nickname changes										- Boolean
+	· Log nickname channel										- Channel
+					
+Message				
+	· Use regex SPAM protection									- Boolean
+	· SPAM ALERT channel										- Channel
+					
+	· Assign role on message									- Boolean
+	· Role to assign on message									- Role
+					
+	· Message regex WHOIS 										- Boolean
+					
+	· FAQ Regex (SBG)											- Boolean
+	· Regex valid channels										- Text (comma separated channels)
+					
+	· Send spam after messages									- Boolean
+	· Quantity of messages after spam							- Number
+					
+Message delete				
+	· Save message deletion logs 								- Boolean
+	· Save message channel to send								- Channel
+					
+MessageReactionAdd		
+	· Activate message reaction									- Boolean
+	· Message id to react										- Number
+	· Role to give on react										- Role
+					
+	· Remove reactions on moderation threads 					- Boolean
+	
+MessageReactionRemove
+	· I guess I should use the config above :v (1 & 2)
+	
+messageUpdate
+	· Log message updates										- Boolean
+	· Channel to send message updates 							- Channel
+					
+nowPlaying				
+	· Enable now playing roles									- Boolean
+	· LookingToPlayRole											- Role
+	· NowPlayingRole											- Role
+	· ActivityName												- String (Intruder)
+					
+NEW! Pool changes				
+	· Enable pooling for changes								- Boolean
+	· Url to pool												- Text
+	· Property to use as ID										- String 
+																		(ie: query.recentchanges.[each].rcid)
+																		(ie: items.[each].id.videoId)
+	· Channel to post new alert									- Channel
+																		

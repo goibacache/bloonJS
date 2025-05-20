@@ -4,10 +4,10 @@ const config            = bloonUtils.getConfig();
 const regexs            = require('../messageRegexs.js');
 const storedProcedures  = require('../utils/storedProcedures.js');
 // eslint-disable-next-line no-unused-vars
-const { Events, GuildMember, Message, TextChannel }        = require('discord.js');
+const { Events, GuildMember, Message, TextChannel, PermissionsBitField }        = require('discord.js');
 
 
-const   commands            = [".rule34"];
+//const   commands            = [".rule34"];
 let     messageCount        = 1;
 const   messageCountTrigger = 2000;
 const   spamMessages = [
@@ -41,22 +41,6 @@ const evnt = {
             // All messages should be lower case to be processed
             message.content = message.content.toLowerCase();
 
-            /*
-            // Is this message in a moderation thread?
-            const channelName = message.channel.name;
-            if (channelName.toLowerCase().includes("moderation for user id: ")){
-                const moderatedPerson = channelName.substring(24); // removes "Moderation for User ID: "
-
-                const userWhoTypedTheMessage = await message.guild.members.fetch(message.author.id);
-                const isMod = userWhoTypedTheMessage.roles.cache.filter(x => x == config.role_Mod).size > 0;
-
-                if (!(isMod || message.author.id == moderatedPerson || message.author.bot)){ // Not the moderated person, not a bot (bloon) and not a mod.
-                    await message.delete();
-                    console.log(`Non allowed person posted on ${channelName}, deleting.`);
-                }
-            }
-            */
-
             // Check if it's spam or +18 - Instantly delete if it mentions everyone && the user doesn't have the mod/hiddenManager/aug role
             if (message.content.match(regSpam)?.length > 1){ 
                 //console.log("SPAM FILTER: Message appears to be spam based on the SpamRegex");
@@ -70,11 +54,8 @@ const evnt = {
                      * @type {GuildMember}
                      */
                     const userWhoMentionedEveryone = await message.guild.members.fetch(message.author.id);
-                    const isMod = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Mod).size > 0;
-                    const isHiddenManager = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_HiddenManager).size > 0
-                    const isAug = userWhoMentionedEveryone.roles.cache.filter(x => x == config.role_Aug).size > 0
-                    //if (!(isMod || isHiddenManager || isAug)){
-                    if (isMod || isHiddenManager || isAug) {
+                    const userHasBanPermissions = userWhoMentionedEveryone.permissions.has(PermissionsBitField.Flags.BanMembers)
+                    if (userHasBanPermissions) {
                         console.log(`SPAM FILTER: Message was sent by trusted user.\nMessage: ${message.content}`)
                     }else{
                         // Delete, send message to mod channel and timeout user for 10 minutes
@@ -158,6 +139,8 @@ const evnt = {
             }
 
             // Handle regexs replies in the general / help & map making channels
+            isInChannel(message, config.intruderMapmakingChannel) || isInChannel(message, config.pugChannel) 
+
             if (isInChannel(message, config.intruderGeneralChannel) || isInChannel(message, config.intruderHelpChannel) || isInChannel(message, config.intruderMapmakingChannel) || isInChannel(message, config.pugChannel) ) {
                 regexs.forEach(reg => {
                     if(reg.regex.test(message)){
@@ -167,6 +150,7 @@ const evnt = {
                 });
             }
 
+            /*
             // Includes a command but not in the right channel.
             if (commands.includes(message.content.trim()) && !isInChannel(message, config.offTopicChannel)){
                 message.react("🚫");        // React
@@ -179,13 +163,14 @@ const evnt = {
                 message.reply({ content: 'https://www.youtube.com/watch?v=gb8wRhHZxNc' });  // Answer accordingly
                 return;
             }
+            */
 
             // Check if the message is NOT on PUG and count, if it gets to the message count trigger, then "spam"
             if (!isInChannel(message, config.pugChannel)){
                 messageCount++;
 
                 if (messageCount > messageCountTrigger){
-                    console.log(`Spam sent to intruder general: ${messageCount}`);
+                    console.log(`Spam sent to general channel: ${messageCount}`);
                     messageCount = 1;
                     const channel = message.guild.channels.cache.get(config.intruderGeneralChannel) || message.guild.channels.fetch(config.intruderGeneralChannel);
                     await channel.send({ content: getRandomSpamMessage() });

@@ -22,7 +22,6 @@ module.exports = {
 		.setName('setup')
 		.setDescription(`Setup bloon for server administrators`)
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator | PermissionFlagsBits.BanMembers)
-        .for
         .addSubcommand(subcommand => subcommand
                                         .setName(comandOptions.welcomeChannel.title)
                                         .setDescription(comandOptions.welcomeChannel.description)
@@ -32,8 +31,8 @@ module.exports = {
                                                         )
                         )
         .addSubcommand(subcommand => subcommand
-                                .setName(comandOptions.leaveChannel)
-                                .setDescription('Leave message text channel')
+                                .setName(comandOptions.leaveChannel.title)
+                                .setDescription(comandOptions.leaveChannel.description)
                                 .addChannelOption(option => option
                                                                 .setName('channel')
                                                                 .setDescription('The channel to setup')

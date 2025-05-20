@@ -11,12 +11,13 @@
 
 // Imports
 const { Client, Collection, Events, GatewayIntentBits, Partials } = require('discord.js');
-const fs 			= require('fs');
-const bloonUtils 	= require('./utils/utils.js');
-const config 		= bloonUtils.getConfig();
-const readline 		= require('readline');
-const { clearInterval } = require('timers');
-const { kofi_InsertOrUpdate } = require('./utils/storedProcedures.js');
+const fs 			            = require('fs');
+const bloonUtils 	            = require('./utils/utils.js');
+const storedProcedures 	        = require('./utils/storedProcedures.js');
+const config 		            = bloonUtils.getConfig();
+const readline 		            = require('readline');
+const { clearInterval }         = require('timers');
+const { kofi_InsertOrUpdate }   = require('./utils/storedProcedures.js');
 
 /**
  * @typedef {import('discord.js').TextChannel} TextChannel
@@ -31,6 +32,7 @@ client.events 				= new Collection(); // Events handler list
 client.commands 			= new Collection(); // Command handler list
 client.contextMenuCommands	= new Collection(); // Command handler list
 client.cooldowns 			= new Collection();
+client.serverConfigs		= new Collection();
 
 process.noDeprecation = true; // Stops the "ExperimentalWarning"
 
@@ -200,6 +202,14 @@ client.once(Events.ClientReady, async c => {
 
 // Log in to Discord with your client's token
 client.login(config.token);
+
+const loadServerConfigsAsync = async() => {
+    const serverConfigs = await storedProcedures.serverConfig_Get();
+    console.log(`📝 Server config: Loaded ${serverConfigs.length} server configs`);
+    client.serverConfigs = serverConfigs;
+}
+
+loadServerConfigsAsync();
 
 //#region functions
 function askQuestion(query) {

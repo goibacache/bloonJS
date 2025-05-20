@@ -1,18 +1,22 @@
-const fs 			    		= require('fs');
+//const fs 			    		= require('fs');
 const { EmbedBuilder } 			= require('@discordjs/builders');
 const { Events } 				= require('discord.js');
-const bloonUtils 				= require('../utils/utils.js');
-const config 					= bloonUtils.getConfig();
-const storedProcedures  		= require('../utils/storedProcedures.js');
+//const bloonUtils 				= require('../utils/utils.js');
+//const config 					= bloonUtils.getConfig();
+//const storedProcedures  		= require('../utils/storedProcedures.js');
+
+//const { ServerConfig } = require('../interfaces/ServerConfig.js');
 
 /**
   * @typedef {import('discord.js').ModalSubmitInteraction} ModalSubmitInteraction
   * @typedef {import('discord.js').Message} Message
   * @typedef {import('discord.js').Channel} Channel
   * @typedef {import('discord.js').User} User
+  * @typedef {import('discord.js').GuildMember} GuildMember
+  * @typedef {import('../interfaces/ServerConfig.js')} ServerConfig
  */
 
-const   fileRoute   = './localMemory/invites.bak';
+//const   fileRoute   = './localMemory/invites.bak';
 
 const evnt = {
     name: Events.GuildMemberAdd,
@@ -23,10 +27,22 @@ const evnt = {
 	 */
 	async execute(member) {
 		try{
-			if (member.guild.id != config.bloonGuildId){
-				console.log(`GuildMemberAdd ${member.user.id} is not joining the same guild as the bot.\nBloon's Guild: ${config.bloonGuildId} != ${member.guild.id}`);
+            /**
+             * The server config
+             * @type {ServerConfig}
+             */
+            const serverConfig = member.client.serverConfigs.find(x => x.ServerId == member.guild.id);
+            if (!serverConfig){
+                console.log(`GuildMemberAdd: No config found for guild ${member.guild.id} for user ${member.user.id}.`);
 				return;
-			}
+            }
+
+            console.log(`GuildMemberAdd: Using config of ${serverConfig.ServerId}`);
+
+            if (!serverConfig.GMA_AddWelcomeMessage){
+                console.log(`GuildMemberAdd: Config is setup to not to add welcome message. Guild ${member.guild.id} - User ${member.user.id}.`);
+                return;
+            }
 
 			// 28/02/2024 removed due to security concerns. Agent role will be added on first message.
 			/*
@@ -35,6 +51,11 @@ const evnt = {
 			member.roles.add(agentRole);    // Assign it
 			console.log(`GuildMemberAdd ${member.user.id}: Role added.`);
 			*/
+
+            if (serverConfig.GMA_AddWelcomeMessageChannel.length == 0 && serverConfig.GMA_AddWelcomeMessageChannelBackup.length == 0){
+                console.log(`GuildMemberAdd: Config does not have channels to post new member message. Guild ${member.guild.id} - User ${member.user.id}.`);
+                return;
+            }
 
 			// Welcome message
 			const avatarURL		= member.user.avatarURL();
@@ -51,73 +72,27 @@ const evnt = {
 			.setFooter({ text: `Account Created: ${dateJoined}` });
 
 			// Sends the embed into the General channel.
-			console.log(`GuildMemberAdd ${member.user.id}: Sending welcome message...`);
-			const generalChannel = await member.guild.channels.cache.get(config.intruderGeneralChannel) || member.guild.channels.fetch(config.intruderGeneralChannel);
-			const generalMessageChannel = await generalChannel.send({ embeds: [newUserEmbed] });
+			console.log(`GuildMemberAdd: Sending welcome message to first channel ${member.user.id}`);
+			const welcomeMessageChannel = await member.guild.channels.fetch(serverConfig.GMA_AddWelcomeMessageChannel+"");
+			const welcomeMessageChannelMessage = await welcomeMessageChannel.send({ embeds: [newUserEmbed] });
 
-			console.log(`GuildMemberAdd ${member.user.id}: Welcome message sent to general.`);
+			console.log(`GuildMemberAdd: ${member.user.id}: Welcome message sent to ${serverConfig.GMA_AddWelcomeMessageChannel}.`);
 
-			await generalMessageChannel.react("🐴");
+			const welcomeMessageBackupChannel = await member.guild.channels.fetch(serverConfig.GMA_AddWelcomeMessageChannelBackup+"");
+			await welcomeMessageBackupChannel.send({ embeds: [newUserEmbed] });
 
-			const bloonsideChannel = member.guild.channels.cache.get(config.bloonsideChannel) || member.guild.channels.fetch(config.bloonsideChannel);
-			await bloonsideChannel.send({ embeds: [newUserEmbed] });
-			console.log(`GuildMemberAdd ${member.user.id}: Welcome message sent to bloonside.`);
+			console.log(`GuildMemberAdd: Welcome message sent to backup channel ${serverConfig.GMA_AddWelcomeMessageChannelBackup}.`);
 
-			// Add message to server logs with invite code, if any.
-			const cachedInvites = new Map(JSON.parse(readPreviousInvites()));
-			const newInvites = await member.guild.invites.fetch({ cache: false });
-			const newInvitesFormatted = newInvites.map(x => ({ code: x.code, user: x.inviterId, uses: x.uses || 0}))
+            if (serverConfig.GMA_AddWelcomeMessageEmojiReaction.length > 0){
+                console.log(`Reacting to welcome message with ${serverConfig.GMA_AddWelcomeMessageEmojiReaction}`);
+                await welcomeMessageChannelMessage.react(serverConfig.GMA_AddWelcomeMessageEmojiReaction);
+            }
 
-			const inviteCode = newInvitesFormatted.find(newInvite => cachedInvites.get(newInvite.code) < newInvite.uses);
-
-			// Send invite to server log
-			if (inviteCode != undefined){
-				const serverLogs = member.guild.channels.cache.get(config.bloonServerLogs) || member.guild.channels.fetch(config.bloonServerLogs);
-
-				// Check if we have the invite code logged in DDBB
-				const savedInviteData = await storedProcedures.invite_Get(inviteCode.code);
-
-				let message = '';
-
-				if (savedInviteData == null || savedInviteData.length == 0){
-					message = `🗃 <@${member.user.id}> (${member.user.username}) appears to have used the invite code: \`${inviteCode.code}\``;
-				}else{
-					message = `🗃 <@${member.user.id}> (${member.user.username}) appears to have used the invite code \`${inviteCode.code}\` created by <@${savedInviteData[0].InviterDiscordId}> (${savedInviteData[0].InviterDiscordName})`;
-				}
-
-				message += `\nPlease take this info with a grain of salt, this info is not 100% consistent, specially if two people joined at the same time.`;
-
-				await serverLogs.send({ content: message, allowedMentions: { parse: [] } });
-			}
-			
-			// Finally, update the invites to the new state.
-			const mapOfInvites = new Map();
-            newInvites.map(x => mapOfInvites.set(x.code, x.uses || 0))
-            SaveInvites(JSON.stringify(Array.from(mapOfInvites.entries())));
 		}catch(error){
 			console.error("Error in guildMemberAdd.js: " + error);
 		}
 	},
 };
-
-/**
- * Saves the invite list to local memory
- * @param {*} invites 
- */
-const SaveInvites = (invites) => {
-    fs.writeFileSync(fileRoute, invites+""); // Write new value
-}
-
-const readPreviousInvites = () => {
-    // Read from file 
-    if (fs.existsSync(fileRoute)){
-        const data = fs.readFileSync(fileRoute, { encoding: 'utf8', flag: 'r' });
-        return data;
-    }else{
-        // It's just 0
-        return 0;
-    }
-}
 
 module.exports = {
 	evnt

@@ -3,6 +3,30 @@ const mysql = require('mysql2/promise');
 const config = bloonUtils.getConfig();
 const runArgs = bloonUtils.getRunArgs();
 
+const serverConfig_Get = async(serverId = null) => {
+    let connection;
+    const query = `CALL serverConfig_Get(?)`;
+    try{
+        connection = await createConnection();
+
+        const [rows] = await connection.execute(query, [serverId]);
+
+        await connection.unprepare(query);
+
+        await connection.release();
+
+        return rows[0]; 
+
+    }catch(error){
+        if (connection != null){
+            await connection.unprepare(query);
+            await connection.release();
+        }
+        console.error("Error in moderationAction_Insert: ", error);
+        return 0;
+    }
+}
+
 const moderationAction_Insert = async(moderationAction, banedUserDiscordId, banReason, handledByDiscordId, fullMessage = '') => {
     let connection;
     const query = `CALL moderationAction_Insert(?, ?, ?, ?, ?)`;
@@ -484,5 +508,6 @@ module.exports = {
     match_GetBasicAuthorization,
     match_ExternalUser_Create,
     invite_Insert,
-    invite_Get
+    invite_Get,
+    serverConfig_Get
 }
