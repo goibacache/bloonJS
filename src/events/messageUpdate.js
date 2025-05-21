@@ -34,10 +34,10 @@ const evnt = {
 
             console.log(`Message Updated: Using config of ${serverConfig.ServerName}/(${serverConfig.ServerId})`);
 
-			console.log(`Message updated by ${oldMessage.user.tag}: ${oldMessage.content} -> ${newMessage.content}`);
+			console.log(`Message updated by ${oldMessage.member.user.tag}: ${oldMessage.content} -> ${newMessage.content}`);
 
             if (!serverConfig.MU_LogMessageUpdates){
-                console.log(`Message updated: Config is setup to not to log message updates. ${serverConfig.ServerName}/${oldMessage.user.tag}.`);
+                console.log(`Message updated: Config is setup to not to log message updates. ${serverConfig.ServerName}/${oldMessage.member.user.tag}.`);
                 return;
             }
 			
