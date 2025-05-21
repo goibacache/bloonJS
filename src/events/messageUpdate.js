@@ -1,7 +1,8 @@
 // eslint-disable-next-line no-unused-vars
 const { Events, Message } = require('discord.js');
 const bloonUtils = require('../utils/utils.js');
-const config = bloonUtils.getConfig();
+// eslint-disable-next-line no-unused-vars
+const { ServerConfig }              = require('../interfaces/ServerConfig.js'); // Used so VSCODE can see the properties
 
 const evnt = {
     name: Events.MessageUpdate,
@@ -19,10 +20,26 @@ const evnt = {
 			if (newMessage.partial) newMessage = await newMessage.fetch();
 			if (newMessage.author.bot) return;
 			if (!newMessage.editedAt) return;
-			if (newMessage.guildId != config.bloonGuildId) return;
 			if (oldMessage == null || newMessage == null) return;
 
-			console.log(`Message updated: ${oldMessage.content} -> ${newMessage.content}`);
+            /**
+             * The server config
+             * @type {ServerConfig}
+             */
+            const serverConfig = oldMessage.client.serverConfigs.find(x => x.ServerId == oldMessage.guild.id);
+            if (!serverConfig){
+                console.log(`Message Updated: No config found for guild ${oldMessage.guild.id}`);
+                return;
+            }
+
+            console.log(`Message Updated: Using config of ${serverConfig.ServerName}/(${serverConfig.ServerId})`);
+
+			console.log(`Message updated by ${oldMessage.user.tag}: ${oldMessage.content} -> ${newMessage.content}`);
+
+            if (!serverConfig.MU_LogMessageUpdates){
+                console.log(`Message updated: Config is setup to not to log message updates. ${serverConfig.ServerName}/${oldMessage.user.tag}.`);
+                return;
+            }
 			
 			const messageLink = newMessage.url;
 
@@ -56,24 +73,54 @@ const evnt = {
 
 			const maxSize = 1500;
 			// Check for total content length. If its length is over ~1500 split message into various ones.
-			const channel = newMessage.guild.channels.cache.get(config.bloonServerLogs);
+			const channel = newMessage.guild.channels.cache.get(serverConfig.MU_ChannelToLogMessageUpdates);
 			if (oldMessageText.length > maxSize || newMessageText.length > maxSize || ((oldMessageText.length + newMessageText.length) > maxSize)){
 				const messages = [];
 				messages.push(`📝 New edit by <@${newMessage.author.id}> (${newMessage.author.username}) in ${messageLink}`);
 
 				// TODO: if it's just images (no text) don't add the textDecorator
 				if (oldMessageText.length + oldAttachments.length > maxSize){
-					messages.push(`_Old message:_${textDecorator}${oldMessageText.substring(0, maxSize)}${textDecorator}`);
-					messages.push(`_Old message (cont):_${textDecorator}${oldMessageText.substring(maxSize, oldMessageText.length)}${textDecorator}${oldAttachments}`);
+
+                    let oldMessageFormatted = oldMessageText.substring(0, maxSize);
+                    if (oldMessageFormatted.length > 0){
+                        oldMessageFormatted = `${textDecorator}${oldMessageFormatted}${textDecorator}`;
+                    }
+
+                    let oldMessageFormattedPartTwo = oldMessageText.substring(maxSize, oldMessageText.length);
+                    if (oldMessageFormattedPartTwo.length > 0){
+                        oldMessageFormattedPartTwo = `${textDecorator}${oldMessageFormattedPartTwo}${textDecorator}`;
+                    }
+
+					messages.push(`_Old message:_${oldMessageFormatted}`);
+					messages.push(`_Old message (cont):_${oldMessageFormattedPartTwo}${oldAttachments}`);
 				}else{
-					messages.push(`_Old message:_${textDecorator}${oldMessageText}${textDecorator}${oldAttachments}`);
+                    let oldMessageFormatted = oldMessageText;
+                    if (oldMessageFormatted.length > 0){
+                        oldMessageFormatted = `${textDecorator}${oldMessageFormatted}${textDecorator}`
+                    }
+					messages.push(`_Old message:_${oldMessageFormatted}${oldAttachments}`);
 				}
 
 				if (newMessageText.length + newAttachments.length > maxSize){
-					messages.push(`_New message:_${textDecorator}${newMessageText.substring(0, maxSize)}${textDecorator}`);
-					messages.push(`_New message (cont):_${textDecorator}${newMessageText.substring(maxSize, newMessageText.length)}${textDecorator}${newAttachments}`);
+
+                    let newMessageFormatted = newMessageText.substring(0, maxSize);
+                    if (newMessageFormatted.length > 0){
+                        newMessageFormatted = `${textDecorator}${newMessageFormatted}${textDecorator}`;
+                    }
+
+                    let newMessageFormattedPartTwo = newMessageText.substring(maxSize, newMessageText.length);
+                    if (newMessageFormattedPartTwo.length > 0){
+                        newMessageFormattedPartTwo = `${textDecorator}${newMessageFormattedPartTwo}${textDecorator}`;
+                    }
+
+					messages.push(`_New message:_${newMessageFormatted}`);
+					messages.push(`_New message (cont):_${newMessageFormattedPartTwo}${newAttachments}`);
 				}else{
-					messages.push(`_New message:_${textDecorator}${newMessageText}${textDecorator}${newAttachments}`);
+                    let newMessageFormatted = newMessageText;
+                    if (newMessageFormatted.length > 0){
+                        newMessageFormatted = `${textDecorator}${newMessageFormatted}${textDecorator}`;
+                    }
+					messages.push(`_New message:_${newMessageFormatted}${newAttachments}`);
 				}
 				
 				messages.forEach(async message => {
