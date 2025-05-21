@@ -22,7 +22,7 @@ const evnt = {
 				return;
             }
 
-            console.log(`GuildMemberRemove: Using config of ${serverConfig.ServerName} (${serverConfig.ServerId})`);
+            //console.log(`GuildMemberRemove: Using config of ${serverConfig.ServerName} (${serverConfig.ServerId})`);
 
             // (1) Check if log is enabled
             if (!serverConfig.GMR_LogMemberLeave){

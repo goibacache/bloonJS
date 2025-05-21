@@ -28,7 +28,7 @@ const evnt = {
                 return;
             }
 
-            console.log(`Message deleted: Using config of ${serverConfig.ServerName} (${serverConfig.ServerId})`);
+            //console.log(`Message deleted: Using config of ${serverConfig.ServerName} (${serverConfig.ServerId})`);
 
             if (!serverConfig.MD_SaveMessageDeletionLogs && !serverConfig.MD_MessageDeletionLogsChannel){
                 console.log(`Message deleted: Config does not have the setting to save message deletion logs. ${serverConfig.ServerName}.`);

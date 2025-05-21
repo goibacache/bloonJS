@@ -27,7 +27,7 @@ const evnt = {
                 return;
             }
 
-            console.log(`Presence Update: Using config of ${serverConfig.ServerName}/(${serverConfig.ServerId})`);
+            //console.log(`Presence Update: Using config of ${serverConfig.ServerName}/(${serverConfig.ServerId})`);
             
             if (!serverConfig.NP_EnableNowPlayingRoles && !serverConfig.NP_LookingToPlayRole && !serverConfig.NP_NowPlayingRole){
                 console.log(`Presence Update: No config found for guild ${oldPresence.guild.id}`);

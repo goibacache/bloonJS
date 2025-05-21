@@ -43,7 +43,7 @@ const evnt = {
                 return;
             }
 
-            console.log(`Message: Using config of ${serverConfig.ServerName} (${serverConfig.ServerId})`);
+            //console.log(`Message: Using config of ${serverConfig.ServerName} (${serverConfig.ServerId})`);
 
             // All messages should be lower case to be processed
             message.content = message.content.toLowerCase();

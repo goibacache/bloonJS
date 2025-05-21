@@ -32,7 +32,7 @@ const evnt = {
                 return;
             }
 
-            console.log(`Message Updated: Using config of ${serverConfig.ServerName}/(${serverConfig.ServerId})`);
+            //console.log(`Message Updated: Using config of ${serverConfig.ServerName}/(${serverConfig.ServerId})`);
 
 			console.log(`Message updated by ${oldMessage.member.user.tag}: ${oldMessage.content} -> ${newMessage.content}`);
 

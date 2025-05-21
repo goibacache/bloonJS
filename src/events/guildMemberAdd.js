@@ -32,7 +32,7 @@ const evnt = {
 				return;
             }
 
-            console.log(`GuildMemberAdd: Using config of ${serverConfig.ServerName} (${serverConfig.ServerId})`);
+            //console.log(`GuildMemberAdd: Using config of ${serverConfig.ServerName} (${serverConfig.ServerId})`);
 
             // (1) Assign role on join
             if (serverConfig.GMA_RoleOnJoin){

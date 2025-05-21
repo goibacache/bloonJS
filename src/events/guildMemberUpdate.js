@@ -28,7 +28,7 @@ const evnt = {
 				return;
             }
 
-            console.log(`GuildMemberUpdate: Using config of ${serverConfig.ServerName} (${serverConfig.ServerId})`);
+            //console.log(`GuildMemberUpdate: Using config of ${serverConfig.ServerName} (${serverConfig.ServerId})`);
 
             // (1) Check if log is enabled
             if (!serverConfig.GMU_LogNicknameChanges){

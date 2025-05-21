@@ -24,7 +24,7 @@ const evnt = {
                 return;
             }
 
-            console.log(`Reaction Add: Using config of ${serverConfig.ServerName}/(${serverConfig.ServerId})`);
+            //console.log(`Reaction Add: Using config of ${serverConfig.ServerName}/(${serverConfig.ServerId})`);
 
             if (serverConfig.MRA_RoleToToggleOnReact && serverConfig.MRA_MessageIdToReact){
                 if (reaction.message.id == serverConfig.MRA_MessageIdToReact){

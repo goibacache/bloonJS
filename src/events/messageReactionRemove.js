@@ -22,7 +22,7 @@ const evnt = {
                 return;
             }
 
-            console.log(`Reaction Remove: Using config of ${serverConfig.ServerName}/(${serverConfig.ServerId})`);
+            //console.log(`Reaction Remove: Using config of ${serverConfig.ServerName}/(${serverConfig.ServerId})`);
 
 
 			if (reaction.message.id == serverConfig.MRA_MessageIdToReact){
