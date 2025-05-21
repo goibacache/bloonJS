@@ -22,7 +22,31 @@ const serverConfig_Get = async(serverId = null) => {
             await connection.unprepare(query);
             await connection.release();
         }
-        console.error("Error in moderationAction_Insert: ", error);
+        console.error("Error in serverConfig_Get: ", error);
+        return 0;
+    }
+}
+
+const serverConfig_UpdateLastFetch = async(serverId, lastFetchedDate) => {
+let connection;
+    const query = `CALL serverConfig_UpdateLastFetch(?, ?)`;
+    try{
+        connection = await createConnection();
+
+        const [rows] = await connection.execute(query, [serverId, lastFetchedDate]);
+
+        await connection.unprepare(query);
+
+        await connection.release();
+
+        return rows[0]; 
+
+    }catch(error){
+        if (connection != null){
+            await connection.unprepare(query);
+            await connection.release();
+        }
+        console.error("Error in serverConfig_UpdateLastFetch: ", error);
         return 0;
     }
 }
@@ -509,5 +533,6 @@ module.exports = {
     match_ExternalUser_Create,
     invite_Insert,
     invite_Get,
-    serverConfig_Get
+    serverConfig_Get,
+    serverConfig_UpdateLastFetch
 }

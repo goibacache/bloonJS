@@ -36,9 +36,8 @@ client.serverConfigs		= new Collection();
 
 process.noDeprecation = true; // Stops the "ExperimentalWarning"
 
-let wikieditInterval = null;
-
-const wikiCheckInterval = 10;
+let pollChangeInterval = null;
+const pollCheckInterval = 10; // every 10 minutes
 
 //#region import interactions
 let commandsPath = 'interactions';
@@ -184,12 +183,9 @@ client.once(Events.ClientReady, async c => {
 	console.log(`Ready! Logged in as ${c.user.tag} 😎`);
 
 	// Every X minutes check the wiki for changes!
-	wikieditInterval = setInterval(() => {
-		client.emit("wikiedit", client);
-	}, (wikiCheckInterval * 60) * 1000);
-
-	// Save the invites to database
-	client.emit("invitesUpdate", client);
+	pollChangeInterval = setInterval(() => {
+		client.emit("pollChanges", client);
+	}, (pollCheckInterval * 60) * 1000);
 
 	// Giant loop to allow input
 	// eslint-disable-next-line no-constant-condition
@@ -368,17 +364,17 @@ async function handleCommands(command, client) {
 			guilds.leave();
 		}
 
-		if (command.startsWith("wiki")){
-			if (wikieditInterval == null){
-				console.log("wikiedit fetch started.")
+		if (command.startsWith("pollChanges")){
+			if (pollChangeInterval == null){
+				console.log("pollChanges fetch started.")
 				// Every X minutes check the wiki for changes!
-				wikieditInterval = setInterval(() => {
-					client.emit("wikiedit", client);
-				}, (wikiCheckInterval * 60) * 1000);
+				pollChangeInterval = setInterval(() => {
+					client.emit("pollChanges", client);
+				}, (pollCheckInterval * 60) * 1000);
 			}else{
-				console.log("wikiedit fetch stopped.")
-				clearInterval(wikieditInterval);
-				wikieditInterval = null;
+				console.log("pollChanges fetch stopped.")
+				clearInterval(pollChangeInterval);
+				pollChangeInterval = null;
 			}
 		}
 

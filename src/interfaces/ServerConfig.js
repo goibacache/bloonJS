@@ -38,9 +38,13 @@ export class ServerConfig {
     NP_ActivityName;
     PC_EnablePolling;
     PC_UrlToPoll;
+    PC_MinutesToPoll;
+    PC_PollType;
+    PC_WikiBaseUrl;
+    PC_YoutubeMessage;
     PC_PropertyTreeId;
     PC_ChannelToPostAlert;
-    PC_LastFetchedId;
+    PC_LastFetchedDate;
 
     constructor() {
         this.ServerId                               = "";
@@ -81,8 +85,12 @@ export class ServerConfig {
         this.NP_ActivityName                        = "";
         this.PC_EnablePolling                       = false;
         this.PC_UrlToPoll                           = "";
+        this.PC_MinutesToPoll                       = 5;
+        this.PC_PollType                            = "wiki" || "youtube";
+        this.PC_WikiBaseUrl                         = "";
+        this.PC_YoutubeMessage                      = "";
         this.PC_PropertyTreeId                      = "";
         this.PC_ChannelToPostAlert                  = "";
-        this.PC_LastFetchedId                       = "";
+        this.PC_LastFetchedDate                     = new Date();
     }
 }
