@@ -4,15 +4,21 @@ const { ServerConfig }              = require('../interfaces/ServerConfig.js'); 
 
 const evnt = {
     name: Events.MessageReactionRemove,
+    /**
+     * 
+     * @param {ReactionManager} reaction 
+     * @param {GuildMember} user 
+     * @returns 
+     */
 	async execute(reaction, user) {
 		try{
             /**
              * The server config
              * @type {ServerConfig}
              */
-            const serverConfig = reaction.client.serverConfigs.find(x => x.ServerId == reaction.guild.id);
+            const serverConfig = reaction.client.serverConfigs.find(x => x.ServerId == reaction.message.guild.id);
             if (!serverConfig){
-                console.log(`Reaction Remove: No config found for guild ${reaction.guild.id} for removing reaction.`);
+                console.log(`Reaction Remove: No config found for guild ${reaction.message.guild.id} for removing reaction.`);
                 return;
             }
 

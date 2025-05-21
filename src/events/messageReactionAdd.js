@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-const { Events, ReactionManager, GuildMember, PermissionFlagsBits } = require('discord.js');
+const { Events, ReactionManager, GuildMember, PermissionFlagsBits, ReactionEmoji } = require('discord.js');
 // eslint-disable-next-line no-unused-vars
 const { ServerConfig }              = require('../interfaces/ServerConfig.js'); // Used so VSCODE can see the properties
 
@@ -18,9 +18,9 @@ const evnt = {
              * The server config
              * @type {ServerConfig}
              */
-            const serverConfig = reaction.client.serverConfigs.find(x => x.ServerId == reaction.guild.id);
+            const serverConfig = reaction.client.serverConfigs.find(x => x.ServerId == reaction.message.guild.id);
             if (!serverConfig){
-                console.log(`Reaction Add: No config found for guild ${reaction.guild.id} for adding reaction.`);
+                console.log(`Reaction Add: No config found for guild ${reaction.message.guild.id} for adding reaction.`);
                 return;
             }
 
