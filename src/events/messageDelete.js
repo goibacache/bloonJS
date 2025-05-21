@@ -1,16 +1,39 @@
-const { Events, AuditLogEvent } = require('discord.js');
+// eslint-disable-next-line no-unused-vars
+const { Events, AuditLogEvent, Message } = require('discord.js');
 const bloonUtils = require('../utils/utils.js');
-const config = bloonUtils.getConfig();
+// eslint-disable-next-line no-unused-vars
+const { ServerConfig }              = require('../interfaces/ServerConfig.js'); // Used so VSCODE can see the properties
 
 const evnt = {
     name: Events.MessageDelete,
+    /**
+     * 
+     * @param {Message} message 
+     * @returns 
+     */
 	async execute(message) {
 		try{
-			if (message.guildId != config.bloonGuildId) return;
 			if (message.author?.bot) return;
 			if (message.content == null) return; // Just a stupid fix for when the bot was not present
 
-			console.log("Message id " + message.id + " deleted:", message.content);
+			console.log("Message deleted: id " + message.id + " deleted:", message.content);
+
+            /**
+             * The server config
+             * @type {ServerConfig}
+             */
+            const serverConfig = message.client.serverConfigs.find(x => x.ServerId == message.guild.id);
+            if (!serverConfig){
+                console.log(`Message deleted: No config found for guild ${message.guild.id} for message.`);
+                return;
+            }
+
+            console.log(`Message deleted: Using config of ${serverConfig.ServerName} (${serverConfig.ServerId})`);
+
+            if (!serverConfig.MD_SaveMessageDeletionLogs && !serverConfig.MD_MessageDeletionLogsChannel){
+                console.log(`Message deleted: Config does not have the setting to save message deletion logs. ${serverConfig.ServerName}.`);
+                return;
+            }
 
 			// Fetch a couple audit logs than just one as new entries could've been added right after this event was emitted.
 			const fetchedLogs = await message.guild.fetchAuditLogs({
@@ -45,7 +68,7 @@ const evnt = {
 				attachments += `[${attachment.name}](<${attachment.proxyURL}>)	`
 			});
 
-			const channel = message.guild.channels.cache.get(config.bloonServerLogs);
+			const channel = await message.guild.channels.fetch(serverConfig.MD_MessageDeletionLogsChannel);
 			const deletedMessageTextLength = `${msg}${attachments}`.length;
 
 			const textDecorator = '```';

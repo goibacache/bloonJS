@@ -41,7 +41,7 @@ const evnt = {
                 return;
             }
 
-			console.log(`GuildMemberUpdate: Name updated from ${oldMember.nickname} to ${member.nickname}`)
+			console.log(`GuildMemberUpdate: Name updated from ${oldMember.nickname} to ${member.nickname}`);
 
 			// Fetch a couple audit logs than just one as new entries could've been added right after this event was emitted.
 			const fetchedLogs = await member.guild.fetchAuditLogs({

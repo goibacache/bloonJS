@@ -22,6 +22,7 @@ export class ServerConfig {
     M_SBGFaq;
     M_SBGFaqValidChannels;
     M_SendSpamAfterMessages;
+    M_SendSpamAfterMessagesChannel;
     M_QuantityOfMessagesAfterSpam;
     MD_SaveMessageDeletionLogs;
     MD_MessageDeletionLogsChannel;
@@ -64,6 +65,7 @@ export class ServerConfig {
         this.M_SBGFaq                               = false;
         this.M_SBGFaqValidChannels                  = "";
         this.M_SendSpamAfterMessages                = false;
+        this.M_SendSpamAfterMessagesChannel         = "";
         this.M_QuantityOfMessagesAfterSpam          = 2000;
         this.MD_SaveMessageDeletionLogs             = false;
         this.MD_MessageDeletionLogsChannel          = "";

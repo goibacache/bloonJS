@@ -1,5 +1,6 @@
 const { EmbedBuilder } 			= require('@discordjs/builders');
 const { Events } 				= require('discord.js');
+// eslint-disable-next-line no-unused-vars
 const { ServerConfig }          = require('../interfaces/ServerConfig.js'); // Used so VSCODE can see the properties
 
 /**
