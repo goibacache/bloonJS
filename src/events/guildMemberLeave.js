@@ -1,7 +1,5 @@
 const { EmbedBuilder }                          = require('@discordjs/builders');
 const { Events, AuditLogEvent }                 = require('discord.js');
-const bloonUtils                                = require('../utils/utils.js');
-const config                                    = bloonUtils.getConfig();
 // eslint-disable-next-line no-unused-vars
 const { ServerConfig }                          = require('../interfaces/ServerConfig.js'); // Used so VSCODE can see the properties
 
