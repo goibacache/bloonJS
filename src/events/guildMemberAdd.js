@@ -1,11 +1,6 @@
-//const fs 			    		= require('fs');
 const { EmbedBuilder } 			= require('@discordjs/builders');
 const { Events } 				= require('discord.js');
-//const bloonUtils 				= require('../utils/utils.js');
-//const config 					= bloonUtils.getConfig();
-//const storedProcedures  		= require('../utils/storedProcedures.js');
-
-//const { ServerConfig } = require('../interfaces/ServerConfig.js');
+const { ServerConfig }          = require('../interfaces/ServerConfig.js'); // Used so VSCODE can see the properties
 
 /**
   * @typedef {import('discord.js').ModalSubmitInteraction} ModalSubmitInteraction
@@ -13,7 +8,6 @@ const { Events } 				= require('discord.js');
   * @typedef {import('discord.js').Channel} Channel
   * @typedef {import('discord.js').User} User
   * @typedef {import('discord.js').GuildMember} GuildMember
-  * @typedef {import('../interfaces/ServerConfig.js')} ServerConfig
  */
 
 //const   fileRoute   = './localMemory/invites.bak';
@@ -37,23 +31,31 @@ const evnt = {
 				return;
             }
 
-            console.log(`GuildMemberAdd: Using config of ${serverConfig.ServerId}`);
+            console.log(`GuildMemberAdd: Using config of ${serverConfig.ServerName} (${serverConfig.ServerId})`);
 
+            // (1) Assign role on join
+            if (serverConfig.GMA_RoleOnJoin){
+                const joinRole = await member.guild.roles.fetch(serverConfig.GMA_RoleToAssignOnJoin); // Lookup the "agent" role
+                if (joinRole != null){
+                    const couldAddRole = await member.roles.add(joinRole).then(() => true).catch((error) => { console.log(error); return false; });    // Assign it
+                    if (couldAddRole){
+                        console.log(`GuildMemberAdd: Role added for user ${serverConfig.ServerName}/${member.user.tag}.`);
+                    }else{
+                        console.log(`GuildMemberAdd: Could not add role for user ${serverConfig.ServerName}/${member.user.tag}.`);
+                    }
+                }else{
+                    console.log(`GuildMemberAdd: Tried to add role for ${serverConfig.ServerName}/${member.user.tag}. Role was not found.`);
+                }
+            }
+
+            // (2) Add welcome message
             if (!serverConfig.GMA_AddWelcomeMessage){
-                console.log(`GuildMemberAdd: Config is setup to not to add welcome message. Guild ${member.guild.id} - User ${member.user.id}.`);
+                console.log(`GuildMemberAdd: Config is setup to not to add welcome message. ${serverConfig.ServerName}/${member.user.tag}.`);
                 return;
             }
 
-			// 28/02/2024 removed due to security concerns. Agent role will be added on first message.
-			/*
-			console.log(`GuildMemberAdd ${member.user.id}: Adding role...`);
-			const agentRole = await member.guild.roles.fetch(config.role_Agent); // Lookup the "agent" role
-			member.roles.add(agentRole);    // Assign it
-			console.log(`GuildMemberAdd ${member.user.id}: Role added.`);
-			*/
-
-            if (serverConfig.GMA_AddWelcomeMessageChannel.length == 0 && serverConfig.GMA_AddWelcomeMessageChannelBackup.length == 0){
-                console.log(`GuildMemberAdd: Config does not have channels to post new member message. Guild ${member.guild.id} - User ${member.user.id}.`);
+            if (!serverConfig.GMA_AddWelcomeMessageChannel && !serverConfig.GMA_AddWelcomeMessageChannelBackup){
+                console.log(`GuildMemberAdd: Config does not have channels to post new member message. ${serverConfig.ServerName}/${member.user.tag}.`);
                 return;
             }
 
@@ -71,21 +73,25 @@ const evnt = {
 			.setDescription(`**ID:** ${member.user.id}\n**Tag**: <@!${member.user.id}>`)
 			.setFooter({ text: `Account Created: ${dateJoined}` });
 
-			// Sends the embed into the General channel.
-			console.log(`GuildMemberAdd: Sending welcome message to first channel ${member.user.id}`);
-			const welcomeMessageChannel = await member.guild.channels.fetch(serverConfig.GMA_AddWelcomeMessageChannel+"");
-			const welcomeMessageChannelMessage = await welcomeMessageChannel.send({ embeds: [newUserEmbed] });
+			// Sends the embed into the main channel
+            if (serverConfig.GMA_AddWelcomeMessageChannel){
+                console.log(`GuildMemberAdd: Sending welcome message to main channel ${serverConfig.ServerName}/${serverConfig.GMA_AddWelcomeMessageChannel}`);
+                const welcomeMessageChannel = await member.guild.channels.fetch(serverConfig.GMA_AddWelcomeMessageChannel);
+                const welcomeMessageChannelMessage = await welcomeMessageChannel.send({ embeds: [newUserEmbed] });
 
-			console.log(`GuildMemberAdd: ${member.user.id}: Welcome message sent to ${serverConfig.GMA_AddWelcomeMessageChannel}.`);
+                console.log(`GuildMemberAdd: Welcome message sent to ${serverConfig.ServerName}/${serverConfig.GMA_AddWelcomeMessageChannel}.`);
 
-			const welcomeMessageBackupChannel = await member.guild.channels.fetch(serverConfig.GMA_AddWelcomeMessageChannelBackup+"");
-			await welcomeMessageBackupChannel.send({ embeds: [newUserEmbed] });
+                if (serverConfig.GMA_AddWelcomeMessageEmojiReaction.length > 0){
+                    console.log(`GuildMemberAdd: Reacting to welcome message on ${serverConfig.ServerName}/${serverConfig.GMA_AddWelcomeMessageEmojiReaction}`);
+                    await welcomeMessageChannelMessage.react(serverConfig.GMA_AddWelcomeMessageEmojiReaction);
+                }
+            }
 
-			console.log(`GuildMemberAdd: Welcome message sent to backup channel ${serverConfig.GMA_AddWelcomeMessageChannelBackup}.`);
+            if (serverConfig.GMA_AddWelcomeMessageChannelBackup && serverConfig.GMA_AddWelcomeMessageChannel != serverConfig.GMA_AddWelcomeMessageChannelBackup){
+                const welcomeMessageBackupChannel = await member.guild.channels.fetch(serverConfig.GMA_AddWelcomeMessageChannelBackup);
+                await welcomeMessageBackupChannel.send({ embeds: [newUserEmbed] });
 
-            if (serverConfig.GMA_AddWelcomeMessageEmojiReaction.length > 0){
-                console.log(`Reacting to welcome message with ${serverConfig.GMA_AddWelcomeMessageEmojiReaction}`);
-                await welcomeMessageChannelMessage.react(serverConfig.GMA_AddWelcomeMessageEmojiReaction);
+                console.log(`GuildMemberAdd: Welcome message sent to backup channel ${serverConfig.ServerName}/${serverConfig.GMA_AddWelcomeMessageChannelBackup}.`);
             }
 
 		}catch(error){
@@ -93,6 +99,7 @@ const evnt = {
 		}
 	},
 };
+
 
 module.exports = {
 	evnt

@@ -1,6 +1,7 @@
 export class ServerConfig {
 
     ServerId;
+    ServerName;
     GMA_RoleOnJoin;
     GMA_RoleToAssignOnJoin;
     GMA_AddWelcomeMessage;
@@ -12,6 +13,7 @@ export class ServerConfig {
     GMR_LogMemberLeaveChannelBackup;
     GMU_LogNicknameChanges;
     GMU_LogNicknameChangesChannel;
+    GMU_LogNicknameChangesChannelBackup;
     M_UseRegexSPAMProtection;
     M_RegexSPAMProtectionChannel;
     M_AssignRoleOnMessage;
@@ -41,6 +43,7 @@ export class ServerConfig {
 
     constructor() {
         this.ServerId                               = "";
+        this.ServerName                             = "";
         this.GMA_RoleOnJoin                         = false;
         this.GMA_RoleToAssignOnJoin                 = "";
         this.GMA_AddWelcomeMessage                  = false;
@@ -52,6 +55,7 @@ export class ServerConfig {
         this.GMR_LogMemberLeaveChannelBackup        = "";
         this.GMU_LogNicknameChanges                 = false;
         this.GMU_LogNicknameChangesChannel          = "";
+        this.GMU_LogNicknameChangesChannelBackup    = "";
         this.M_UseRegexSPAMProtection               = false;
         this.M_RegexSPAMProtectionChannel           = "";
         this.M_AssignRoleOnMessage                  = false;

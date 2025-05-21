@@ -1,6 +1,6 @@
-const { Events, AuditLogEvent } = require('discord.js');
-const bloonUtils = require('../utils/utils.js');
-const config = bloonUtils.getConfig();
+const { Events, AuditLogEvent }     = require('discord.js');
+// eslint-disable-next-line no-unused-vars
+const { ServerConfig }              = require('../interfaces/ServerConfig.js'); // Used so VSCODE can see the properties
 
 const evnt = {
     name: Events.GuildMemberUpdate,
@@ -12,15 +12,34 @@ const evnt = {
 	 */
 	async execute(oldMember, member) {
 		try{
-			if (member.guild.id != config.bloonGuildId){
-				console.log(`GuildMemberUpdate ${member.user.id} is not updating on the same guild as the bot.\nBloon's Guild: ${config.bloonGuildId} != ${member.guild.id}`);
-				return;
-			}
 
 			if (member.user.bot) return;
 			if (oldMember == null || member == null) return;
 			if (oldMember.nickname == null) return; // was before the bot was loaded?
 			if (oldMember.nickname == member.nickname) return; // Same name, don't care.
+
+            /**
+             * The server config
+             * @type {ServerConfig}
+             */
+            const serverConfig = member.client.serverConfigs.find(x => x.ServerId == member.guild.id);
+            if (!serverConfig){
+                console.log(`GuildMemberUpdate: No config found for guild ${member.guild.id} for user ${member.user.id}.`);
+				return;
+            }
+
+            console.log(`GuildMemberUpdate: Using config of ${serverConfig.ServerName} (${serverConfig.ServerId})`);
+
+            // (1) Check if log is enabled
+            if (!serverConfig.GMU_LogNicknameChanges){
+                console.log(`GuildMemberUpdate: Config is setup to not to log nickname changes. ${serverConfig.ServerName}/${member.user.tag}.`);
+                return;
+            }
+
+            if (!serverConfig.GMU_LogNicknameChangesChannel && !serverConfig.GMU_LogNicknameChangesChannelBackup){
+                console.log(`GuildMemberUpdate: Config does not have channels to post nickname changes. ${serverConfig.ServerName}/${member.user.tag}.`);
+                return;
+            }
 
 			console.log(`GuildMemberUpdate: Name updated from ${oldMember.nickname} to ${member.nickname}`)
 
@@ -47,16 +66,31 @@ const evnt = {
 
 			const textDecorator = "```";
 
-			const channel = member.guild.channels.cache.get(config.bloonServerLogs);
-			/**
-             * The guild object
-             * @type {Message}
-             */
-			await channel.send({ 
-				content: `📛 New nickname change ${wasItAMod}of <@${member.id}> (${member.user.username})\n\n_Old name_:${textDecorator}${oldMember.nickname ?? '[Default nickname]'}${textDecorator}\n_New name_:${textDecorator}${member.nickname ?? '[Default nickname]'}${textDecorator}\n\n`, 
-				allowedMentions: { parse: [] }
-			});
-			
+            // Main channel
+            if (serverConfig.GMU_LogNicknameChangesChannel){
+                const mainChannel = await member.guild.channels.fetch(serverConfig.GMU_LogNicknameChangesChannel);
+                /**
+                 * The guild object
+                 * @type {Message}
+                 */
+                await mainChannel.send({ 
+                    content: `📛 New nickname change ${wasItAMod}of <@${member.id}> (${member.user.username})\n\n_Old name_:${textDecorator}${oldMember.nickname ?? '[Default nickname]'}${textDecorator}\n_New name_:${textDecorator}${member.nickname ?? '[Default nickname]'}${textDecorator}\n\n`, 
+                    allowedMentions: { parse: [] }
+                });
+            }
+
+            // Backup
+            if (serverConfig.GMU_LogNicknameChangesChannelBackup && serverConfig.GMU_LogNicknameChangesChannel != serverConfig.GMU_LogNicknameChangesChannelBackup){
+                const backupChannel = await member.guild.channels.fetch(serverConfig.GMU_LogNicknameChangesChannelBackup);
+                /**
+                 * The guild object
+                 * @type {Message}
+                 */
+                await backupChannel.send({ 
+                    content: `📛 New nickname change ${wasItAMod}of <@${member.id}> (${member.user.username})\n\n_Old name_:${textDecorator}${oldMember.nickname ?? '[Default nickname]'}${textDecorator}\n_New name_:${textDecorator}${member.nickname ?? '[Default nickname]'}${textDecorator}\n\n`, 
+                    allowedMentions: { parse: [] }
+                });
+            }
 		}catch(error){
 			console.error("Error in GuildMemberUpdate.js: " + error);
 		}
