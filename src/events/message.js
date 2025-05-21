@@ -1,12 +1,12 @@
 const bloonUtils        = require('../utils/utils.js');
-const config            = bloonUtils.getConfig();
-
 const regexs            = require('../messageRegexs.js');
 const storedProcedures  = require('../utils/storedProcedures.js');
+
 // eslint-disable-next-line no-unused-vars
 const { Events, GuildMember, Message, TextChannel, PermissionsBitField }        = require('discord.js');
 // eslint-disable-next-line no-unused-vars
 const { ServerConfig }              = require('../interfaces/ServerConfig.js'); // Used so VSCODE can see the properties
+
 let     messageCount        = [];
 const   spamMessages = [
     `Want to support Bloon's development?\nWant to also have your custom answer when people ask bloon about you?\nYou can do both by clicking [here](https://ko-fi.com/bloon/commissions)`,
@@ -28,7 +28,8 @@ const evnt = {
      */
 	async execute(message) {
         try {
-            if (message.author.id === config.clientId || message.author.bot){
+            // Not reply to bots
+            if (message.author.bot){
                 return;
             }
 
@@ -166,7 +167,6 @@ const evnt = {
                 }
             }
             
-
             // Check if it gets to the message count trigger, then "spam"
             if (serverConfig.M_SendSpamAfterMessages && serverConfig.M_SendSpamAfterMessagesChannel){
                 if (messageCount[serverConfig.ServerId] == null){
