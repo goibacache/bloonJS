@@ -7,6 +7,9 @@
 	If you want to take this code and make your own code, go ahead!
 
 	If you find a bug, please tell me or make a PR :^)
+
+    Add your bot to your server using:
+    https://discord.com/api/oauth2/authorize?client_id=YOURID&permissions=1632222833894&scope=bot&applications.commands
 **************************************************************************/
 
 // Imports
@@ -37,7 +40,7 @@ client.serverConfigs		= new Collection();
 process.noDeprecation = true; // Stops the "ExperimentalWarning"
 
 let pollChangeInterval = null;
-const pollCheckInterval = 10; // every 10 minutes
+const pollCheckInterval = 1; // every minute. Every server has its own timer managed in poll
 
 //#region import interactions
 let commandsPath = 'interactions';
@@ -286,6 +289,29 @@ async function handleCommands(command, client) {
 
 			return;
 		}
+
+        if (command.startsWith("deploy")){
+            let args = command.split(" ");
+			if (args.length < 3){
+				console.log(`deploy> command needs at least 3 inputs. ie: 'deploy [guildId] [onlyPublicCommands bool]'`);
+				return;
+			}
+
+			if (args[1] == "0"){
+				console.log(`deploy> command needs a valid guild Id. ie: 'deploy [guildId] [onlyPublicCommands bool]'.`);
+				return;
+			}
+
+            if (args[2] == ""){
+				console.log(`deploy> command needs a valid [onlyPublicCommands bool] ie: 'deploy [guildId] 1'`);
+				return;
+			}
+
+            const guild = await client.guilds.fetch(args[1]); 
+            client.emit(Events.GuildCreate, guild, args[2]);
+			
+			return;
+        }
 
 		if (command.startsWith("fakejoin")){
 			let args = command.split(" ");
