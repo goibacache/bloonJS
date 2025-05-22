@@ -17,6 +17,7 @@ const comandOptions = {
 };
 
 module.exports = {
+    public: false,
     cooldown: 0,
 	data: new SlashCommandBuilder()
 		.setName('setup')

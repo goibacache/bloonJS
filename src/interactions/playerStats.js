@@ -14,6 +14,7 @@ const height    = 320;
 const images = ["Guard.png", "Intruder.png"];
 
 module.exports = {
+    public: false,
 	cooldown: 60 * 5,
 	data: new SlashCommandBuilder()
 		.setName('playerstats')

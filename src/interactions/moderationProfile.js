@@ -1,9 +1,9 @@
-const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle, ComponentType } = require('discord.js')
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle, ComponentType, MessageContextMenuCommandInteraction } = require('discord.js')
 const bloonUtils = require('../utils/utils.js');
-const config = bloonUtils.getConfig();
 const { moderationAction_Profile } = require('../utils/storedProcedures.js');
 
 module.exports = {
+    public: true,
 	cooldown: 5,
 	data: new SlashCommandBuilder()
 		.setName('moderationprofile')
@@ -16,6 +16,10 @@ module.exports = {
                 .setDescription('Discord user to check')
                 .setRequired(true)
         ),
+	/**
+	 * Executes the action
+	 * @param {MessageContextMenuCommandInteraction} interaction
+	 */
 	async execute(interaction) {
 		try{
 			console.log(`\nmoderationProfile.js: ${interaction.member.id}`);
@@ -28,7 +32,7 @@ module.exports = {
                 return;
             }
 
-            const res = await moderationAction_Profile(target.id);
+            const res = await moderationAction_Profile(target.id, interaction.guild.id);
 
             if (res.length == 0){
                 await interaction.editReply({ content: `There is no information about ${target.username} 😇 in the mod logs.` });

@@ -3,6 +3,7 @@ const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 
 module.exports = {
+    public: false,
 	cooldown: 30,
 	data: new SlashCommandBuilder()
 		.setName('wiki')

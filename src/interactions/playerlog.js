@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js')
 
 module.exports = {
+    public: false,
 	data: new SlashCommandBuilder()
 		.setName('playerlog')
 		.setDescription(`Shows the player log routes`),

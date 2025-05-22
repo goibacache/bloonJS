@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('discord.js')
 const { EmbedBuilder } = require('@discordjs/builders');
 
 module.exports = {
+    public: false,
 	cooldown: 15,
 	data: new SlashCommandBuilder()
 		.setName('help')

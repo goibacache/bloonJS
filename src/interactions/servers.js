@@ -23,6 +23,7 @@ regionsToEmojis["CN"]   = "./assets/svg/cn.svg";
 const lockEmoji         = "./assets/svg/lock.svg";
 
 module.exports = {
+    public: false,
 	cooldown: 60,
 	data: new SlashCommandBuilder()
 		.setName('servers')

@@ -40,6 +40,7 @@ const clearCachedLongerThanTimeStamp = () => {
 }
 
 module.exports = {
+    public: false,
 	cooldown: 60,
 	data: new SlashCommandBuilder()
 		.setName('stats')
