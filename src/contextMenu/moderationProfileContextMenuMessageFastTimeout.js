@@ -1,4 +1,4 @@
-const { ContextMenuCommandBuilder, ApplicationCommandType, PermissionFlagsBits } 	= require('discord.js');
+const { ContextMenuCommandBuilder, ApplicationCommandType, PermissionFlagsBits, MessageContextMenuCommandInteraction } 	= require('discord.js');
 const { createTimeoutModal } 	= require('../utils/contextMenuUtils.js');
 
 /**

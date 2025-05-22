@@ -85,7 +85,7 @@ module.exports = {
 
             // Get log of actions of a user
             let     currentActionIndex      = 0;
-            const   moderationProfile       = await storedProcedures.moderationAction_Profile(selectedUserId);
+            const   moderationProfile       = await storedProcedures.moderationAction_Profile(selectedUserId, interaction.guild.id);
             const   moderationProfileEmbeds = await bloonUtils.loadModerationProfileEmbeds(moderationProfile);
             let     moderationHistoryEmbed  = bloonUtils.getModerationProfileEmbed(0, moderationProfileEmbeds, previousButton, nextButton);
 

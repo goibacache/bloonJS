@@ -88,7 +88,7 @@ module.exports = {
 
             // Get log of actions of a user
             let     currentActionIndex      = 0;
-            const   moderationProfile       = await storedProcedures.moderationAction_Profile(selectedUserId);
+            const   moderationProfile       = await storedProcedures.moderationAction_Profile(selectedUserId, interaction.guild.id);
 
             // If the moderation profile is not empty, find the account name
             if (moderationProfile.length > 0){

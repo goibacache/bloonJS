@@ -51,13 +51,13 @@ let connection;
     }
 }
 
-const moderationAction_Insert = async(moderationAction, banedUserDiscordId, banReason, handledByDiscordId, fullMessage = '') => {
+const moderationAction_Insert = async(moderationAction, banedUserDiscordId, banReason, handledByDiscordId, fullMessage = '', serverId) => {
     let connection;
-    const query = `CALL moderationAction_Insert(?, ?, ?, ?, ?)`;
+    const query = `CALL moderationAction_Insert(?, ?, ?, ?, ?, ?)`;
     try{
         connection = await createConnection();
 
-        const [rows] = await connection.execute(query, [moderationAction.id, banedUserDiscordId, banReason, handledByDiscordId, fullMessage]);
+        const [rows] = await connection.execute(query, [moderationAction.id, banedUserDiscordId, banReason, handledByDiscordId, fullMessage, serverId]);
 
         await connection.unprepare(query);
 
@@ -75,13 +75,13 @@ const moderationAction_Insert = async(moderationAction, banedUserDiscordId, banR
     }
 }
 
-const moderationAction_GetNewId = async(moderationAction) => {
+const moderationAction_GetNewId = async(moderationAction, serverId) => {
     let connection;
-    const query = `CALL moderationAction_GetNewId(?)`;
+    const query = `CALL moderationAction_GetNewId(?, ?)`;
     try{
         connection = await createConnection();
     
-        const [rows] = await connection.execute(query, [moderationAction.id]);
+        const [rows] = await connection.execute(query, [moderationAction.id, serverId]);
 
         await connection.unprepare(query);
 
@@ -95,6 +95,29 @@ const moderationAction_GetNewId = async(moderationAction) => {
         }
         console.error("Error in moderationAction_GetNewId: ", error);
         return 0;
+    }
+}
+
+const moderationAction_Profile = async(_userId, _serverId) => {
+    let connection;
+    const query = `CALL moderationAction_Profile(?, ?)`;
+    try{
+        const connection = await createConnection();
+
+        const [rows] = await connection.execute(query, [_userId, _serverId]);
+
+        await connection.unprepare(query);
+
+        await connection.release();
+
+        return rows[0]; 
+    }catch(error){
+        if (connection != null){
+            await connection.unprepare(query);
+            await connection.release();
+        }
+        console.error("Error in moderationAction_Profile: ", error);
+        return null;
     }
 }
 
@@ -117,29 +140,6 @@ const kofi_GetKofiPhrase = async(_userName) => {
             await connection.release();
         }
         console.error("Error in kofiphrase_get: ", error);
-        return null;
-    }
-}
-
-const moderationAction_Profile = async(_userId) => {
-    let connection;
-    const query = `CALL moderationAction_Profile(?)`;
-    try{
-        const connection = await createConnection();
-
-        const [rows] = await connection.execute(query, [_userId]);
-
-        await connection.unprepare(query);
-
-        await connection.release();
-
-        return rows[0]; 
-    }catch(error){
-        if (connection != null){
-            await connection.unprepare(query);
-            await connection.release();
-        }
-        console.error("Error in moderationAction_Profile: ", error);
         return null;
     }
 }
@@ -519,9 +519,9 @@ const createConnection = async () => {
 module.exports = {
     moderationAction_Insert,
     moderationAction_GetNewId,
+    moderationAction_Profile,
     kofi_GetKofiPhrase,
     kofi_InsertOrUpdate,
-    moderationAction_Profile,
     match_GetInfo,
     match_GetDetails,
     match_GetAllMatches,

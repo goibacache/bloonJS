@@ -1,5 +1,7 @@
 const { EmbedBuilder, ThreadAutoArchiveDuration, ChannelType, ForumChannel, ThreadChannel } = require('discord.js');
 const https = require('https');
+// eslint-disable-next-line no-unused-vars
+const { ServerConfig } = require('../interfaces/ServerConfig.js');
 //#region initialization
 
 /**
@@ -458,25 +460,26 @@ const resolveButtonState = (currentActionIndex, maxActionIndex, previousButton, 
 }
 
 /**
- * Makes thread only for SBG in the moderation action forum
+ * 
  * @param {Client} client 
+ * @param {Number} userId 
+ * @param {ServerConfig} serverConfig 
  * @returns {GuildForum}
  */
-const createOrFindModerationActionThread = async (client, userId) => {
+const createOrFindModerationActionThread = async (client, userId, serverConfig) => {
 
     try {
         const name = `Moderation for User ID: ${userId}`;
-        const config = getConfig();
         /**
          * The guild object
          * @type {Guild}
          */
-        const guild = await client.guilds.fetch(config.bloonGuildId);
+        const guild = await client.guilds.fetch(serverConfig.ServerId);
         /**
          * The text channel object
          * @type {ForumChannel}
          */
-        const channel = await guild.channels.fetch(config.moderationActionForumChannel);
+        const channel = await guild.channels.fetch(serverConfig.MR_ForumChannel);
 
         /**
          * The thread text channel object

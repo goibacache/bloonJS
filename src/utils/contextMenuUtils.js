@@ -352,10 +352,8 @@ const getInputText = (interaction) => {
  * @param {MessageContextMenuCommandInteraction | UserContextMenuCommandInteraction} interaction 
  * @returns string, string, string, number
  */
-const 
-
-getGuildChannelMessageAndTarget = (interaction) => {
-    const guild 			= interaction.targetMessage ? interaction.targetMessage.guildId : 0;
+const getGuildChannelMessageAndTarget = (interaction) => {
+    const guild 			= interaction.targetMessage ? interaction.targetMessage.guildId : interaction.guild.id;
     const channel 			= interaction.targetMessage ? interaction.targetMessage.channelId : 0;
     const messageId 		= interaction.targetMessage ? interaction.targetMessage.id : 0;
     const selectedUserId 	= interaction.targetMessage ? interaction.targetMessage.author.id : interaction.targetUser.id;

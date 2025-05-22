@@ -45,6 +45,9 @@ export class ServerConfig {
     PC_PropertyTreeId;
     PC_ChannelToPostAlert;
     PC_LastFetchedDate;
+    MR_ModerationActionChannel;
+    MR_CreateThread;
+    MR_ForumChannel;
 
     constructor() {
         this.ServerId                               = "";
@@ -92,5 +95,8 @@ export class ServerConfig {
         this.PC_PropertyTreeId                      = "";
         this.PC_ChannelToPostAlert                  = "";
         this.PC_LastFetchedDate                     = new Date();
+        this.MR_ModerationActionChannel             = "";
+        this.MR_CreateThread                        = false;
+        this.MR_ForumChannel                        = "";
     }
 }

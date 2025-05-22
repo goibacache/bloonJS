@@ -1,7 +1,7 @@
 const bloonUtils        = require('../utils/utils.js');
-const config            = bloonUtils.getConfig();
 const storedProcedures  = require('../utils/storedProcedures.js');
-
+// eslint-disable-next-line no-unused-vars
+const { ServerConfig }              = require('../interfaces/ServerConfig.js'); // Used so VSCODE can see the properties
 /**
   * @typedef {import('discord.js').ModalSubmitInteraction} ModalSubmitInteraction
   * @typedef {import('discord.js').Message} Message
@@ -31,6 +31,15 @@ module.exports = {
             const   messageId           = interactionParts[3];
             const   selectedUserId      = interactionParts[4];
 
+            /**
+             * @type ServerConfig
+            */
+            const serverConfig = interaction.client.serverConfigs.find(x => x.ServerId == guildId);
+            if (!serverConfig){
+                await interaction.editReply({ content: `No config found for your server, sorry.` });
+                return;
+            }
+
             // Various returns
             let userUnbanned = false;
             let DMsent = false;
@@ -50,8 +59,8 @@ module.exports = {
              * @type {User}
              */
             const userToBeActedUpon         = await interaction.client.users.fetch(selectedUserId); // Get user outside of guild
-            const caseID                    = await storedProcedures.moderationAction_GetNewId(action);
-            const moderationActionChannel   = await interaction.member.guild.channels.fetch(config.moderationActionsChannel);
+            const caseID                    = await storedProcedures.moderationAction_GetNewId(action, guildId);
+            const moderationActionChannel   = await interaction.member.guild.channels.fetch(serverConfig.MR_ModerationActionChannel);
             const actionEmbed               = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, unbanText, interaction.member, null);
             
             if (caseID == 0) {
@@ -89,7 +98,7 @@ module.exports = {
                 });
             
             // Save it on the database
-            savedInDatabase = await storedProcedures.moderationAction_Insert(action, selectedUserId, unbanText, interaction.member.id)
+            savedInDatabase = await storedProcedures.moderationAction_Insert(action, selectedUserId, unbanText, interaction.member.id, guildId)
                 .then(() => true)
                 .catch((error) => {
                     console.log(`Error while saving in database: ${error}`);
@@ -106,14 +115,15 @@ module.exports = {
 
             
             // Thread
-            const thread = await bloonUtils.createOrFindModerationActionThread(interaction.client, selectedUserId);
+            const thread = await bloonUtils.createOrFindModerationActionThread(interaction.client, selectedUserId, serverConfig);
 
             if (thread){
                 threadCreated = true;
                 // "Loading" message
                 const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.tag})\n...` });
                 // Edit the message and mention all of the roles that should be included.
-                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.tag})\nSummoning: <@&${config.role_Mod}>...` })
+                // TODO: Figure out who to add (mods)
+                //await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.tag})\nSummoning: <@&${config.role_Mod}>...` })
                 // Finally send the message we really want to send...
                 await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.tag})\n${unbanText}`, embeds: [] });
             }

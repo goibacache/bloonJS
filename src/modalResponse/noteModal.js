@@ -60,7 +60,7 @@ module.exports = {
                                                         throw `Couldn't find that user on this server or on discord.`;
                                                     })
                                                 });
-            const caseID                    = await storedProcedures.moderationAction_GetNewId(action);
+            const caseID                    = await storedProcedures.moderationAction_GetNewId(action, guildId);
             const moderationActionChannel   = await interaction.member.guild.channels.fetch(config.moderationActionsChannel);
             const actionEmbed               = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, noteText, interaction.member, null, DMsent);
             
@@ -85,7 +85,7 @@ module.exports = {
             }
 
             // Save it on the database
-            savedInDatabase = await storedProcedures.moderationAction_Insert(action, selectedUserId, noteText, interaction.member.id, fullMessage)
+            savedInDatabase = await storedProcedures.moderationAction_Insert(action, selectedUserId, noteText, interaction.member.id, fullMessage, guildId)
                 .then(() => true)
                 .catch((error) => {
                     console.log(`Error while saving in database: ${error}`);
