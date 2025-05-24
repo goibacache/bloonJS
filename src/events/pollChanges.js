@@ -70,10 +70,17 @@ const evnt = {
                                  */
                                 const separatedPropertiesWhenReached = [...separatedPropertyTree];
                                 
+                                if (pollingServerConfig.PC_PollType == "youtube" && change.snippet.channelId != pollingServerConfig.PC_YoutubeChannelId){
+                                    console.log(`The youtube video found does not match the youtube channel Id`);
+                                    console.log(`url:`, pollingServerConfig.PC_UrlToPoll);
+                                    console.log(`change:`, change);
+                                    continue;
+                                }
+
                                 let currentChangeDate = new Date(GetRemainingProperties(change, separatedPropertiesWhenReached)); // Get the datetime
 
                                 // Update the latest update (to save it later)
-                                if (lastUpdateDate == undefined || lastUpdateDate < currentChangeDate){
+                                if (currentChangeDate != undefined && (lastUpdateDate == undefined || lastUpdateDate < currentChangeDate)){
                                     lastUpdateDate = currentChangeDate;
                                 }
 
@@ -110,7 +117,7 @@ const evnt = {
                                     }
 
                                     if (pollingServerConfig.PC_PollType == "youtube"){
-                                        await channel.send({ content: `${pollingServerConfig.PC_YoutubeMessage} ${change.snippet.title} https://youtu.be/${change.id.videoId}` });
+                                        await channel.send({ content: `${change.snippet.title} https://www.youtube.com/watch?v=${change.id.videoId}` });
                                         console.log(`new youtube change found ${change.id.videoId}`);
                                     }
                                 }
