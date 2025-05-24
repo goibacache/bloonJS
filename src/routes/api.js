@@ -107,35 +107,60 @@ router.post('/v1/createMatch', async (req, res) => {
     }
 });
 
-router.post('/v1/newVideo', async(req, res) => {
+router.get('/v1/PubSubSubscription', async(req, res) => {
+    try {
+        const challenge     = req.query["hub.challenge"];
+        const topic         = req.query["hub.topic"];
+        const mode          = req.query["hub.mode"];
+        const leaseSeconds  = req.query["hub.lease_seconds"];
+        const verifyToken   = req.query["hub.verify_token"];
+
+        console.log(`📶 PubSubSubscription: \nNew:          ${mode}\nTopic:        ${topic}\nChallenge:    ${challenge}\nLeaseSeconds: ${leaseSeconds}\nVerifyToken:  ${verifyToken}`);
+
+        if (verifyToken != config.PubSubHubbubToken){
+            console.log(`🚨 Verify token is not the same as the settings, cancelling subscription`);
+            return res.end();
+        }else{
+            console.log(`✅ Verify token is the same as the settings`);
+        }
+        
+        return res.end(challenge);
+    } catch (error) {
+        return res.end(bloonUtils.match_createJsonResError(error));
+    }
+});
+
+router.post('/v1/PubSubSubscription', async(req, res) => {
     try {
 
         const hook = req.query["hook"];
         const isUrl = hook.match(regUrl);
         if (!isUrl){
-            console.log(`newVideo: Hook is not an URL ${hook}`);
+            console.log(`PubSubSubscription: Hook is not an URL ${hook}`);
             return res.end();
         }
 
-        const youtubeVideoUrl = req.body.feed.entry[0].link[0]["$"].href;
-        const isYoutubeVideoUrl = youtubeVideoUrl ? youtubeVideoUrl.match(regUrl) : false;
-        if(!isYoutubeVideoUrl){
-            console.log(`newVideo: Youtube link is not an URL ${youtubeVideoUrl}`);
-            return res.end();
+        const entries = req.body.feed.entry;
+        for (const entry of entries) {
+            const youtubeVideoUrl = entry.link[0]["$"].href;
+            const isYoutubeVideoUrl = youtubeVideoUrl ? youtubeVideoUrl.match(regUrl) : false;
+            if(!isYoutubeVideoUrl){
+                console.log(`PubSubSubscription: Youtube link is not an URL ${youtubeVideoUrl}`);
+                return res.end();
+            }
+
+            console.log(`posting to discord: ${youtubeVideoUrl}`);
+            await fetch(hook, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ "content": youtubeVideoUrl })
+            });
         }
+        
 
-        console.log(`posting to discord: ${youtubeVideoUrl}`);
-        await fetch(hook, {
-            method: 'POST',
-              headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ "content": youtubeVideoUrl })
-        });
-
-        return res.end(
-            youtubeVideoUrl
-        );
+        return res.end();
 
     } catch (error) {
         return res.end(bloonUtils.match_createJsonResError(error));
