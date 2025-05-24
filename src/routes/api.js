@@ -7,6 +7,7 @@ const bloonUtils = require('../utils/utils.js');
 const config = bloonUtils.getConfig();
 const { match_CreateMatch, match_GetBasicAuthorization } = require('../utils/storedProcedures.js');
 
+const regUrl = /(https?:\/\/)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z]{1,6}\b([-a-zA-Z@:%_+.~#?&//=]*)?/gi;
 
 router.post('/v1/createMatch', async (req, res) => {
     try {
@@ -101,6 +102,41 @@ router.post('/v1/createMatch', async (req, res) => {
                 }
             )
         );
+    } catch (error) {
+        return res.end(bloonUtils.match_createJsonResError(error));
+    }
+});
+
+router.post('/v1/newVideo', async(req, res) => {
+    try {
+
+        const hook = req.query["hook"];
+        const isUrl = hook.match(regUrl);
+        if (!isUrl){
+            console.log(`newVideo: Hook is not an URL ${hook}`);
+            return res.end();
+        }
+
+        const youtubeVideoUrl = req.body.feed.entry[0].link[0]["$"].href;
+        const isYoutubeVideoUrl = youtubeVideoUrl ? youtubeVideoUrl.match(regUrl) : false;
+        if(!isYoutubeVideoUrl){
+            console.log(`newVideo: Youtube link is not an URL ${youtubeVideoUrl}`);
+            return res.end();
+        }
+
+        console.log(`posting to discord: ${youtubeVideoUrl}`);
+        await fetch(hook, {
+            method: 'POST',
+              headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ "content": youtubeVideoUrl })
+        });
+
+        return res.end(
+            youtubeVideoUrl
+        );
+
     } catch (error) {
         return res.end(bloonUtils.match_createJsonResError(error));
     }
