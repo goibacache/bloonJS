@@ -1,7 +1,10 @@
 const { SlashCommandBuilder, AttachmentBuilder } = require('discord.js')
 const bloonUtils = require('../utils/utils.js');
-const config = bloonUtils.getConfig();
+//const config = bloonUtils.getConfig();
 const { registerFont, createCanvas, Image } = require('canvas');
+
+// eslint-disable-next-line no-unused-vars
+const { ServerConfig }              = require('../interfaces/ServerConfig.js'); // Used so VSCODE can see the properties
 
 const backgroundSVG = "./assets/svg/BackgroundID.svg";
 const profileBase   = "./assets/profiles/";
@@ -26,12 +29,26 @@ module.exports = {
             .setMaxLength(17)
             .setMinLength(15)
         ),
+    /**
+     * 
+     * @param {import('discord.js').Interaction} interaction 
+     * @returns 
+     */
 	async execute(interaction) {
 		try{
-            if (interaction.channel.id != config.bloonCommandsChannel){
-				await interaction.reply({ content: 'This command can only be used in the Bloon Commands Channel!', ephemeral: true });
+            /**
+             * @type ServerConfig
+            */
+            const serverConfig = interaction.client.serverConfigs.find(x => x.ServerId == interaction.guild.id);
+            if (!serverConfig){
+                await interaction.reply({ content: `No config found for your server, sorry.` });
+                return;
+            }
+
+            if (interaction.channel.id != serverConfig.Interaction_Channel){
+				await interaction.reply({ content: 'This command can only be used in the interaction Channel!', ephemeral: true });
 				console.log(`playerStats.js: Interaction used in wrong channel.`);
-				return "noCooldown"; // Inmediatly remove cooldown
+				return "noCooldown"; // Immediately remove cooldown
 			}
 
 			console.log(`playerStats.js: ${interaction.member.id}`);

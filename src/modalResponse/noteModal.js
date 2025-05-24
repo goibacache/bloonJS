@@ -1,5 +1,4 @@
 const bloonUtils        = require('../utils/utils.js');
-const config            = bloonUtils.getConfig();
 const storedProcedures  = require('../utils/storedProcedures.js');
 
 /**
@@ -29,6 +28,15 @@ module.exports = {
             const   channelId           = interactionParts[2];
             const   messageId           = interactionParts[3];
             const   selectedUserId      = interactionParts[4];
+
+            /**
+             * @type ServerConfig
+            */
+            const serverConfig = interaction.client.serverConfigs.find(x => x.ServerId == guildId);
+            if (!serverConfig){
+                await interaction.editReply({ content: `No config found for your server, sorry.` });
+                return;
+            }
 
             // Various returns
             let DMsent = null; // No DM on notes.
@@ -61,7 +69,7 @@ module.exports = {
                                                     })
                                                 });
             const caseID                    = await storedProcedures.moderationAction_GetNewId(action, guildId);
-            const moderationActionChannel   = await interaction.member.guild.channels.fetch(config.moderationActionsChannel);
+            const moderationActionChannel   = serverConfig.MR_ModerationActionChannel != null ? await interaction.member.guild.channels.fetch(serverConfig.MR_ModerationActionChannel) : null;
             const actionEmbed               = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, noteText, interaction.member, null, DMsent);
             
             if (caseID == 0) {
@@ -92,15 +100,17 @@ module.exports = {
                     return false;
                 });
 
-            // Write the moderation action in the chat to log it in the database
-            sentInEvidence = await moderationActionChannel.send({ 
-                content: `Note for <@${userToBeActedUpon.id}> (${userToBeActedUpon.user ? userToBeActedUpon.user.tag : userToBeActedUpon.tag})`,
-                embeds: [actionEmbed]
-            }).then(() => true)
-            .catch((error) => {
-                console.log(`Error while sending to the evidence channel: ${error}`);
-                return false;
-            });
+            if (serverConfig.MR_ModerationActionChannel && moderationActionChannel != null){
+                // Write the moderation action in the chat to log it in the database
+                sentInEvidence = await moderationActionChannel.send({ 
+                    content: `Note for <@${userToBeActedUpon.id}> (${userToBeActedUpon.user ? userToBeActedUpon.user.tag : userToBeActedUpon.tag})`,
+                    embeds: [actionEmbed]
+                }).then(() => true)
+                .catch((error) => {
+                    console.log(`Error while sending to the evidence channel: ${error}`);
+                    return false;
+                });
+            }
 
             const line1 = isMessageAction ? messageDeleted ? `\n✅ Message deleted` : `\n❌ Message couldn't be deleted` : '';
             const line2 = sentInEvidence ? `\n✅ Evidence sent` : `\n❌ Couldn't send the evidence`;

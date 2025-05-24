@@ -1,6 +1,4 @@
 const { SlashCommandBuilder } = require('discord.js')
-const bloonUtils = require('../utils/utils.js');
-const config = bloonUtils.getConfig();
 
 module.exports = {
     public: false,

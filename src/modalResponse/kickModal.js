@@ -66,7 +66,7 @@ module.exports = {
                                                     throw `Couldn't find that user on this server.`;
                                                 });
             const caseID                    = await storedProcedures.moderationAction_GetNewId(action, guildId);
-            const moderationActionChannel   = await interaction.member.guild.channels.fetch(serverConfig.MR_ModerationActionChannel);
+            const moderationActionChannel   = serverConfig.MR_ModerationActionChannel != null ? await interaction.member.guild.channels.fetch(serverConfig.MR_ModerationActionChannel) : null;
 
             const isMessageAction = messageId != 0;
             
@@ -114,26 +114,30 @@ module.exports = {
 
             const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, kickText, interaction.member, null, DMsent);
 
-            // Write the moderation action in the chat to log it in the database
-            sentInEvidence = moderationActionChannel.send({ content: `Kick for <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})`, embeds: [actionEmbed]})
-                .then(() => true)
-                .catch((error) => {
-                    console.log(`Error while sending to the evidence channel: ${error}`);
-                    return false;
-                });
+            if (serverConfig.MR_ModerationActionChannel && moderationActionChannel != null){
+                // Write the moderation action in the chat to log it in the database
+                sentInEvidence = moderationActionChannel.send({ content: `Kick for <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})`, embeds: [actionEmbed]})
+                    .then(() => true)
+                    .catch((error) => {
+                        console.log(`Error while sending to the evidence channel: ${error}`);
+                        return false;
+                    });
+            }
 
-            // Thread
-            const thread = await bloonUtils.createOrFindModerationActionThread(interaction.client, selectedUserId, serverConfig);
+            if (serverConfig.MR_CreateThread && serverConfig.MR_ForumChannel){
+                // Thread
+                const thread = await bloonUtils.createOrFindModerationActionThread(interaction.client, selectedUserId, serverConfig);
 
-            if (thread){
-                threadCreated = true;
-                // "Loading" message
-                const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\n...` });
-                // Edit the message and mention all of the roles that should be included.
-                // TODO: Figure out who to add (mods)
-                //await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\nSummoning: <@&${config.role_Mod}>...` })
-                // Finally send the message we really want to send...
-                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\n${kickText}`, embeds: [] });
+                if (thread){
+                    threadCreated = true;
+                    // "Loading" message
+                    const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\n...` });
+                    // Edit the message and mention all of the roles that should be included.
+                    // TODO: Figure out who to add (mods)
+                    //await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\nSummoning: <@&${config.role_Mod}>...` })
+                    // Finally send the message we really want to send...
+                    await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\n${kickText}`, embeds: [] });
+                }
             }
 
             const line1 = userKicked ? `✅ User was kicked` : `❌ Couldn't kick user`;

@@ -18,7 +18,7 @@ module.exports = {
 
             const helpEmbed = new EmbedBuilder()
             .setColor(0x0099FF)
-            .setTitle(`Bloon Mods commands`)
+            .setTitle(`Mod commands`)
             .setTimestamp();
         
             helpEmbed.addFields(

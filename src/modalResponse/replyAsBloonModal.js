@@ -1,5 +1,9 @@
-const bloonUtils        = require('../utils/utils.js');
-const config            = bloonUtils.getConfig();
+//const bloonUtils        = require('../utils/utils.js');
+//const config            = bloonUtils.getConfig();
+
+// eslint-disable-next-line no-unused-vars
+const { ServerConfig }              = require('../interfaces/ServerConfig.js'); // Used so VSCODE can see the properties
+
 /**
   * @typedef {import('discord.js').ModalSubmitInteraction} ModalSubmitInteraction
   * @typedef {import('discord.js').Message} Message
@@ -27,6 +31,15 @@ module.exports = {
             const   channelId           = interactionParts[2];
             const   messageId           = interactionParts[3];
             const   replyDirectly       = interactionParts[4] == "true";
+
+            /**
+             * @type ServerConfig
+            */
+            const serverConfig = interaction.client.serverConfigs.find(x => x.ServerId == guildId);
+            if (!serverConfig){
+                await interaction.editReply({ content: `No config found for your server, sorry.` });
+                return;
+            }
 
             // console.log(`Modal submit ${customId}.\nGuild: ${guildId}. Channel: ${channelId}.\nBy user ${interaction.user.tag}`);
 
@@ -64,7 +77,7 @@ module.exports = {
 				messages.push(`_Bloon message_:${textDecorator}${reply}${textDecorator}`);
             }
 
-            const bloonServerLogs = await guild.channels.fetch(config.bloonServerLogs);
+            const bloonServerLogs = await guild.channels.fetch(serverConfig.MR_ModerationActionChannel);
             messages.forEach(async message => {
                 await bloonServerLogs.send({ content: message, allowedMentions: { parse: [] }});
             });

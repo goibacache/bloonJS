@@ -83,7 +83,7 @@ module.exports = {
                                                     throw `Couldn't find that user on this server.`;
                                                 });
             const caseID                    = await storedProcedures.moderationAction_GetNewId(action, guildId);
-            const moderationActionChannel   = await interaction.member.guild.channels.fetch(serverConfig.MR_ModerationActionChannel);
+            const moderationActionChannel   = serverConfig.MR_ModerationActionChannel != null ? await interaction.member.guild.channels.fetch(serverConfig.MR_ModerationActionChannel) : null;
             
             if (caseID == 0) {
                 await interaction.editReply({ content: `Couldn't save ${action.name} in database.`, components: [] });
@@ -106,18 +106,20 @@ module.exports = {
                     return false;
                 });
 
-            // Thread
-            const thread = await bloonUtils.createOrFindModerationActionThread(interaction.client, selectedUserId, serverConfig);
+            if (serverConfig.MR_CreateThread && serverConfig.MR_ForumChannel){
+                // Thread
+                const thread = await bloonUtils.createOrFindModerationActionThread(interaction.client, selectedUserId, serverConfig);
 
-            if (thread){
-                threadCreated = true;
-                // "Loading" message
-                const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\n...` });
-                // Edit the message and mention all of the roles that should be included.
-                // TODO: Figure out who to add (mods)
-                //await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\nSummoning: <@&${config.role_Mod}>...` })
-                // Finally send the message we really want to send...
-                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\n${noteText}`, embeds: [] });
+                if (thread){
+                    threadCreated = true;
+                    // "Loading" message
+                    const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\n...` });
+                    // Edit the message and mention all of the roles that should be included.
+                    // TODO: Figure out who to add (mods)
+                    //await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\nSummoning: <@&${config.role_Mod}>...` })
+                    // Finally send the message we really want to send...
+                    await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})\n${noteText}`, embeds: [] });
+                }
             }
 
             if (isMessageAction){
@@ -143,15 +145,17 @@ module.exports = {
                     return false;
                 });
 
-            // Write the moderation action in the chat to log it
-            const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, noteText, interaction.member, null, DMsent);
+            if (serverConfig.MR_ModerationActionChannel && moderationActionChannel != null){
+                // Write the moderation action in the chat to log it
+                const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, noteText, interaction.member, null, DMsent);
 
-            sentInEvidence = moderationActionChannel.send({ content: `Timeout for <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})`, embeds: [actionEmbed]})
-                .then(() => false)
-                .catch((error) => {
-                    console.log(`Error while sending to the evidence channel: ${error}`);
-                    return false;
-                });
+                sentInEvidence = moderationActionChannel.send({ content: `Timeout for <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})`, embeds: [actionEmbed]})
+                    .then(() => false)
+                    .catch((error) => {
+                        console.log(`Error while sending to the evidence channel: ${error}`);
+                        return false;
+                    });
+            }
 
             const line1 = userTimedOut ? `✅ User was timed out` : `❌ Couldn't time out user`;
             const line2 = DMsent ? `\n✅ DM was delivered` : `\n❌ DM couldn't be delivered`;

@@ -66,7 +66,7 @@ module.exports = {
                                                     throw `Couldn't find that user on this server.`;
                                                 });
             const caseID                    = await storedProcedures.moderationAction_GetNewId(action, guildId);
-            const moderationActionChannel   = await interaction.member.guild.channels.fetch(serverConfig.MR_ModerationActionChannel);
+            const moderationActionChannel   = serverConfig.MR_ModerationActionChannel != null ? await interaction.member.guild.channels.fetch(serverConfig.MR_ModerationActionChannel) : null;
             
             if (caseID == 0) {
                 await interaction.editReply({ content: `Couldn't save ${action.name} in database.`, components: [] });
@@ -80,7 +80,7 @@ module.exports = {
                     return false;
                 });
 
-            if (serverConfig.MR_CreateThread){
+            if (serverConfig.MR_CreateThread && serverConfig.MR_ForumChannel){
                 // Create thread
                 const thread = await bloonUtils.createOrFindModerationActionThread(interaction.client, selectedUserId, serverConfig);
 
@@ -123,11 +123,11 @@ module.exports = {
                     return false;
                 });
 
-            // Write the moderation action in the chat
-            const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, warnText, interaction.member, null, DMsent);
-
             // If is setup
-            if (serverConfig.MR_ModerationActionChannel){
+            if (serverConfig.MR_ModerationActionChannel && moderationActionChannel != null){
+                // Write the moderation action in the chat
+                const actionEmbed = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, warnText, interaction.member, null, DMsent);
+
                 sentInEvidence = moderationActionChannel.send({ content: `Warn for <@${userToBeActedUpon.id}> (${userToBeActedUpon.user.tag})`, embeds: [actionEmbed]})
                 .then(() => true)
                 .catch((error) => {

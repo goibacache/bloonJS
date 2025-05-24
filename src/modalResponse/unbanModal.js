@@ -60,7 +60,7 @@ module.exports = {
              */
             const userToBeActedUpon         = await interaction.client.users.fetch(selectedUserId); // Get user outside of guild
             const caseID                    = await storedProcedures.moderationAction_GetNewId(action, guildId);
-            const moderationActionChannel   = await interaction.member.guild.channels.fetch(serverConfig.MR_ModerationActionChannel);
+            const moderationActionChannel   = serverConfig.MR_ModerationActionChannel != null ? await interaction.member.guild.channels.fetch(serverConfig.MR_ModerationActionChannel) : null;
             const actionEmbed               = bloonUtils.createModerationActionEmbed(action, userToBeActedUpon, caseID, unbanText, interaction.member, null);
             
             if (caseID == 0) {
@@ -105,27 +105,30 @@ module.exports = {
                     return false;
                 });
 
-            // Write the moderation action in the chat to log it in the database
-            sentInEvidence = moderationActionChannel.send({ content: `Unban for <@${userToBeActedUpon.id}> (${userToBeActedUpon.tag})`, embeds: [actionEmbed]})
-                .then(() => true)
-                .catch((error) => {
-                    console.log(`Error while sending to the evidence channel: ${error}`);
-                    return false;
-                });
+            if (serverConfig.MR_ModerationActionChannel && moderationActionChannel != null){
+                // Write the moderation action in the chat to log it in the database
+                sentInEvidence = moderationActionChannel.send({ content: `Unban for <@${userToBeActedUpon.id}> (${userToBeActedUpon.tag})`, embeds: [actionEmbed]})
+                    .then(() => true)
+                    .catch((error) => {
+                        console.log(`Error while sending to the evidence channel: ${error}`);
+                        return false;
+                    });
+            }
 
-            
-            // Thread
-            const thread = await bloonUtils.createOrFindModerationActionThread(interaction.client, selectedUserId, serverConfig);
+            if (serverConfig.MR_CreateThread && serverConfig.MR_ForumChannel){ 
+                // Thread
+                const thread = await bloonUtils.createOrFindModerationActionThread(interaction.client, selectedUserId, serverConfig);
 
-            if (thread){
-                threadCreated = true;
-                // "Loading" message
-                const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.tag})\n...` });
-                // Edit the message and mention all of the roles that should be included.
-                // TODO: Figure out who to add (mods)
-                //await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.tag})\nSummoning: <@&${config.role_Mod}>...` })
-                // Finally send the message we really want to send...
-                await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.tag})\n${unbanText}`, embeds: [] });
+                if (thread){
+                    threadCreated = true;
+                    // "Loading" message
+                    const firstThreadMessage = await thread.send({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.tag})\n...` });
+                    // Edit the message and mention all of the roles that should be included.
+                    // TODO: Figure out who to add (mods)
+                    //await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.tag})\nSummoning: <@&${config.role_Mod}>...` })
+                    // Finally send the message we really want to send...
+                    await firstThreadMessage.edit({ content: `Hey <@${userToBeActedUpon.id}> (${userToBeActedUpon.tag})\n${unbanText}`, embeds: [] });
+                }
             }
 
             const line1 = userUnbanned ? `✅ User was unbanned` : `❌ Couldn't unban the user`;

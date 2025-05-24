@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 const { ContextMenuCommandBuilder, ApplicationCommandType, PermissionFlagsBits, MessageContextMenuCommandInteraction } 	= require('discord.js');
 const { createTimeoutModal } 	= require('../utils/contextMenuUtils.js');
 

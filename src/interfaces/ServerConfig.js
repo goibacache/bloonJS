@@ -48,6 +48,7 @@ export class ServerConfig {
     MR_ModerationActionChannel;
     MR_CreateThread;
     MR_ForumChannel;
+    Interaction_Channel;
 
     constructor() {
         this.ServerId                               = "";
@@ -98,5 +99,6 @@ export class ServerConfig {
         this.MR_ModerationActionChannel             = "";
         this.MR_CreateThread                        = false;
         this.MR_ForumChannel                        = "";
+        this.Interaction_Channel                    = "";
     }
 }

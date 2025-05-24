@@ -16,11 +16,10 @@ module.exports = {
 		),
 	async execute(interaction) {
 		try{
+            await interaction.deferReply(); // This makes it so it can take more than 3 seconds to reply.
+
 			console.log(`\nwiki.js: ${interaction.member.id}`);
 
-			await interaction.deferReply(); // This makes it so it can take more than 3 seconds to reply.
-
-			// sharklootgilt.superbossgames.com/wiki/
 			const searchTerm = interaction.options.getString('searchterm');
 			const parameters = `?action=opensearch&format=json&formatversion=2&search=${searchTerm}&namespace=0&limit=1`
 			const queryUrl = `${config.wikiAPI}${parameters}`;
