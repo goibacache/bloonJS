@@ -41,7 +41,7 @@ export class ServerConfig {
     PC_MinutesToPoll;
     PC_PollType;
     PC_WikiBaseUrl;
-    PC_YoutubeMessage;
+    PC_YoutubeChannelId;
     PC_PropertyTreeId;
     PC_ChannelToPostAlert;
     PC_LastFetchedDate;
@@ -91,7 +91,7 @@ export class ServerConfig {
         this.PC_MinutesToPoll                       = 5;
         this.PC_PollType                            = "wiki" || "youtube";
         this.PC_WikiBaseUrl                         = "";
-        this.PC_YoutubeMessage                      = "";
+        this.PC_YoutubeChannelId                    = "";
         this.PC_PropertyTreeId                      = "";
         this.PC_ChannelToPostAlert                  = "";
         this.PC_LastFetchedDate                     = new Date();
