@@ -1,11 +1,63 @@
-<svg xmlns="http://www.w3.org/2000/svg" id="flag-icon-css-jp" viewBox="0 0 640 480">
-  <defs>
-    <clipPath id="jp-a">
-      <path fill-opacity=".7" d="M-88 32h640v480H-88z"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="flag-icon-css-jp"
+   viewBox="0 0 160 120"
+   version="1.1"
+   sodipodi:docname="jp.svg"
+   width="160"
+   height="120"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1361"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="0.86354167"
+     inkscape:cx="398.35947"
+     inkscape:cy="272.1351"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="flag-icon-css-jp" />
+  <defs
+     id="defs1352">
+    <clipPath
+       id="jp-a">
+      <path
+         fill-opacity="0.7"
+         d="M -88,32 H 552 V 512 H -88 Z"
+         id="path1349" />
     </clipPath>
   </defs>
-  <g fill-rule="evenodd" stroke-width="1pt" clip-path="url(#jp-a)" transform="translate(88 -32)">
-    <path fill="#fff" d="M-128 32h720v480h-720z"/>
-    <circle cx="523.1" cy="344.1" r="194.9" fill="#d30000" transform="translate(-168.4 8.6) scale(.76554)"/>
+  <g
+     fill-rule="evenodd"
+     stroke-width="4pt"
+     clip-path="url(#jp-a)"
+     transform="matrix(0.25,0,0,0.25,22,-8)"
+     id="g1358">
+    <path
+       fill="#ffffff"
+       d="M -128,32 H 592 V 512 H -128 Z"
+       id="path1354"
+       style="stroke-width:16pt" />
+    <circle
+       cx="523.09998"
+       cy="344.10001"
+       r="194.89999"
+       fill="#d30000"
+       transform="matrix(0.76554,0,0,0.76554,-168.4,8.6)"
+       id="circle1356"
+       style="stroke-width:16pt" />
   </g>
 </svg>

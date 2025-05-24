@@ -1,9 +1,71 @@
-<svg xmlns="http://www.w3.org/2000/svg" id="flag-icon-css-au" viewBox="0 0 640 480">
-  <path id="path617" fill="#006" stroke-width="1.3" d="M0 0h640v480H0z"/>
-  <path id="path625" fill="#fff" fill-rule="evenodd" stroke-width="1.3" d="M299.8 392.5l-43.7 3.8 6 43.4L232 408l-30.1 31.7 6-43.4-43.7-3.8 37.7-22.3-24.3-36.5 41 15.5 13.4-41.7 13.5 41.7 41-15.5-24.3 36.5m224.4 62.3L476 416.7l17.8 6.7 5.8-18.1 5.8 18.1 17.8-6.7-10.5 15.8 16.4 9.7-19 1.7 2.6 18.9-13-13.9-13.2 13.9 2.6-18.9-19-1.6m16.4-291.9L476 134.6l17.8 6.7 5.8-18.1 5.8 18.1 17.8-6.7-10.5 15.8 16.4 9.8-19 1.6 2.6 18.9-13-13.8-13.2 13.7 2.6-18.8-19-1.6M380.8 265l-10.5-15.8 17.8 6.7 5.8-18.1 5.9 18.1 17.8-6.7L407 265l16.4 9.7-19 1.7 2.7 18.9-13.2-13.9-13 13.9 2.5-18.9-19-1.6m216.3-38L570 221l17.8 6.7 5.8-18.1 5.9 18.1 17.8-6.7-10.5 15.8 16.3 9.7-19 1.7 2.6 18.8-13-13.8-13.2 13.8 2.6-18.8-19-1.7M542 320l-10.3 6.5 2.9-11.9-9.3-7.8 12.1-1 4.6-11.2 4.7 11.3 12.1.9-9.3 7.8 2.9 11.9"/>
-  <path id="path969" fill="#006" stroke-width=".5" d="M0 0h320v240H0z"/>
-  <path id="path971" fill="#fff" stroke-width=".5" d="M37.5 0l122 90.5L281 0h39v31l-120 89.5 120 89V240h-40l-120-89.5L40.5 240H0v-30l119.5-89L0 32V0z"/>
-  <path id="path973" fill="#c8102e" stroke-width=".5" d="M212 140.5L320 220v20l-135.5-99.5zm-92 10l3 17.5-96 72H0zM320 0v1.5l-124.5 94 1-22L295 0zM0 0l119.5 88h-30L0 21z"/>
-  <path id="path975" fill="#fff" stroke-width=".5" d="M120.5 0v240h80V0zM0 80v80h320V80z"/>
-  <path id="path977" fill="#c8102e" stroke-width=".5" d="M0 96.5v48h320v-48zM136.5 0v240h48V0z"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="flag-icon-css-au"
+   viewBox="0 0 160 120"
+   version="1.1"
+   sodipodi:docname="au.svg"
+   width="160"
+   height="120"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs12" />
+  <sodipodi:namedview
+     id="namedview10"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="2.19375"
+     inkscape:cx="84.786325"
+     inkscape:cy="87.521367"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="flag-icon-css-au" />
+  <path
+     id="path617"
+     fill="#000066"
+     stroke-width="1.3"
+     d="M 0,0 H 160 V 120 H 0 Z" />
+  <path
+     id="path625"
+     fill="#ffffff"
+     fill-rule="evenodd"
+     stroke-width="1.3"
+     d="m 74.95,98.125 -10.925,0.95 1.5,10.85 L 58,102 l -7.525,7.925 1.5,-10.85 L 41.05,98.125 50.475,92.55 44.4,83.425 54.65,87.3 58,76.875 61.375,87.3 71.625,83.425 65.55,92.55 m 56.1,15.575 -2.65,-3.95 4.45,1.675 1.45,-4.525 1.45,4.525 4.45,-1.675 -2.625,3.95 4.1,2.425 -4.75,0.425 0.65,4.725 -3.25,-3.475 -3.3,3.475 0.65,-4.725 -4.75,-0.4 m 4.1,-72.975 -2.625,-3.95 4.45,1.675 1.45,-4.525 1.45,4.525 4.45,-1.675 -2.625,3.95 4.1,2.45 -4.75,0.4 0.65,4.725 -3.25,-3.45 -3.3,3.425 0.65,-4.7 -4.75,-0.4 M 95.2,66.25 92.575,62.3 l 4.45,1.675 1.45,-4.525 1.475,4.525 4.45,-1.675 -2.65,3.95 4.1,2.425 -4.75,0.425 0.675,4.725 -3.3,-3.475 -3.25,3.475 L 95.85,69.1 91.1,68.7 m 54.075,-9.5 -2.675,-3.95 4.45,1.675 1.45,-4.525 1.475,4.525 4.45,-1.675 -2.625,3.95 4.075,2.425 -4.75,0.425 0.65,4.7 -3.25,-3.45 -3.3,3.45 0.65,-4.7 -4.75,-0.425 M 135.5,80 l -2.575,1.625 0.725,-2.975 -2.325,-1.95 3.025,-0.25 1.15,-2.8 1.175,2.825 3.025,0.225 -2.325,1.95 0.725,2.975" />
+  <path
+     id="path969"
+     fill="#000066"
+     stroke-width="0.5"
+     d="M 0,0 H 80 V 60 H 0 Z" />
+  <path
+     id="path971"
+     fill="#ffffff"
+     stroke-width="0.5"
+     d="M 9.375,0 39.875,22.625 70.25,0 H 80 V 7.75 L 50,30.125 80,52.375 V 60 H 70 L 40,37.625 10.125,60 H 0 V 52.5 L 29.875,30.25 0,8 V 0 Z" />
+  <path
+     id="path973"
+     fill="#c8102e"
+     stroke-width="0.5"
+     d="M 53,35.125 80,55 v 5 L 46.125,35.125 Z m -23,2.5 0.75,4.375 -24,18 H 0 Z M 80,0 v 0.375 l -31.125,23.5 0.25,-5.5 L 73.75,0 Z M 0,0 29.875,22 h -7.5 L 0,5.25 Z" />
+  <path
+     id="path975"
+     fill="#ffffff"
+     stroke-width="0.5"
+     d="m 30.125,0 v 60 h 20 V 0 Z M 0,20 V 40 H 80 V 20 Z" />
+  <path
+     id="path977"
+     fill="#c8102e"
+     stroke-width="0.5"
+     d="m 0,24.125 v 12 h 80 v -12 z M 34.125,0 v 60 h 12 V 0 Z" />
 </svg>

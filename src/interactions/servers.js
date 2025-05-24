@@ -1,8 +1,11 @@
 const { SlashCommandBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType} = require('discord.js')
 const { EmbedBuilder } = require('@discordjs/builders');
 const bloonUtils = require('../utils/utils.js');
-const config = bloonUtils.getConfig();
+//const config = bloonUtils.getConfig();
 const { registerFont, createCanvas, Image } = require('canvas');
+
+// eslint-disable-next-line no-unused-vars
+const { ServerConfig }              = require('../interfaces/ServerConfig.js'); // Used so VSCODE can see the properties
 
 const maxRoomsForEmbed = 10;
 
@@ -30,19 +33,28 @@ module.exports = {
 		.setDescription(`Provides information about Intruder's servers.`),
 	async execute(interaction) {
 		try{
+            /**
+             * @type ServerConfig
+            */
+            const serverConfig = interaction.client.serverConfigs.find(x => x.ServerId == interaction.guild.id);
+            if (!serverConfig){
+                await interaction.reply({ content: `No config found for your server, sorry.` });
+                return;
+            }
+
 			console.log(`servers.js: ${interaction.member.id}`);
 
-			if (interaction.channel.id != config.bloonCommandsChannel){
-				await interaction.reply({ content: 'This command can only be used in the Bloon Commands Channel!', ephemeral: true });
+			if (interaction.channel.id != serverConfig.Interaction_Channel){
+				await interaction.reply({ content: 'This command can only be used in the Interaction Channel!', ephemeral: true });
 				console.log(`servers.js: Interaction used in wrong channel.`);
-				return "noCooldown"; // Inmediatly remove cooldown
+				return "noCooldown"; // Immediately remove cooldown
 			}
 
 			await interaction.deferReply(); // This makes it so it can take more than 3 seconds to reply.
 
             // Load servers
             let servers = await bloonUtils.getHTTPResult("https://api.intruderfps.com/rooms?OrderBy=agentCount%3Adesc");
-            servers.data = servers.data.filter(x => x.version != 7777); // Let's get those developer rooms out of the way :^)
+            servers.data = servers.data.filter(x => x.version != 1111); // Let's get those developer rooms out of the way :^)
 
             let currentPage = 0;
             const lastPage = Math.ceil(servers.data.length / 10) - 1;
@@ -54,7 +66,7 @@ module.exports = {
             const columnsPositionX = [90, 530, 600];
             const distanceBetweenColumns = 33;
 
-            // Creates a canvas page for, all the pages.
+            // Creates a canvas page for all the pages.
             for (let page = 0; page <= lastPage; page++) {
                 const canvas = setupCanvas();
                 const ctx = canvas.getContext('2d');
