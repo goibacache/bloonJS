@@ -143,20 +143,32 @@ router.post('/v1/NewYoutubePubSubSubscription', async(req, res) => {
         }
         //#endregion
 
+        console.log(`PubSubSubscription: 🤓 Name is ${name}`);
+
         const channelId = req.body["channelId"];
         const discordWebhook = req.body["discordWebhook"];
+        const mode = req.body["mode"];
 
         const discordWebHookIsUrl = discordWebhook.match(regUrl);
         if (!discordWebHookIsUrl){
-            return JSON.stringify(
+            return res.end(JSON.stringify(
                 {
                     res: false,
                     msg: `Discord webhook does not appear to be a URL`
                 }
-            );
+            ));
         }
 
         console.log(`📶 requesting new youtube subscription from pubsubhubbub`);
+
+        if (mode != "subscribe" && mode != "unsubscribe"){
+            return res.end(JSON.stringify(
+                {
+                    res: false,
+                    msg: `Invalid mode`
+                }
+            ));
+        }
 
         const fetchStatus = await fetch(`https://pubsubhubbub.appspot.com/subscribe`, {
             method: 'POST',
@@ -165,7 +177,7 @@ router.post('/v1/NewYoutubePubSubSubscription', async(req, res) => {
             },
             body: new URLSearchParams({
                 "hub.callback":     `${config.WEB_Host}/api/v1/PubSubSubscription?hook=${discordWebhook}`,
-                "hub.mode":         `subscribe`,
+                "hub.mode":         mode,
                 "hub.topic":        `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`,
                 "hub.verify":       `async`,
                 "hub.verify_token": config.PubSubHubbubToken
@@ -173,12 +185,12 @@ router.post('/v1/NewYoutubePubSubSubscription', async(req, res) => {
         });
 
         if (fetchStatus.status != 202) { // Created
-            return JSON.stringify(
+            return res.end(JSON.stringify(
                 {
                     res: false,
                     msg: `subscription couldn't be made ${fetchStatus.body}`
                 }
-            );
+            ));
         }
 
         return res.end(JSON.stringify({ res: true }));
