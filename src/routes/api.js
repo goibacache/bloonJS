@@ -11,10 +11,12 @@ const regUrl = /(https?:\/\/)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z]{1,6}\b([-a-
 
 router.post('/v1/createMatch', async (req, res) => {
     try {
+
         res.setHeader('Content-Type', 'application/json');
 
         const body = req.body;
 
+        //#region check authorization
         const authorization = req.headers.authorization;
         if (authorization == null || authorization == undefined) {
             return res.end(bloonUtils.match_createJsonResError("No authorization"))
@@ -40,6 +42,8 @@ router.post('/v1/createMatch', async (req, res) => {
         if (exists.length == 0) {
             return res.end(bloonUtils.match_createJsonResError("Incorrect authorization data"));
         }
+
+        //#endregion
 
         // Get body params
         const { MatchName, Team1Name, Team1RoleId, Team2Name, Team2RoleId, StartDate, EndDate, DateTimeZone } = body;
@@ -107,8 +111,86 @@ router.post('/v1/createMatch', async (req, res) => {
     }
 });
 
+router.post('/v1/NewYoutubePubSubSubscription', async(req, res) => {
+    try {
+        console.log(`PubSubSubscription: trying to add a new youtube subscription!`);
+
+        //#region check authorization
+        const authorization = req.headers.authorization;
+        if (authorization == null || authorization == undefined) {
+            return res.end(bloonUtils.match_createJsonResError("No authorization"))
+        }
+
+        // Check it has 2 parts
+        const authorizationParts = authorization.split(' ');
+        if (authorizationParts.length != 2) {
+            return res.end(bloonUtils.match_createJsonResError("Bad authorization format"));
+        }
+
+        const authorizationData = Buffer.from(authorizationParts[1], 'base64').toString('utf8');
+        if (authorizationData.indexOf(':') == -1) {
+            return res.end(bloonUtils.match_createJsonResError("Invalid authorization data"));
+        }
+
+        const userAndPassArray = authorizationData.split(':');
+
+        const name = userAndPassArray[0];
+        const passHash = crypto.createHash('md5').update(userAndPassArray[1]).digest('hex');
+
+        const exists = await match_GetBasicAuthorization(name, passHash);
+        if (exists.length == 0) {
+            return res.end(bloonUtils.match_createJsonResError("Incorrect authorization data"));
+        }
+        //#endregion
+
+        const channelId = req.body["channelId"];
+        const discordWebhook = req.body["discordWebhook"];
+
+        const discordWebHookIsUrl = discordWebhook.match(regUrl);
+        if (!discordWebHookIsUrl){
+            return JSON.stringify(
+                {
+                    res: false,
+                    msg: `Discord webhook does not appear to be a URL`
+                }
+            );
+        }
+
+        console.log(`📶 requesting new youtube subscription from pubsubhubbub`);
+
+        const fetchStatus = await fetch(`https://pubsubhubbub.appspot.com/subscribe`, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                "hub.callback":     `${config.WEB_Host}/api/v1/PubSubSubscription?hook=${discordWebhook}`,
+                "hub.mode":         `subscribe`,
+                "hub.topic":        `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`,
+                "hub.verify":       `async`,
+                "hub.verify_token": config.PubSubHubbubToken
+            })
+        });
+
+        if (fetchStatus.status != 202) { // Created
+            return JSON.stringify(
+                {
+                    res: false,
+                    msg: `subscription couldn't be made ${fetchStatus.body}`
+                }
+            );
+        }
+
+        return res.end(JSON.stringify({ res: true }));
+    } catch (error) {
+        return res.end(bloonUtils.match_createJsonResError(error));
+    }
+});
+
 router.get('/v1/PubSubSubscription', async(req, res) => {
     try {
+        console.log(`PubSubSubscription: new subscription GET!`);
+
         const challenge     = req.query["hub.challenge"];
         const topic         = req.query["hub.topic"];
         const mode          = req.query["hub.mode"];
@@ -121,7 +203,7 @@ router.get('/v1/PubSubSubscription', async(req, res) => {
             console.log(`🚨 Verify token is not the same as the settings, cancelling subscription`);
             return res.end();
         }else{
-            console.log(`✅ Verify token is the same as the settings`);
+            console.log(`✅ Verify token is the same as the settings, subscribed correctly`);
         }
         
         return res.end(challenge);
@@ -132,7 +214,7 @@ router.get('/v1/PubSubSubscription', async(req, res) => {
 
 router.post('/v1/PubSubSubscription', async(req, res) => {
     try {
-
+        console.log(`PubSubSubscription: new subscription POST!`);
         const hook = req.query["hook"];
         const isUrl = hook.match(regUrl);
         if (!isUrl){

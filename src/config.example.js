@@ -61,5 +61,8 @@ module.exports = {
 	oAutClientSecret:				"your-discord-bot-client-secret", 			// Your bot's oAuth Client Secret
 	oAuthReturnUrl:					"your-discord-bot-oauth-return-url",		// I deploy the site on bloon.local/authorize but you can wherever
 	oAuthTokenSecret:				"your-discord-bot-auth-token-to-sign-jwts",	// RSA key or a bunch of random strings for testing
-	ICLWebHookToAddToTeam:			"your-discord-webhook-url-so-people-can-tell-you-they-want-to-join-a-team-but-are-banned-discord.com/api-is-pre-appended"	
+	ICLWebHookToAddToTeam:			"your-discord-webhook-url-so-people-can-tell-you-they-want-to-join-a-team-but-are-banned-discord.com/api-is-pre-appended",
+
+    // PubSubHubbub
+    PubSubHubbubToken:              "your-desired-pubsub-token-to-verify-requests-are-yours"
 }
