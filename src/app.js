@@ -2,6 +2,7 @@ const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const xmlBodyParser = require('express-xml-bodyparser');
 const logger = require('morgan');
 
 const indexRouter         = require('./routes/index');
@@ -27,6 +28,7 @@ if (process.argv.length <= 2){ // Two means it's dev
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(xmlBodyParser());
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: 0, // forever
   etag: true
